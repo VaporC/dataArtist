@@ -1,7 +1,6 @@
-![logo]
 # dataArtist 
 Simple and interactive scientific data visualization and manipulation, based on pyqtgraph.
-![screenshot]
+![logo] ![screenshot]
 
 ## About
 *dataArtist* is a graphical program for interactive data analysis and processing. It is currently specialized image processing tasks in combination with electroluminescence imaging of photovoltaic devices.
