@@ -1,4 +1,5 @@
-# dataArtist ![logo]
+# dataArtist 
+![logo]
 
 Simple and interactive scientific data visualization and manipulation, based on pyqtgraph.
 ![screenshot]
@@ -30,7 +31,7 @@ Data is imported through drag n'drop.
 `pip install dataArtist`
 
 ## Scripting, Automation, Modding
-*dataArtist* comes with a built-in python shell. Data can be examplary accessed though 'd1.l3' (display 1, data layer 3) and tools e.g. through 'd.tools['Axes'].click()' (in current display execute tool 'Axes').
+*dataArtist* comes with a built-in python shell. Data can be examplary accessed though `d1.l3` (display 1, data layer 3) and tools e.g. through `d.tools['Axes'].click()` (in current display execute tool 'Axes').
 *dataArtist* allows adding own tools, displays and importers, for examples, see dataArtist/modding.
 
 ## Example: Electroluminescence imaging
@@ -43,8 +44,8 @@ For camera calibration all needed images are dropped into *dataArtist* and the m
 ### Image correction
 The correction of EL image is shown in the following figure. 15. Perspective correction (red box) can be done either using the outline of the PV device (automatically detected or manually defined) or using a reference image. 
 ![screenshot_correction]
-> dataArtist screenshot – tool 'CalibrationFile' (a), tool 'CorrectCamera' (b), tool 'PerspectiveCorrection'
-> Green arrow: Camera correction, Red arrow: Perspective correction
+> dataArtist screenshot – **a**: tool 'CalibrationFile'; **b**: tool 'CorrectCamera'; **c**: tool 'PerspectiveCorrection'
+> **green arrow**: Camera correction; **red arrow**: Perspective correction
 
 [logo]: https://cloud.githubusercontent.com/assets/350050/15405164/00b08326-1dbe-11e6-959d-c7745de7d167.png "dataArtist logo"
 [screenshot]: https://cloud.githubusercontent.com/assets/350050/15405168/045f8bf2-1dbe-11e6-816c-a382d6f477c0.png "dataArtist screenshot"
