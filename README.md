@@ -37,6 +37,13 @@ Data is imported through drag n'drop.
 *dataArtist* comes with a built-in python shell. Data can be examplary accessed though `d1.l3` (display 1, data layer 3) and tools e.g. through `d.tools['Axes'].click()` (in current display execute tool 'Axes').
 *dataArtist* allows adding own tools, displays and importers, for examples, see dataArtist/modding.
 
+## Main dependencies
+Package | Description
+------- | -----------
+[pyqtgraph](http://www.pyqtgraph.org/) | Scientific Graphics and GUI Library based on Qt
+[imgProcessor](www.###.org/) | General propose image processing libary
+[appBase](www.###.org/) | Based packages for apps, based on Qt
+
 ## Example: Electroluminescence imaging
 
 ### Camera calibration
