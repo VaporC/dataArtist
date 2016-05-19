@@ -8,6 +8,10 @@ Simple and interactive scientific data visualization and manipulation, based on 
 It is written in Python (2.7) and is released under open source.
 *dataArtist* is written to be platform independent. It is known to run under Windows 7-10 and Ubuntu Linux 14.10 (soon).
 
+TODO
+[USER manual](../blob/master/LICENSE)
+[DEVELOPERS manual](../blob/master/LICENSE)
+
 ## Tutorials
 TODO
 General usage, camera calibration and image correction are explained in youtube screencast sessions, see
