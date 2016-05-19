@@ -1,5 +1,6 @@
 # dataArtist 
 Simple and interactive scientific data visualization and manipulation, based on pyqtgraph.
+
 ![logo] ![screenshot]
 
 ## About
