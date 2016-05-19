@@ -1,6 +1,5 @@
-# dataArtist 
 ![logo]
-
+# dataArtist 
 Simple and interactive scientific data visualization and manipulation, based on pyqtgraph.
 ![screenshot]
 
@@ -48,6 +47,6 @@ The correction of EL image is shown in the following figure. 15. Perspective cor
 > **green arrow**: Camera correction; **red arrow**: Perspective correction
 
 [logo]: https://cloud.githubusercontent.com/assets/350050/15405164/00b08326-1dbe-11e6-959d-c7745de7d167.png "dataArtist logo"
-[screenshot]: https://cloud.githubusercontent.com/assets/350050/15405168/045f8bf2-1dbe-11e6-816c-a382d6f477c0.png "dataArtist screenshot"
+[screenshot]: https://cloud.githubusercontent.com/assets/350050/15406631/806a7a8a-1dc4-11e6-9e76-709cd482857f.png "dataArtist screenshot"
 [screenshot_psf]: https://cloud.githubusercontent.com/assets/350050/15404653/bd2e51b6-1dbb-11e6-8282-2ea539f0286d.png "dataArtist camera calibration"
 [screenshot_correction]: https://cloud.githubusercontent.com/assets/350050/15404785/53d4c992-1dbc-11e6-93b7-c6108ab9a2b0.png "dataArtist image correction"
