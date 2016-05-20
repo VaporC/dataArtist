@@ -1,7 +1,11 @@
 # dataArtist 
 *...scientific data processing made easy.*
 
-![logo] ![screenshot]
+![screenshot]
+
+## Latest release
+[**Windows 7+*] (../blob/master/LICENSE)
+
 
 ## About
 *dataArtist* is a graphical program for interactive data analysis and processing. It is currently specialized image processing tasks in combination with electroluminescence imaging of photovoltaic devices.
@@ -11,12 +15,11 @@ It is written in Python (2.7) and is released under open source.
 __Please cite *dataArtist* as follows:__
 > K.G. Bedrich et al., “Electroluminescence Imaging of PV Devices: Camera Calibration and Image Correction” in IEEE PVSC, 2016.
 
+
 **TODO**
 [USER manual](../blob/master/LICENSE)
 
 [DEVELOPERS manual](../blob/master/LICENSE)
-
-
 
 ## Tutorials
 TODO
