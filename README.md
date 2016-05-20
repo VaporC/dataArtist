@@ -1,8 +1,6 @@
-# dataArtist 
-*...scientific data processing made easy.*
+**dataArtist** - *...scientific data processing made easy.*
 
-Download the latest release:
-* [Windows 7-10] (../blob/master/LICENSE)
+[Download for Windows 7-10] (../blob/master/LICENSE)
 
 
 ![screenshot]
