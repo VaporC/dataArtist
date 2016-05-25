@@ -1,6 +1,6 @@
 **dataArtist** - *...scientific data processing made easy.*
 
-[Download for Windows 7-10] (../blob/master/LICENSE)
+[Download for Windows 7-10] (https://github.com/radjkarl/dataArtist/releases/tag/v0.1-alpha)
 
 
 ![screenshot]
