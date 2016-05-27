@@ -23,7 +23,7 @@ __Please cite *dataArtist* as follows:__
 ## Tutorials
 TODO
 General usage, camera calibration and image correction are explained in youtube screencast sessions, see
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ)
 
 
 ## Supported file types
