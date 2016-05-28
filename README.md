@@ -52,9 +52,11 @@ Data is imported through drag n'drop.
 ## Main dependencies
 Package | Description
 ------- | -----------
-[pyqtgraph](http://www.pyqtgraph.org/) | Scientific Graphics and GUI Library based on Qt
-[imgProcessor](www.###.org/) | General propose image processing libary
-[appBase](www.###.org/) | Based packages for apps, based on Qt
+[pyqtgraph_karl](https://github.com/radjkarl/pyqtgraph_karl) | Scientific Graphics and GUI Library based on Qt (Fork)
+[imgProcessor](https://github.com/radjkarl/imgProcessor) | General propose image processing libary
+[appBase](https://github.com/radjkarl/appBase) | Base packages for apps, based on Qt
+[fancyWidgets](https://github.com/radjkarl/fancyWidgets) | A collection of fancy widgets, based on Qt
+[fanctTools](https://github.com/radjkarl/fancyTools) | A collection of useful not-GUI tools
 
 
 ## Example: Electroluminescence imaging
