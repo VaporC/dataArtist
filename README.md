@@ -35,6 +35,7 @@ Data is imported through drag n'drop.
 
 
 ## Installation
+
 ### Portable version
 * *dataArtist* runs out of the box. No installation needed (currently Windows only). See section [Releases](https://github.com/radjkarl/dataArtist/releases).
 
@@ -67,7 +68,7 @@ Package | Description
 ### Camera calibration
 For camera calibration all needed images are dropped into *dataArtist* and the matching tool is executed. The calibration results are hereinafter saved to a calibration file. The determination of the point spread function is exemplary shown in the following figure:
 ![screenshot_psf]
-> dataArtist screenshot – toolbar ‘calibration’. **a**: Best focus determination; **b**: noise-level-function measurement; **c**: Dark current mapping; **d**: Flat field mapping; **e**: PSF estimation (selected): **f**: lens distortion measurement 
+> dataArtist screenshot – toolbar 'calibration'. **a**: Best focus determination; **b**: noise-level-function measurement; **c**: Dark current mapping; **d**: Flat field mapping; **e**: PSF estimation (selected): **f**: lens distortion measurement 
 
 
 ### Image correction
