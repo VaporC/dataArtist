@@ -1,0 +1,665 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.globals.CalibrationFile &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.globals.CalibrationFile</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.globals.CalibrationFile</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span>
+
+<span class="kn">from</span> <span class="nn">imgProcessor.camera.CameraCalibration</span> <span class="kn">import</span> <span class="n">CameraCalibration</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.ArgSetter</span> <span class="kn">import</span> <span class="n">ArgSetter</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.GlobalTool</span> <span class="kn">import</span> <span class="n">GlobalTool</span>
+
+
+<div class="viewcode-block" id="CalibrationFile"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile">[docs]</a><span class="k">class</span> <span class="nc">CalibrationFile</span><span class="p">(</span><span class="n">GlobalTool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create and view all individual camera calibrations coefficients</span>
+<span class="sd">    </span>
+<span class="sd">    Right click on &#39;infos&#39; to view or remove a coefficient</span>
+<span class="sd">    </span>
+<span class="sd">    Selected light range and calibration dates will be used in tool</span>
+<span class="sd">    &#39;CorrectCamera&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;camCalFile.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">GlobalTool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span>  <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cal_file_path</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_curIndex</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+
+        <span class="n">pNew</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;New&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">})</span>   
+        <span class="n">pNew</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_createNew</span><span class="p">)</span> 
+        
+        <span class="n">pLoad</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Load&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">})</span>   
+        <span class="n">pLoad</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loadFromFile</span><span class="p">)</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Calibration&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;-&#39;</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pCalChanged</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAutosave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Autosave&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>   
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Modified&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;readonly&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>   
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAutosave</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pAutoSaveChanged</span><span class="p">)</span>
+
+        <span class="n">pSave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Save as&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>   
+        <span class="n">pSave</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_saveToFile</span><span class="p">())</span> 
+
+<span class="c">#         pUnload = self.pCal.addChild({</span>
+<span class="c">#             &#39;name&#39;: &#39;Unload&#39;,</span>
+<span class="c">#             &#39;type&#39;: &#39;action&#39;,</span>
+<span class="c">#             &#39;visible&#39;:False</span>
+<span class="c">#             })   </span>
+<span class="c">#         pUnload.sigActivated.connect(self._unloadCalibration) </span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Light spectra&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[],</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;dark current&#39;</span><span class="p">,</span> <span class="s">&#39;flat field&#39;</span><span class="p">,</span> <span class="s">&#39;lens&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;noise&#39;</span><span class="p">,</span> <span class="s">&#39;psf&#39;</span><span class="p">,</span> <span class="s">&#39;balance&#39;</span><span class="p">):</span>
+
+            <span class="n">pDates</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s">&#39;limits&#39;</span><span class="p">:[],</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+            
+            <span class="n">aView</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;View&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">aDel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;Remove&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">aView</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">name</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_viewCurrentCoeff</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+            <span class="n">aDel</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">name</span><span class="p">:</span> 
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_removeCurrentCoeff</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+            <span class="n">pDates</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Info&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;str&#39;</span><span class="p">,</span>
+                <span class="s">&#39;readonly&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                <span class="s">&#39;addToContextMenu&#39;</span><span class="p">:[</span><span class="n">aView</span><span class="p">,</span><span class="n">aDel</span><span class="p">]})</span> 
+            <span class="n">pDates</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">p</span><span class="p">,</span><span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pDatesChanged</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+           
+
+    <span class="k">def</span> <span class="nf">_removeCurrentCoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+        <span class="n">pDates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span>  <span class="n">pDates</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        
+        <span class="n">c</span><span class="o">.</span><span class="n">deleteCoeff</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pDates</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;limits&#39;</span><span class="p">])</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">pDates</span><span class="o">.</span><span class="n">setLimits</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="p">:</span>
+            <span class="n">pDates</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span>
+        
+
+    <span class="k">def</span> <span class="nf">_viewCurrentCoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentCoeff</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">,)</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="c">#display calibration data if is image</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Calibration: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="n">date</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">data</span>
+
+
+<div class="viewcode-block" id="CalibrationFile.getCurrentCoeff"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.getCurrentCoeff">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentCoeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">getCoeff</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                          <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CalibrationFile.currentCameraMatrix"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.currentCameraMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">currentCameraMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getLens</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="s">&#39;lens&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">l</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;cameraMatrix&#39;</span><span class="p">]</span></div>
+        
+
+    <span class="k">def</span> <span class="nf">_pAutoSaveChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">show</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span>
+            
+
+    <span class="k">def</span> <span class="nf">_pCalChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_curIndex</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;limits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_pDatesChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update infos for chosen date and calibration typ</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ch</span> <span class="o">=</span>  <span class="n">param</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span><span class="o">.</span><span class="n">infos</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="n">date</span><span class="p">)</span> <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_createNew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;New camera calibration&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;camera name&#39;</span><span class="p">:{</span>
+                                <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;change me&#39;</span><span class="p">,</span> 
+                                <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">},</span>
+                <span class="s">&#39;bit depth&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">16</span><span class="p">,</span> 
+                                <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">8</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">24</span><span class="p">,</span><span class="mi">32</span><span class="p">],</span> 
+                                <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+                                <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;e.g. 16 for 16 bit&#39;</span><span class="p">}</span> <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">CameraCalibration</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+            <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;camera name&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setCamera</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;bit depth&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;limits&#39;</span><span class="p">])</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">setLimits</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">_loadFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span>
+                            <span class="nb">filter</span><span class="o">=</span><span class="s">&#39;*</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">CameraCalibration</span><span class="o">.</span><span class="n">ftype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cal_file_path</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span>
+            
+            <span class="n">c</span> <span class="o">=</span> <span class="n">CameraCalibration</span><span class="o">.</span><span class="n">loadFromFile</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            
+            <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_curIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">setLimits</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">curCal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_curIndex</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+
+<div class="viewcode-block" id="CalibrationFile.udpateFlatField"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.udpateFlatField">[docs]</a>    <span class="k">def</span> <span class="nf">udpateFlatField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update flat field&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>
+                <span class="s">&#39;light spectrum&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;visible&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&quot;e.g. &#39;IR&#39;&quot;</span><span class="p">},</span>                                        
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">}</span> <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addFlatField</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                           <span class="n">error</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;light spectrum&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CalibrationFile.updateDarkCurrent"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.updateDarkCurrent">[docs]</a>    <span class="k">def</span> <span class="nf">updateDarkCurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update dark current&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>                                     
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">}</span> <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addDarkCurrent</span><span class="p">(</span><span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_checkCal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&#39;no calibration chosen - load now&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showMenu</span><span class="p">()</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loadFromFile</span><span class="p">()</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;no calibration chosen&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c</span>     
+
+
+<div class="viewcode-block" id="CalibrationFile.updateNoise"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.updateNoise">[docs]</a>    <span class="k">def</span> <span class="nf">updateNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nlf_coeff</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update noise&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>                                     
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span>
+                        <span class="p">}</span>
+                    <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">nlf_coeff</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CalibrationFile.updateDeconvolutionBalance"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.updateDeconvolutionBalance">[docs]</a>    <span class="k">def</span> <span class="nf">updateDeconvolutionBalance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update deconvolution balance&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:{</span><span class="s">&#39;value&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span>
+                         <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">float</span> <span class="p">},</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>                                     
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span> <span class="p">},</span>
+                <span class="s">&#39;light_spectrum&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;visible&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span> <span class="p">}</span> <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;light_spectrum&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addDeconvolutionBalance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="CalibrationFile.updatePSF"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.updatePSF">[docs]</a>    <span class="k">def</span> <span class="nf">updatePSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psf</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update Point spread function&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>                                     
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span>
+                        <span class="p">},</span>
+                <span class="s">&#39;light_spectrum&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;visible&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span>
+                        <span class="p">}</span>
+                <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;light_spectrum&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addPSF</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CalibrationFile.updateLens"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.updateLens">[docs]</a>    <span class="k">def</span> <span class="nf">updateLens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lens</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkCal</span><span class="p">()</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ArgSetter</span><span class="p">(</span><span class="s">&#39;Update Lens&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s">&#39;date&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(),</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Please stick to the date format&#39;</span><span class="p">},</span>                                     
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;[change me]&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span> <span class="p">},</span>
+                <span class="s">&#39;light_spectrum&#39;</span><span class="p">:{</span>
+                        <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;visible&#39;</span><span class="p">,</span> 
+                        <span class="s">&#39;dtype&#39;</span><span class="p">:</span><span class="nb">str</span> <span class="p">}</span> <span class="p">})</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">]</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;light_spectrum&#39;</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">addLens</span><span class="p">(</span><span class="n">lens</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateInfo</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>     
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CalibrationFile.correct"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Call CameraCalibration.correct()</span>
+<span class="sd">        with added kwargs as defined by the tool settings</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;dark current&#39;</span><span class="p">,</span><span class="s">&#39;flat field&#39;</span><span class="p">,</span><span class="s">&#39;lens&#39;</span><span class="p">,</span><span class="s">&#39;noise&#39;</span><span class="p">,</span><span class="s">&#39;psf&#39;</span><span class="p">)</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                no calibration found for [</span><span class="si">%s</span><span class="s">] </span>
+<span class="s">                at the chosen light spectrum [</span><span class="si">%s</span><span class="s">]&#39;&#39;&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">()))</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">dates</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">=</span><span class="n">val</span>
+            
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s">&#39;light_spectrum&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+            <span class="s">&#39;date&#39;</span><span class="p">:</span><span class="n">dates</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+        
+    <span class="k">def</span> <span class="nf">_updateInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curCal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+        <span class="c">#needs to be copy of list - otherwise limits would not be updated:</span>
+        <span class="n">l_new</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;light spectra&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">setLimits</span><span class="p">(</span><span class="n">l_new</span><span class="p">)</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLight</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;dark current&#39;</span><span class="p">,</span><span class="s">&#39;flat field&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;lens&#39;</span><span class="p">,</span> <span class="s">&#39;noise&#39;</span><span class="p">,</span> <span class="s">&#39;psf&#39;</span><span class="p">,</span> <span class="s">&#39;balance&#39;</span><span class="p">):</span>
+            <span class="n">dates</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ll</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dates</span><span class="p">:</span>
+                <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-&#39;</span><span class="p">]</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pCal</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">setLimits</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_saveToFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;filter&#39;</span><span class="p">:</span><span class="s">&#39;*</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">CameraCalibration</span><span class="o">.</span><span class="n">ftype</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;directory&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cal_file_path</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_curIndex</span><span class="p">]</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">pModified</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;camera calibration saved&#39;</span>
+
+
+    <span class="k">def</span> <span class="nf">_autosave</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAutosave</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_saveToFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cal_file_path</span><span class="p">)</span>
+                
+
+<div class="viewcode-block" id="CalibrationFile.saveState"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="n">GlobalTool</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;cal dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span></div>
+        
+
+<div class="viewcode-block" id="CalibrationFile.restoreState"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.globals.html#dataArtist.figures.image.tools.globals.CalibrationFile.CalibrationFile.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">GlobalTool</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_dir</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;cal dir&#39;</span><span class="p">]</span></div></div>
+
+
+<span class="c">#     def save(self, session, path):</span>
+<span class="c">#         l = {}</span>
+<span class="c">#         l[&#39;cal dir&#39;] = self._last_dir</span>
+<span class="c">#         session.addContentToSave(l, *path+(&#39;general.txt&#39;,))</span>
+<span class="c"># </span>
+<span class="c"># </span>
+<span class="c">#     def restore(self, session, path):</span>
+<span class="c">#         l =  eval(session.getSavedContent(*path +(&#39;general.txt&#39;,) ))</span>
+<span class="c">#         self._last_dir = l[&#39;cal dir&#39;]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

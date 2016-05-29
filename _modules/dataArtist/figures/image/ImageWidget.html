@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.ImageWidget &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.ImageWidget</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.ImageWidget</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">import</span> <span class="n">ImageView</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.ordereddict</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+<span class="kn">from</span> <span class="nn">fancytools.utils.incrementName</span> <span class="kn">import</span> <span class="n">incrementName</span>
+<span class="kn">from</span> <span class="nn">imgProcessor.transform.PerspectiveTransformation</span> <span class="kn">import</span> <span class="n">PerspectiveTransformation</span>
+<span class="kn">from</span> <span class="nn">imgProcessor.transformations</span> <span class="kn">import</span> <span class="n">isColor</span><span class="p">,</span> <span class="n">toColor</span><span class="p">,</span> <span class="n">toGray</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.items.ColorLayerItem</span> <span class="kn">import</span> <span class="n">ColorLayerItem</span>
+<span class="kn">from</span> <span class="nn">dataArtist.figures._PyqtgraphgDisplayBase</span> <span class="kn">import</span> <span class="n">PyqtgraphgDisplayBase</span>
+<span class="kn">from</span> <span class="nn">dataArtist.figures.DisplayWidget</span> <span class="kn">import</span> <span class="n">DisplayWidget</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.dialogs.DifferentShapeDialog</span> <span class="kn">import</span> <span class="n">DifferentShapeDialog</span>
+        
+    
+
+<div class="viewcode-block" id="ImageWidget"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget">[docs]</a><span class="k">class</span> <span class="nc">ImageWidget</span><span class="p">(</span><span class="n">DisplayWidget</span><span class="p">,</span> <span class="n">ImageView</span><span class="p">,</span> <span class="n">PyqtgraphgDisplayBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A pyqtgraph.ImageView with methods to add/move/remove images </span>
+<span class="sd">    as layer or colour-layer</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(</span><span class="s">&#39;dataArtist&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;media&#39;</span><span class="p">,</span> <span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;image.svg&#39;</span><span class="p">)</span>
+    <span class="n">sigOverlayAdded</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c">#item, name, tip</span>
+    <span class="n">sigOverlayRemoved</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#item</span>
+
+    <span class="n">shows_one_layer_at_a_time</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">setPen</span><span class="p">()</span> <span class="c"># update colour theme</span>
+        
+        <span class="n">ImageView</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">PlotItem</span><span class="p">(</span><span class="n">axisItems</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;bottom&#39;</span><span class="p">:</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&#39;left&#39;</span><span class="p">:</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]}))</span>
+        <span class="n">PyqtgraphgDisplayBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span> <span class="c">#colorlayerItems</span>
+
+        <span class="c">#for unified access within different widgets:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">setTitle</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_firstTime</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_changed</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeline_visible</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_redefined</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_moved_layer</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">discreteTimeSteps</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c">#make splitter an unchangeable small grey line:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s">&quot;QSplitter::handle{background-color: grey}&quot;</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">setHandleWidth</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="c">#TODO: better would be to init imageView with given histrogramAxis</span>
+        <span class="c">#      ... but this is easier:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sigLabelChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setHistogramLabel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHistogramLabel</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">labelText</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sigRangeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">setRange</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sigFontSizeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setHistogramFontSize</span><span class="p">)</span>
+ 
+        <span class="c">#hide buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiBtn</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">normBtn</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="c">#fixed height for time axis:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">setSizes</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">-</span><span class="mi">35</span><span class="p">,</span> <span class="mi">35</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">setStretchFactor</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c">#Remove ROI plot:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiPlot</span><span class="o">.</span><span class="n">setMouseEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiPlot</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateView</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="ImageWidget.close"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span><span class="c">#free memory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ImageView</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.roiClicked"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.roiClicked">[docs]</a>    <span class="k">def</span> <span class="nf">roiClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;not used&#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.roiChanged"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.roiChanged">[docs]</a>    <span class="k">def</span> <span class="nf">roiChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;not used&#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.saveState"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;view&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;histogram&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;histoRegion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">getLevels</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;colorbar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.restoreState"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;view&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;histogram&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="o">*</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;histoRegion&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;colorbar&#39;</span><span class="p">])</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;image&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">autoLevels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
+                      <span class="n">autoHistogramRange</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></div>
+        
+
+<div class="viewcode-block" id="ImageWidget.showTimeline"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.showTimeline">[docs]</a>    <span class="k">def</span> <span class="nf">showTimeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeline_visible</span> <span class="o">=</span> <span class="n">show</span>
+        <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiPlot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiPlot</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span> </div>
+
+
+<div class="viewcode-block" id="ImageWidget.setColorLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.setColorLayer">[docs]</a>    <span class="k">def</span> <span class="nf">setColorLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        same as addColorLayer, but replaces citem, if existent</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">setLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.addColorLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.addColorLayer">[docs]</a>    <span class="k">def</span> <span class="nf">addColorLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;Unnamed&#39;</span><span class="p">,</span> <span class="n">tip</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> 
+                      <span class="n">color</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a [layer], a np.array (2d or 3d), as colour overlay to the image</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">s</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span> <span class="c"># multi layer color image</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># single layer color image</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c">#multi layer grey image</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>  
+        
+        <span class="k">if</span> <span class="n">isColor</span><span class="p">(</span><span class="n">layer</span><span class="p">):</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">toGray</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#set colour as function of the number of colorItems:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">intColor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="p">))</span><span class="o">.</span><span class="n">rgb</span><span class="p">()</span>
+        
+        <span class="n">cItem</span> <span class="o">=</span> <span class="n">ColorLayerItem</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span>
+                               <span class="n">imageWidget</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                               <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span>
+                               <span class="p">)</span> 
+        <span class="n">name</span> <span class="o">=</span> <span class="n">incrementName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cItem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">cItem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigOverlayAdded</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">cItem</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tip</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cItem</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.removeColorLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.removeColorLayer">[docs]</a>    <span class="k">def</span> <span class="nf">removeColorLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nameOrItem</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nameOrItem</span><span class="p">,</span> <span class="n">ColorLayerItem</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="n">nameOrItem</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">nameOrItem</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigOverlayRemoved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">item</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_setHistogramFontSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptSize</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        set font size of the histogram and change the size of the </span>
+<span class="sd">        viewBox that contain the image and the histogram accordingly </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">vb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">vb</span>
+        <span class="n">vb</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="n">vb</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mf">9.0</span><span class="o">/</span><span class="n">ptSize</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">setFontSize</span><span class="p">(</span><span class="n">ptSize</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ImageWidget.insertLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.insertLayer">[docs]</a>    <span class="k">def</span> <span class="nf">insertLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        insert a new image as layer</span>
+<span class="sd">        ...add new / override existing layer</span>
+<span class="sd">        ...show dialog when data.shape != self.image.shape</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">MemoryError</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c">#replace, if only has one layer</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                    <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="n">s2</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="c">#LAYER COLOR IS DIFFERENT:</span>
+                    <span class="n">c1</span> <span class="o">=</span> <span class="n">isColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">c2</span> <span class="o">=</span> <span class="n">isColor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">c1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c2</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">toColor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                        <span class="n">s2</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">c1</span> <span class="ow">and</span> <span class="n">c2</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">toColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+                        <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="k">if</span> <span class="n">s1</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">:</span>
+                        <span class="c">#NEW LAYER SHAPE DOESNT FIT EXISTING:</span>
+                        <span class="c">###show DIALOG#####</span>
+                        <span class="n">d</span> <span class="o">=</span> <span class="n">DifferentShapeDialog</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+                        <span class="n">d</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+                        
+                        <span class="n">r</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">opt</span>                
+                        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">optNewDisplay</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="o">=</span> <span class="n">index</span>
+                            <span class="k">return</span>
+                        <span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">optCut</span><span class="p">:</span>
+                            <span class="n">data</span> <span class="o">=</span>  <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">s1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">s1</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">s1</span><span class="p">:</span>
+                                <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+                                <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">s2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">s2</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">=</span><span class="n">data</span>
+                                <span class="n">data</span> <span class="o">=</span> <span class="n">d</span>
+                        <span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">optResize</span><span class="p">:</span>
+                            <span class="n">data</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">s1</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> 
+                        
+                        <span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">optWarp</span><span class="p">:</span>
+                            <span class="n">data</span> <span class="o">=</span> <span class="n">PerspectiveTransformation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fitImg</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.insertMovedLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.insertMovedLayer">[docs]</a>    <span class="k">def</span> <span class="nf">insertMovedLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertLayer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_moved_layer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.addLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.addLayer">[docs]</a>    <span class="k">def</span> <span class="nf">addLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a new image as layer the the and of the image stack</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insertLayer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateView</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="ImageWidget.removeLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.removeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">toMove</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="o">!=</span> <span class="n">index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">toMove</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_moved_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_moved_layer</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>  
+                <span class="c">#TODO: has last index, if addWidget was called before</span>
+                    <span class="c">#therefore index cannot be preserved when layers are limited</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
+                    <span class="n">i</span><span class="o">-=</span><span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>  
+        <span class="c">#reset:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="o">=</span> <span class="bp">None</span></div>
+    
+
+<div class="viewcode-block" id="ImageWidget.clear"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">None</span>    
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cItems</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeColorLayer</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> </div>
+           
+
+<div class="viewcode-block" id="ImageWidget.getData"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.getData">[docs]</a>    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return all image layers or one specified by index</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span></div>
+
+         
+<div class="viewcode-block" id="ImageWidget.update"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update either the full image or an image layer</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">insertLayer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#set all layers</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="c">#single grayscale</span>
+                        <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span><span class="mi">3</span> 
+                        <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)):</span><span class="c">#single color</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_image_redefined</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_changed</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+                 
+<div class="viewcode-block" id="ImageWidget.updateView"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.updateView">[docs]</a>    <span class="k">def</span> <span class="nf">updateView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update the visual representation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">force</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_changed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_redefined</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_kwargs</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_firstTime</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_firstTime</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_image_redefined</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="n">force</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_index</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">imageDisp</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># needed by ImageView to set histogram levels</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">updateImage</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autoLevels&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_changed</span> <span class="o">=</span> <span class="bp">False</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.updateImage"><a class="viewcode-back" href="../../../../dataArtist.figures.image.html#dataArtist.figures.image.ImageWidget.ImageWidget.updateImage">[docs]</a>    <span class="k">def</span> <span class="nf">updateImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">autoHistogramRange</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        overwrite original method to hide timeline when </span>
+<span class="sd">        3d image has only one layer</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">## Redraw image on screen</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="k">if</span> <span class="n">autoHistogramRange</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">autoHistogramRange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autoHistogramRange&#39;</span><span class="p">]</span>
+        
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getProcessedImage</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">autoHistogramRange</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">setHistogramRange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levelMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levelMax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">updateImage</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">roiPlot</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline_visible</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">updateImage</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

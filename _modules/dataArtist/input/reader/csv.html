@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.input.reader.csv &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.input.reader.csv</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.input.reader.csv</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span> 
+
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.pgcollections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree.parameterTypes</span> <span class="kn">as</span> <span class="nn">pTypes</span>
+<span class="kn">from</span> <span class="nn">fancytools.os.countLines</span> <span class="kn">import</span> <span class="n">countLines</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">_ReaderBase</span> <span class="kn">import</span> <span class="n">ReaderBase</span>
+
+
+
+        
+<div class="viewcode-block" id="CsvPlotReader"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.csv.CsvPlotReader">[docs]</a><span class="k">class</span> <span class="nc">CsvPlotReader</span><span class="p">(</span><span class="n">ReaderBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Readout values from a plain-text saved in file. The format has to be similar to the following example::</span>
+<span class="sd">        </span>
+<span class="sd">        value00 value01 value02</span>
+<span class="sd">        value10 value11 value12</span>
+<span class="sd">        ...</span>
+<span class="sd">    </span>
+<span class="sd">    Where the values of all dimensions are written in one line, separated by one or</span>
+<span class="sd">    more signs like spaces &#39; &#39; or tab &#39;\t&#39;.</span>
+<span class="sd">    </span>
+<span class="sd">    Large files (larger that RAM) can be read through choosing a buffer size.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">]</span>
+    <span class="n">ftypes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;csv&#39;</span><span class="p">,</span><span class="s">&#39;txt&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ReaderBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span> <span class="o">=</span> <span class="n">_CSVPreferences</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_line</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastModified</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastFilename</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+    <span class="nd">@staticmethod</span> 
+<div class="viewcode-block" id="CsvPlotReader.check"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.csv.CsvPlotReader.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>  
+        <span class="k">return</span> <span class="n">ftype</span> <span class="ow">in</span> <span class="n">CsvPlotReader</span><span class="o">.</span><span class="n">ftypes</span></div>
+    
+
+<div class="viewcode-block" id="CsvPlotReader.open"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.csv.CsvPlotReader.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        
+        <span class="n">prefs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span>
+        <span class="c">#VARIABLES:</span>
+        <span class="n">buff</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pBuffer</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pReadEveryNLine</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">stop_at_line</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pHasStopLine</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">stop_n</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pStopLine</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">x_col</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pXColumn</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">has_x_col</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pHasXColumn</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_line</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#number of current line</span>
+        <span class="n">step_len</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#number of lines in the read file_part</span>
+        <span class="n">n_defective_lines</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># number of corrupted lines</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># current index in data array</span>
+        <span class="n">at_end</span> <span class="o">=</span> <span class="bp">False</span> <span class="c"># is file the the end</span>
+
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">filename</span>
+
+        <span class="c">#COUNT LINES:</span>
+        <span class="k">if</span> <span class="n">stop_at_line</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span> <span class="o">=</span> <span class="n">stop_n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modified</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QFileInfo</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">lastModified</span><span class="p">()</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span>
+            <span class="c">#ONLY OF THIS IS A NEW FILE OR THE FILE WAS MODIFIED:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lastFilename</span> <span class="o">==</span> <span class="n">filename</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastModified</span> <span class="o">==</span> <span class="n">modified</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span> <span class="o">=</span> <span class="n">countLines</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pBuffer</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lastnLines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lastFilename</span> <span class="o">=</span> <span class="n">filename</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lastModified</span> <span class="o">=</span> <span class="n">modified</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastnLines</span>
+
+        <span class="c">#GET NUMBER OF COLUMNS:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            
+            <span class="c">#FIND SEPARATOR:</span>
+            <span class="k">if</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pFindSeparator</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="n">prefs</span><span class="o">.</span><span class="n">pSeparator</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_findSeparator</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+            <span class="n">separator</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">separators</span><span class="p">[</span><span class="n">prefs</span><span class="o">.</span><span class="n">pSeparator</span><span class="o">.</span><span class="n">value</span><span class="p">()]</span>
+            
+            <span class="c">#DEFINE NUMBER OF COLUMNS:</span>
+            <span class="n">n_col</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">separator</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c">#back to begin</span>
+            <span class="c">#FILTER COLUMNS:</span>
+            <span class="n">filter_columns</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">filter_columns</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]][:</span><span class="n">n_col</span><span class="p">]</span>
+                <span class="c">#ADD X COLUMN TO THE BEGINNING:</span>
+                <span class="k">if</span> <span class="n">has_x_col</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">x_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                        <span class="n">c</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">x_col</span><span class="p">)</span>
+                <span class="n">n_col</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="n">col_filter</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">(</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">col_filter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="n">l</span><span class="p">[:</span><span class="n">n_col</span><span class="p">]</span>
+            
+            <span class="c">#GET FIRST LINE NAMES:</span>
+            <span class="n">fline</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pFirstLine</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fline</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="n">col_filter</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">fline</span> <span class="o">==</span> <span class="s">&#39;axes names&#39;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                
+                <span class="k">else</span><span class="p">:</span> <span class="c">#plot names:</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="n">names</span>
+                    <span class="k">if</span> <span class="n">has_x_col</span><span class="p">:</span>
+                        <span class="n">labels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">x_col</span><span class="p">)</span>
+                        
+            <span class="c">#JUMP TO START POSITION:</span>
+            <span class="n">startline</span> <span class="o">=</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pStartLine</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">startline</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span><span class="n">startline</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_line</span> <span class="o">=</span> <span class="n">startline</span>
+  
+            <span class="c">#PRINT FIRST 10 LINES:</span>
+            <span class="k">if</span> <span class="n">prefs</span><span class="o">.</span><span class="n">pPrintFirstLines</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="n">startPos</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="k">print</span> <span class="s">&#39;==========&#39;</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nLines</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="p">):</span>
+                    
+                    <span class="c">#TODO: do the check for \n only once </span>
+                    <span class="c"># ??? doesn&#39;t have every line \n at the end??</span>
+                    <span class="c">#print line[-2:]</span>
+                    <span class="c">#if line[-2:] == &#39;\n&#39;:</span>
+                    <span class="c">#    line = line[:-2]</span>
+                    <span class="k">print</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_line</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="s">&#39;--&gt; </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">col_filter</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">)))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">startPos</span><span class="p">)</span>
+                <span class="k">print</span> <span class="s">&#39;==========&#39;</span>
+            
+            <span class="c">#CREATE DATA ARRAY:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span><span class="o">/</span><span class="n">step</span>
+            <span class="k">if</span> <span class="n">n_col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;no columns given&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">n_col</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">,</span><span class="n">n_col</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">prefs</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">prefs</span><span class="o">.</span><span class="n">pDType</span><span class="o">.</span><span class="n">value</span><span class="p">()])</span>
+    
+            <span class="c">#MAIN LOOP:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span><span class="p">:</span>
+                <span class="c">#READ PART OF THE FILE:</span>
+                <span class="n">file_piece</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_piece</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_piece</span><span class="p">[::</span><span class="n">step</span><span class="p">]):</span>
+                    <span class="c">#line = line[:-1]</span>
+                    <span class="c">#FILTER COLUMNS:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">col_filter</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_line</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="n">step_len</span>
+                    <span class="c">#ADD LINE TO ARRAY:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">n_defective_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c">#CHECK BREAK CRITERIA:</span>
+                    <span class="k">if</span> <span class="n">stop_at_line</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_line</span> <span class="o">&gt;=</span> <span class="n">stop_n</span><span class="p">:</span>
+                        <span class="n">at_end</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">at_end</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">step_len</span> <span class="o">+=</span> <span class="n">l</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> lines were corrupted&#39;</span> <span class="o">%</span><span class="n">n_defective_lines</span>
+
+            <span class="c">#SPLIT ARRAY IF NEEDED:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">has_x_col</span> <span class="ow">and</span> <span class="n">n_col</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">has_x_col</span> <span class="ow">and</span> <span class="n">n_col</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">has_x_col</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="n">x_col</span><span class="p">]</span>
+                    <span class="c">#GET Y COLUMNS THROUGH REMOVING THE X COLUMN:</span>
+                    <span class="n">y_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span> <span class="n">data</span><span class="p">[:,:</span><span class="n">x_col</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span><span class="n">x_col</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_cols</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c">#CREATE TUPLE OF [y_n] OR [x, y_n] arrays:</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">y_cols</span><span class="p">[:,</span><span class="n">n</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">has_x_col</span><span class="p">:</span>
+                        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">labels</span>
+            
+            <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">labels</span></div>
+
+    
+    <span class="k">def</span> <span class="nf">_findSeparator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="c">#find separating symbol between values (e.g. tab, comma ...)</span>
+        <span class="n">separators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">separators</span>
+
+        <span class="n">last_pos</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">numberOfSeparator</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">separators</span><span class="p">)</span>
+        <span class="c">#get the first 50 lines and try to determine the separator there</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nLines</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="p">):</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">separators</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">numberOfSeparator</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="n">separators</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">numberOfSeparator</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">numberOfSeparator</span><span class="p">))]</span>
+        <span class="k">print</span> <span class="s">&quot;--&gt; separator set to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="n">sep</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">last_pos</span><span class="p">)</span> <span class="c"># go back  </span>
+        <span class="k">return</span> <span class="n">sep</span> 
+
+<div class="viewcode-block" id="CsvPlotReader.status"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.csv.CsvPlotReader.status">[docs]</a>    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#read lines over all lines</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_line</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLines</span></div></div>
+
+
+
+<span class="k">class</span> <span class="nc">_CSVPreferences</span><span class="p">(</span><span class="n">pTypes</span><span class="o">.</span><span class="n">GroupParameter</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;Plot import&#39;</span><span class="p">):</span>
+        <span class="n">pTypes</span><span class="o">.</span><span class="n">GroupParameter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">separators</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;SPACE&#39;</span><span class="p">:</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;TAB&#39;</span><span class="p">:</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;COMMA&#39;</span><span class="p">:</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;SEMICOLON&#39;</span><span class="p">:</span><span class="s">&#39;;&#39;</span><span class="p">}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">=</span> <span class="n">OrderedDict</span> <span class="p">(</span> <span class="p">(</span>
+                        <span class="p">(</span><span class="s">&quot;16 bit float&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;32 bit float&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;64 bit float&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;8 bit integer&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;16 bit integer&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;32 bit integer&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s">&quot;64 bit integer&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Data type&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&quot;32 bit float&quot;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFindSeparator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Find Separator Character&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFindSeparator</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                            <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="ow">not</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pSeparator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pFindSeparator</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Separator Character&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;COMMA&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">separators</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;the sign, that separates the values in one line e.g. &#39;</span><span class="se">\t</span><span class="s">&#39; for a tab&#39;&#39;&#39;</span><span class="p">}</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pPrintFirstLines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Print 1st 10 lines&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFirstLine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;First line contains&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;plot names&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="s">&#39;plot names&#39;</span><span class="p">,</span> <span class="s">&#39;axes names&#39;</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">]})</span>
+   
+        <span class="bp">self</span><span class="o">.</span><span class="n">pBuffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Buffer[byte]&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mf">10e6</span><span class="p">),</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mf">1e10</span><span class="p">],</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;max. size(byte) loaded into RAM insert &#39;0&#39; to read the whole file&#39;&#39;&#39;</span><span class="p">}</span> <span class="p">)</span>
+
+<span class="c">#TODO:</span>
+<span class="c">#         self.pFIFO = self.addChild({</span>
+<span class="c">#             &#39;name&#39;:&quot;Use FIFO&quot;,</span>
+<span class="c">#             &#39;type&#39;:&#39;bool&#39;,</span>
+<span class="c">#             &#39;value&#39;:False})</span>
+<span class="c">#         </span>
+<span class="c">#         self.pFIFOlength = self.pFIFO.addChild({</span>
+<span class="c">#             &#39;name&#39;:&quot;length&quot;,</span>
+<span class="c">#             &#39;type&#39;:&#39;int&#39;,</span>
+<span class="c">#             &#39;value&#39;:100})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStartLine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Start line&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHasStopLine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Stop line&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHasStopLine</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                            <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStopLine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pHasStopLine</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;line&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pReadEveryNLine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Read every n line&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">100000</span><span class="p">],</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHasXColumn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;X Column&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHasXColumn</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                            <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pXColumn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pHasXColumn</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Index&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100000</span><span class="p">],</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFilterColumns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Filter Columns&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;True: take all columns, False: Choose specific columns&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                            <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>
+        
+        <span class="n">pAddColumns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Add&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Index&quot;</span><span class="p">,</span>
+            <span class="s">&#39;autoIncrementName&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;renamable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;removable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFilterColumns</span><span class="o">.</span><span class="n">children</span><span class="p">())</span><span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+        <span class="n">pAddColumns</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items.PseudoSquareROI &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.items.PseudoSquareROI</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.items.PseudoSquareROI</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+
+
+<div class="viewcode-block" id="PseudoSquareROI"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.PseudoSquareROI.PseudoSquareROI">[docs]</a><span class="k">class</span> <span class="nc">PseudoSquareROI</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ROI built by intersection of an ellipse and a rectangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">ratioEllispeRectangle</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span> <span class="o">=</span> <span class="n">ratioEllispeRectangle</span>
+        
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="PseudoSquareROI.setRatioEllispeRect"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.PseudoSquareROI.PseudoSquareROI.setRatioEllispeRect">[docs]</a>    <span class="k">def</span> <span class="nf">setRatioEllispeRect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mi">1</span><span class="o">&lt;=</span> <span class="n">ratio</span> <span class="o">&lt;=</span><span class="mf">1.41</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span> <span class="o">=</span> <span class="n">ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_intersectionPointsAndAngles</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">ratioEllispeRectangle</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return all 8  x and y coords of lines build by intersection of ellipse and rect</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">x1</span>  <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">h</span>
+
+        <span class="c">#ellipse parameters:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">x1</span><span class="o">*</span> <span class="n">ratioEllispeRectangle</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">y2</span><span class="o">*</span> <span class="n">ratioEllispeRectangle</span>
+        <span class="c">#intersection coords in the 1st quadrant with center=(0,0):</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">x1</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">y2</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        
+        <span class="c">#edge points:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">+</span><span class="n">x1</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">y1</span><span class="p">)</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">+</span><span class="n">x2</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">y2</span><span class="p">)</span>
+        <span class="n">p3</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">-</span><span class="n">x2</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">y2</span><span class="p">)</span>
+        <span class="n">p4</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">y1</span><span class="p">)</span>
+        <span class="n">p5</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span>  <span class="n">cy</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
+        <span class="n">p6</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">-</span><span class="n">x2</span><span class="p">,</span> <span class="n">cy</span><span class="o">-</span><span class="n">y2</span><span class="p">)</span>
+        <span class="n">p7</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">+</span><span class="n">x2</span><span class="p">,</span> <span class="n">cy</span><span class="o">-</span><span class="n">y2</span><span class="p">)</span>
+        <span class="n">p8</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">cx</span><span class="o">+</span><span class="n">x1</span><span class="p">,</span> <span class="n">cy</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
+        
+        <span class="c">#angle in as degree*16 (needed in .drawArc)</span>
+        <span class="n">a1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">p1</span><span class="p">)</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">p2</span><span class="p">)</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">a4</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">p4</span><span class="p">)</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">a6</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">p6</span><span class="p">)</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">a8</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">p8</span><span class="p">)</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="n">arc_length</span> <span class="o">=</span> <span class="n">a1</span><span class="o">-</span><span class="n">a2</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">p3</span><span class="p">,</span><span class="n">p4</span><span class="p">,</span><span class="n">p5</span><span class="p">,</span><span class="n">p6</span><span class="p">,</span><span class="n">p7</span><span class="p">,</span><span class="n">p8</span><span class="p">),</span> <span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">a4</span><span class="p">,</span><span class="n">a6</span><span class="p">,</span><span class="n">a8</span><span class="p">),</span> <span class="n">arc_length</span>
+        
+    
+    
+    <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">x</span><span class="p">()</span><span class="o">/</span><span class="n">r</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">r</span><span class="o">.</span><span class="n">y</span><span class="p">()</span><span class="o">/</span><span class="n">r</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c">#get draw params:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_intersectionPointsAndAngles</span><span class="p">(</span>
+                                <span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">)</span>
+        <span class="c">#scale rect:</span>
+        <span class="n">bl</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">bottomLeft</span><span class="p">()</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">topRight</span><span class="p">()</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">tr</span><span class="o">-</span><span class="n">bl</span>
+        <span class="n">newSize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">newSize</span><span class="o">-</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">setBottomLeft</span><span class="p">(</span><span class="n">bl</span><span class="o">-</span><span class="n">ds</span><span class="p">)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">setTopRight</span><span class="p">(</span><span class="n">tr</span><span class="o">+</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rect</span> <span class="o">=</span> <span class="n">r</span>
+
+    
+<div class="viewcode-block" id="PseudoSquareROI.paint"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.PseudoSquareROI.PseudoSquareROI.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">r</span><span class="o">.</span><span class="n">height</span><span class="p">())</span><span class="c">## workaround for GL bug</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="o">.</span><span class="n">Antialiasing</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentPen</span><span class="p">)</span>
+        <span class="c">#interrupted rectangle:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c">#outer circle:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawArc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alen</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawArc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alen</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawArc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alen</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawArc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angles</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alen</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PseudoSquareROI.getMask"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.PseudoSquareROI.PseudoSquareROI.getMask">[docs]</a>    <span class="k">def</span> <span class="nf">getMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">s</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span>
+        <span class="c">#opencv convention:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>        
+        <span class="n">arr2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="c">#draw rotated rectangle:</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int0</span><span class="p">(</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">BoxPoints</span><span class="p">((</span><span class="n">center</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="p">[</span><span class="n">vertices</span><span class="p">],</span> 
+                         <span class="mi">0</span><span class="p">,</span> 
+                         <span class="n">color</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                         <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c">#draw ellipse:</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span> 
+                    <span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">),</span> 
+                    <span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">),</span>
+                      <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">)</span> <span class="p">),</span> 
+                    <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span>
+                    <span class="n">startAngle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+                    <span class="n">endAngle</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c">#bring both together:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+
+<div class="viewcode-block" id="PseudoSquareROI.getArrayRegion"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.PseudoSquareROI.PseudoSquareROI.getArrayRegion">[docs]</a>    <span class="k">def</span> <span class="nf">getArrayRegion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">img</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the result of ROI.getArrayRegion() masked by the elliptical shape</span>
+<span class="sd">        of the ROI. Regions outside the ellipse are set to 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#TODO: get right area for pseudosquare</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">getArrayRegion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c">## generate an ellipsoidal mask</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfunction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="p">(((</span><span class="n">x</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span> <span class="p">(</span>
+                        <span class="p">(</span><span class="n">y</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">h</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">,</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
+    
+        <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mask</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

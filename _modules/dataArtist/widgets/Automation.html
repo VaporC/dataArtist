@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.Automation &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.Automation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.Automation</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree</span> <span class="kn">import</span> <span class="n">Parameter</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.FwTabWidget</span> <span class="kn">import</span> <span class="n">FwTabWidget</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.CodeEditor</span> <span class="kn">import</span> <span class="n">CodeEditor</span>
+
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.ParameterMenu</span> <span class="kn">import</span> <span class="n">ParameterMenu</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+<span class="c">#---CONSTANTS------------------------------</span>
+<span class="c">#GET ALL PYTHON BUILD-INs:</span>
+<span class="kn">import</span> <span class="nn">__builtin__</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.CircleWidget</span> <span class="kn">import</span> <span class="n">CircleWidget</span>
+<span class="n">BUILTINS_DICT</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">__builtin__</span><span class="p">):</span>
+    <span class="n">BUILTINS_DICT</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">__builtin__</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">__builtin__</span>
+
+<span class="n">SPRIPT_PATH</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(</span><span class="s">&#39;dataArtist&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;scripts&quot;</span><span class="p">)</span>
+<span class="c">#------------------------------------------</span>
+
+
+
+<div class="viewcode-block" id="Automation"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation">[docs]</a><span class="k">class</span> <span class="nc">Automation</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Widget for easy automation within dataArtist, providing:</span>
+<span class="sd">    </span>
+<span class="sd">    * On/Of switch</span>
+<span class="sd">    * &#39;Collect&#39; button to grab the address of tool buttons and it&#39;s parameters</span>
+<span class="sd">    * &#39;Import&#39; list to load saved scripts</span>
+<span class="sd">    * Multiple script editors listed as Tabs</span>
+<span class="sd">    * &#39;Run on new input&#39; - Activate active script as soon as the input has changed</span>
+<span class="sd">    * &#39;Run&#39; - run active script now </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">sigLayerChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggleDataChanged</span><span class="p">)</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">sigNewLayer</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggleNewData</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
+
+        <span class="n">refreshR</span> <span class="o">=</span> <span class="mi">20</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_collect</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_activeWidgets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#BUTTON: OF/OFF</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s">&#39;Console&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">setBold</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_toggleShow</span><span class="p">)</span>
+        <span class="c">#COMBOBOX: IMPORT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">addItems</span><span class="p">((</span>
+                    <span class="s">&#39;&lt;import&gt;&#39;</span><span class="p">,</span> 
+                    <span class="s">&#39;from file&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span>
+                <span class="c">#don&#39;t show &#39;.py&#39; and hide __init__.py</span>
+                <span class="p">[</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">SPRIPT_PATH</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span> 
+                    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;_&#39;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">))])</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_importScript</span><span class="p">)</span>
+        <span class="c">#BUTTON: COLLECT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;Collect&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s">&#39;click on all tool parameters you want to change during the batch process&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectWidgets</span><span class="p">)</span>
+        <span class="c">#TABWIDGET: SCRIPT </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span> <span class="o">=</span> <span class="n">FwTabWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">setTabsAddable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">setTabsClosable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">setTabsRenamable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">defaultTabWidget</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">ScriptTab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refreshR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">addEmptyTab</span><span class="p">(</span><span class="s">&#39;New&#39;</span><span class="p">)</span>
+        <span class="c">#BUTTON: RUN AT NEW INPUT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_run_on</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Activate on&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="s">&#39;New Data&#39;</span><span class="p">,</span> <span class="s">&#39;Data Changed&#39;</span><span class="p">])</span>
+        
+        <span class="c">#SPINBOX REFRESHRATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_refresh</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Refresh rate:&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">setSuffix</span><span class="p">(</span><span class="s">&quot; Hz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">refreshR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">hz</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">setRefreshrate</span><span class="p">(</span><span class="n">hz</span><span class="p">))</span>
+        <span class="c">#BUTTON: RUN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;Run&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">)</span>
+        <span class="c">#LAYOUT</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setMargin</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+            <span class="c">#top layout</span>
+        <span class="n">hl</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="p">)</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="p">)</span>
+            <span class="c">#fill layout</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hl</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">)</span>
+        
+        <span class="n">hl2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_run_on</span><span class="p">)</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="p">)</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_refresh</span><span class="p">)</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="p">)</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">insertStretch</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">hl2</span><span class="o">.</span><span class="n">insertStretch</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hl2</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toggleShow</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> <span class="c">#automation disabled by default</span>
+
+
+<div class="viewcode-block" id="Automation.checkWidgetIsActive"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.checkWidgetIsActive">[docs]</a>    <span class="k">def</span> <span class="nf">checkWidgetIsActive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="c">#bring widget into list of updated widgets</span>
+        <span class="c">#if not there already</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_activeWidgets</span>
+        <span class="k">if</span> <span class="n">widget</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span></div>
+        
+        
+<div class="viewcode-block" id="Automation.saveState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span><span class="o">=</span><span class="p">{}</span>
+        <span class="c">#BUTTONS</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;active&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;collect&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+        <span class="c">#l[&#39;runOnNewInput&#39;] = self.btn_run_new.isChecked()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;runOn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">currentText</span><span class="p">())</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;tabTitles&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">tabText</span><span class="p">(</span><span class="n">tab</span><span class="p">))</span> <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">]</span>
+        <span class="c">#SCRIPTS</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;scripts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+            <span class="n">ss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">())</span>
+<span class="c">#             session.addContentToSave(tab.editor.toPlainText(), </span>
+<span class="c">#                             *path+(&#39;scripts&#39;, &#39;%s.txt&#39; %n))</span>
+        <span class="c">#--&gt;</span>
+<span class="c">#         session.addContentToSave(l, *path+(&#39;automation.txt&#39;,))</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+        
+<div class="viewcode-block" id="Automation.restoreState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="c">#         l =  eval(session.getSavedContent(*path +(&#39;automation.txt&#39;,) ) )</span>
+        <span class="c">#BUTTONS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;active&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toggleShow</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;active&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;collect&#39;</span><span class="p">])</span>
+        <span class="c">#self.btn_run_new.setChecked(l[&#39;runOnNewInput&#39;])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">count</span><span class="p">())]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s">&#39;runOn&#39;</span><span class="p">]))</span>
+        <span class="c">#SCRIPTS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;scripts&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;tabTitles&#39;</span><span class="p">]):</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">addEmptyTab</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+<span class="c">#             txt = ss[n]#session.getSavedContent(*path+(&#39;scripts&#39;, &#39;%s.txt&#39; %n))</span>
+            <span class="n">tab</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="n">n</span><span class="p">])</span></div>
+    
+        
+<div class="viewcode-block" id="Automation.collectWidgets"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.collectWidgets">[docs]</a>    <span class="k">def</span> <span class="nf">collectWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get a Tool button or a parameter within the tools menu</span>
+<span class="sd">        and add it to the active script</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#TOGGLE BETWEEN NORMAL- AND PointingHandCursor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_collect</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">setOverrideCursor</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QCursor</span><span class="p">(</span>
+                                                        <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">PointingHandCursor</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">restoreOverrideCursor</span><span class="p">()</span>
+        <span class="c">#TOGGLE BUTTON</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_collect</span><span class="p">)</span>
+        <span class="c">#add chosen widget to active script:  </span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">widget</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span><span class="o">.</span><span class="n">addTool</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+            <span class="c">#TOOLS:</span>
+            <span class="n">tool</span><span class="o">.</span><span class="n">returnToolOnClick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_collect</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+            <span class="c">#TOOL-PARAMETERS:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">menu</span><span class="p">(),</span> <span class="n">ParameterMenu</span><span class="p">):</span>
+                <span class="n">tool</span><span class="o">.</span><span class="n">menu</span><span class="p">()</span><span class="o">.</span><span class="n">pTree</span><span class="o">.</span><span class="n">returnParameterOnKlick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_collect</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_importScript</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Open a file, read it&#39;s content and add it to the active script tab</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span><span class="c"># &#39;&lt;import&gt;&#39; placeholder within the comboBox</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># import from file</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+                <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">addEmptyTab</span><span class="p">(</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="n">tab</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">appendPlainText</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">())</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># import one of the examples scripts</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">addEmptyTab</span><span class="p">(</span><span class="s">&#39;ex</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">tab</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">appendPlainText</span><span class="p">(</span>
+                        <span class="nb">open</span><span class="p">(</span><span class="n">SPRIPT_PATH</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                             <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="n">index</span><span class="p">)))</span><span class="o">+</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+
+    <span class="k">def</span> <span class="nf">_updateWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update all active display widgets</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">widget</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_activeWidgets</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">updateView</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> 
+
+
+    <span class="k">def</span> <span class="nf">_toggleShow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Show/hide all widgets within Automation except of the on/off switch</span>
+<span class="sd">        And move the horizontal splitter according to the space needed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sizes</span><span class="p">()</span>
+        <span class="n">minSize</span> <span class="o">=</span> <span class="mf">7.0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_run_on</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_refresh</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="c"># move splitter:</span>
+                <span class="c"># assume equal sizes for all to calc the splitter size</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">setSizes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_collect</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_run_on</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_refresh</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sb_refreshrate</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="c"># move splitter:</span>
+                <span class="c"># smallest possible size of batchTab </span>
+            <span class="k">if</span> <span class="n">l</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">minSize</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">i</span><span class="p">:</span>
+                        <span class="n">l</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="o">+</span><span class="n">a</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">l</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">minSize</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">setSizes</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+      
+    <span class="k">def</span> <span class="nf">_setRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;update button&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">undoRedo</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c">#TODO: remove try... if .display if not a weakref.proxy any more</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">__repr__</span><span class="o">.</span><span class="n">__self__</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span>
+        <span class="c">#SHOW RUN INDICATOR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runIndicator</span> <span class="o">=</span> <span class="n">CircleWidget</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runIndicator</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runIndicator</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+       
+    <span class="k">def</span> <span class="nf">_setDone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;update button&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&#39;Start&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">undoRedo</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_runIndicator&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_runIndicator</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runIndicator</span>
+
+
+<div class="viewcode-block" id="Automation.toggle"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.toggle">[docs]</a>    <span class="k">def</span> <span class="nf">toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Start/Stop the active script</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span>
+        <span class="c">#STOP</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">btn_run_now</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;Stop&#39;</span><span class="p">:</span>
+            <span class="n">tab</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="c">#START </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">backupChangedLayer</span><span class="p">(</span><span class="n">changes</span><span class="o">=</span><span class="s">&#39;Script &lt;</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">tabText</span><span class="p">(</span><span class="n">tab</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_activeWidgets</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="p">]</span>
+
+        <span class="n">tab</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Automation.toggleNewData"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.toggleNewData">[docs]</a>    <span class="k">def</span> <span class="nf">toggleNewData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        toggle run settings allow running for new data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span><span class="c">#=new data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Automation.toggleDataChanged"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.Automation.toggleDataChanged">[docs]</a>    <span class="k">def</span> <span class="nf">toggleDataChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        toggle run settings allow running for data changed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">btn_show</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cb_run_on</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span><span class="c">#=data changed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">()</span></div></div>
+
+
+
+<div class="viewcode-block" id="ScriptTab"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.ScriptTab">[docs]</a><span class="k">class</span> <span class="nc">ScriptTab</span><span class="p">(</span><span class="n">CodeEditor</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A Tab containing:</span>
+<span class="sd">    * a code editor</span>
+<span class="sd">    * a QThread to run the script</span>
+<span class="sd">    * method addTool() to add tools or toolParameters to the code editor</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automation</span><span class="p">,</span> <span class="n">refreshrate</span><span class="p">):</span>
+        <span class="n">CodeEditor</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automation</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="p">)</span>
+        <span class="c">#THREAD to run the script within:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">_Thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automation</span><span class="p">,</span> <span class="n">refreshrate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s">&#39;&#39;&#39;This is a Python 2.7 console.</span>
+<span class="s">it accepts ...</span>
+<span class="s">* all built-in functions, like &#39;dir&#39;</span>
+<span class="s">* already imported modules, like &#39;np&#39;, for numpy</span>
+<span class="s">* special dataArtist functions, like &#39;new&#39;, &#39;d&#39; ...</span>
+
+<span class="s">Click on &#39;Globals&#39; in the right click menu for more information.</span>
+<span class="s">&#39;&#39;&#39;</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">addGlobals</span><span class="p">({</span><span class="s">&#39;d&#39;</span><span class="p">:</span><span class="s">&#39;Access the current display&#39;</span><span class="p">,</span> 
+                         <span class="s">&#39;d0&#39;</span><span class="p">:</span><span class="s">&#39;Access display 0&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;d.l&#39;</span><span class="p">:</span><span class="s">&#39;Access all layers of [d]&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;d.l0&#39;</span><span class="p">:</span><span class="s">&#39;Access only the first layer of [d]&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;d.tools[&lt;NAME&gt;].click()&#39;</span><span class="p">:</span><span class="s">&#39;Execute a tool, given by name&#39;</span><span class="p">,</span>
+                         <span class="sd">&#39;&#39;&#39;d.tools[&lt;NAME&gt;].param(</span>
+<span class="sd">&lt;NAME1&gt;,...).setValue(&lt;VALUE&gt;)&#39;&#39;&#39;</span><span class="p">:</span><span class="s">&#39;Modify a parameter of a tool&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;new&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Create A new display</span>
+<span class="s">Options are...</span>
+<span class="s">    new(axes=3)</span>
+<span class="s">    new(axes=[&#39;x&#39;,&#39;y&#39;])</span>
+<span class="s">    new(names=[&#39;LIST OF FILENAMES TO LOAD FROM&#39;])</span>
+<span class="s">    new(data=np.ones(shape=100,100), axes=3) # to create on image layer</span>
+<span class="s">    new(data=np.ones(shape=10,10), axes=2) # to create 10 layers of 2d plots &#39;&#39;&#39;</span><span class="p">,</span> 
+                         <span class="s">&#39;timed&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Creates, registers and return a QtCore.QTimer instance</span>
+<span class="s">Options are...</span>
+<span class="s">    timed(func_to_call, timeout=20) #executes func_to_call every 20 ms</span>
+<span class="s">    timed(func_to_call, timeout=20, stopAfter=10000) #... ends the execution after 10 sec</span>
+<span class="s">    timed(func_to_call, timeout=20, stopAfter=10000, stopFunc=done) #... execute &#39;done&#39; when done</span>
+<span class="s">    timed(func_to_call, 20, 10000, done)#... same, but shorter&#39;&#39;&#39;</span><span class="p">,</span> 
+                         <span class="s">&#39;np&#39;</span><span class="p">:</span><span class="s">&#39;The [numpy] package, containing e.g. np.array.&#39;</span><span class="p">}</span>
+                                  <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ScriptTab.addTool"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Automation.ScriptTab.addTool">[docs]</a>    <span class="k">def</span> <span class="nf">addTool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        append a tool or tool-parameter to the end of the editor text </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#TOOL</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="n">Tool</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">appendPlainText</span><span class="p">(</span><span class="s">&quot;d.tools[&#39;</span><span class="si">%s</span><span class="s">&#39;].click()&quot;</span> <span class="o">%</span><span class="p">(</span>
+                                                    <span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span> <span class="p">)</span>
+        <span class="c">#TOOL-PARAMETER</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">):</span>
+            <span class="n">topParam</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">path</span><span class="p">()</span>
+            <span class="n">tool</span> <span class="o">=</span> <span class="n">topParam</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;master&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">appendPlainText</span><span class="p">(</span><span class="s">&quot;d.tools[&#39;</span><span class="si">%s</span><span class="s">&#39;].param(&#39;</span><span class="si">%s</span><span class="s">&#39;).setValue(&#39;XXX&#39;)&quot;</span> <span class="o">%</span><span class="p">(</span>
+                                                    <span class="n">tool</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">path</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span></div></div>
+
+
+
+<span class="k">class</span> <span class="nc">_ExecGlobalsDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    a dict containing the globals for the script execution</span>
+<span class="sd">    containing all normal build-ins and some special arguments</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="n">knownArgs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;np&#39;</span><span class="p">:</span><span class="n">np</span><span class="p">,</span> 
+                     <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">display</span><span class="p">,</span> 
+                     <span class="s">&#39;QtGui&#39;</span><span class="p">:</span><span class="n">QtGui</span><span class="p">,</span>
+                     <span class="s">&#39;QtCore&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">knownArgs</span><span class="p">)</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">BUILTINS_DICT</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        try to find item, elsewise:</span>
+<span class="sd">        translate &#39;d1&#39;-&#39;d[n]&#39; into the corresponding display of the same number</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;d&#39;</span> <span class="ow">and</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">displaydict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;display </span><span class="si">%s</span><span class="s"> doesn&#39;t exist&quot;</span> <span class="o">%</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+   
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get all current displays</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displaydict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displaydict</span><span class="p">()</span>
+        
+
+
+<span class="k">class</span> <span class="nc">_Thread</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The thread for executing the script within ScriptTab</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scriptTab</span><span class="p">,</span> <span class="n">automation</span><span class="p">,</span> <span class="n">refreshrate</span><span class="p">):</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">scriptTab</span> <span class="o">=</span> <span class="n">scriptTab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">automation</span> <span class="o">=</span> <span class="n">automation</span>
+        <span class="c">#CREATE AND EXTEND THE GLOBALS USED FOR EXECUTING THE SCRIPT:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_globals</span> <span class="o">=</span> <span class="n">_ExecGlobalsDict</span><span class="p">(</span><span class="n">automation</span><span class="o">.</span><span class="n">display</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_globals</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="c">#&#39;wait&#39;:self.wait,</span>
+                              <span class="s">&#39;timed&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_getAndRegisterTimer</span><span class="p">,</span>
+                              <span class="s">&#39;new&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_addActiveWidget</span><span class="p">})</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_globals</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">BUILTINS_DICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">k</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_widgetUpdateTimer</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_widgetUpdateTimer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">_updateWidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRefreshrate</span><span class="p">(</span><span class="n">refreshrate</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_addActiveWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">automation</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">checkWidgetIsActive</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span>
+        
+
+    <span class="k">def</span> <span class="nf">_getAndRegisterTimer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeoutFunc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stopAfter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                                   <span class="n">stopFunc</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A convenience function for creating processes connected through a QTimer</span>
+<span class="sd">        </span>
+<span class="sd">        ============  ======================================================</span>
+<span class="sd">        Argument      Description</span>
+<span class="sd">        ============  ======================================================</span>
+<span class="sd">        timeoutFunc   A function to be called after every [timeout]</span>
+<span class="sd">        timeout       Execute [timeoutFunc] every [timeout] in milliseconds</span>
+<span class="sd">        stopAfter     Stop the timed process after [stopAfter] milliseconds</span>
+<span class="sd">        stopFunc      A function to be called when the timer stopped</span>
+<span class="sd">        ============  ======================================================</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">_Timer</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">sigStarted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">_setRunning</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">sigStopped</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkStopped</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timeoutFunc</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">timeoutFunc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stopAfter</span><span class="p">:</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="n">stopAfter</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stopFunc</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">sigStopped</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">stopFunc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span>
+
+
+    <span class="k">def</span> <span class="nf">setRefreshrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hz</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_widgetUpdateTimer</span><span class="o">.</span><span class="n">setInterval</span><span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">hz</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_checkStopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set the script execution to &#39;done&#39; if all timers are inactive</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">isActive</span><span class="p">():</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_done</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_widgetUpdateTimer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">_updateWidget</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">_setDone</span><span class="p">()</span>
+            
+      
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Start the script execution</span>
+<span class="sd">        and check whether the execution is done at the end</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_done</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_globals</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">_widgetUpdateTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scriptTab</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()),</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;exec&#39;</span><span class="p">)</span>
+            <span class="k">exec</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_globals</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_done</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkStopped</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Stop all timers and kill this script execution thread</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+
+
+<span class="k">class</span> <span class="nc">_Timer</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A QTimer with 2 new signals. emitted, when the timer...</span>
+<span class="sd">    * started, and</span>
+<span class="sd">    * stopped</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">sigStarted</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    <span class="n">sigStopped</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    
+    
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msec</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigStarted</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msec</span><span class="p">:</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msec</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigStopped</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

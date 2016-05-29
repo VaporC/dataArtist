@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.view.Overlay &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.view.Overlay</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.view.Overlay</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span>
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+
+<div class="viewcode-block" id="Overlay"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay">[docs]</a><span class="k">class</span> <span class="nc">Overlay</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    manage multiple single color overlays</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;overlay.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+        
+        <span class="c">#make some space for the color layer names:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">pTree</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">.</span><span class="n">setResizeMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QHeaderView</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">pTree</span><span class="o">.</span><span class="n">setColumnWidth</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">270</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAdd</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;add&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;from display&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;menu&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAdd</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildAddMenu</span><span class="p">)</span>
+        
+        <span class="n">pa</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">)</span>
+        
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">sigOverlayAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addLayerControl</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">sigOverlayRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayerControl</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Overlay.addLayerFromOtherDisplay"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.addLayerFromOtherDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">addLayerFromOtherDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">layernumber</span><span class="p">,</span> <span class="n">layername</span><span class="p">):</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="p">[</span><span class="n">layernumber</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">layername</span><span class="p">,</span> <span class="n">tip</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Overlay.buildAddMenu"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.buildAddMenu">[docs]</a>    <span class="k">def</span> <span class="nf">buildAddMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add an action for all layers of other ImageDisplays</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">layerNames</span><span class="p">()):</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="p">:</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">addLayerFromOtherDisplay</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Overlay.removeLayer"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.removeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">child</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAdd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">removeColorLayer</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_exportLayerToNewDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">childs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">ch</span><span class="o">.</span><span class="n">name</span><span class="p">():</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                    <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                    <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">image</span><span class="p">],</span> 
+                    <span class="n">title</span><span class="o">=</span><span class="s">&#39;Color overlay (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span><span class="n">name</span> <span class="p">)</span> 
+
+
+<div class="viewcode-block" id="Overlay.removeLayerControl"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.removeLayerControl">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayerControl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        remove color button in parameter menu if an overlay is removed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;item&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span> <span class="c">#can be None, when called from restore</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">item</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">)</span>
+                <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span>
+                <span class="n">ch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>            </div>
+
+
+<div class="viewcode-block" id="Overlay.addLayerControl"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.addLayerControl">[docs]</a>    <span class="k">def</span> <span class="nf">addLayerControl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tip</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add color button in parameter menu if an overlay is added</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">aExport</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;Export to new display&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">aExport</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">name</span><span class="p">:</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_exportLayerToNewDisplay</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s">&#39;isGroup&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;color&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="n">tip</span><span class="p">,</span>
+                    <span class="s">&#39;removable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;autoIncrementName&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;addToContextMenu&#39;</span><span class="p">:[</span><span class="n">aExport</span><span class="p">],</span>
+                    <span class="c">#TODO:</span>
+                   <span class="c"># &#39;sliding&#39;:True</span>
+                   <span class="s">&#39;item&#39;</span><span class="p">:</span><span class="n">item</span>
+                    <span class="p">})</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">getQColor</span><span class="p">())</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">param</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setQColor</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>     </div>
+
+
+<div class="viewcode-block" id="Overlay.saveState"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">Tool</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c">#save the layers to file</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">state</span><span class="p">[</span><span class="s">&#39;c_layer_</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">image</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="Overlay.restoreState"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">old_ch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="c">#remove old param:</span>
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span>
+        <span class="n">pa</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">old_ch</span><span class="p">:</span>
+            <span class="n">pa</span><span class="o">.</span><span class="n">removeChild</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+        <span class="n">pa</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">old_ch</span><span class="p">):</span>
+            <span class="c">#load layers from file</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;c_layer_</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">tip</span><span class="o">=</span><span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span></div>
+
+
+<span class="c">#     def save(self, session, path):</span>
+<span class="c">#         Tool.save(self, session, path)</span>
+<span class="c">#         #save the layers to file</span>
+<span class="c">#         for n, ch in enumerate(self._menu.p.children()[1:]):</span>
+<span class="c">#             p = session.createSavePath(*path+(&#39;colorLayer_%s.npy&#39; %n,))</span>
+<span class="c">#             np.save(p,ch.opts[&#39;item&#39;].image)</span>
+<span class="c"># </span>
+<span class="c"># </span>
+<span class="c">#     def restore(self, session, path):</span>
+<span class="c">#         Tool.restore(self, session, path)</span>
+<span class="c">#         old_ch = list(self._menu.p.childs[1:])</span>
+<span class="c"># </span>
+<span class="c">#         #remove old param:</span>
+<span class="c">#         pa = self._menu.p</span>
+<span class="c">#         pa.sigChildRemoved.disconnect(self.removeLayer)</span>
+<span class="c">#         for ch in old_ch:</span>
+<span class="c">#             pa.removeChild(ch)</span>
+<span class="c">#         pa.sigChildRemoved.connect(self.removeLayer)</span>
+<span class="c">#         </span>
+<span class="c">#         for n, ch in enumerate(old_ch):</span>
+<span class="c">#             #load layers from file</span>
+<span class="c">#             p = session.getSavedFile(*path+(&#39;colorLayer_%s.npy&#39; %n,))</span>
+<span class="c">#             img = np.load(p)</span>
+<span class="c">#             self.display.widget.addColorLayer(img, name=ch.opts[&#39;name&#39;], tip=ch.opts[&#39;name&#39;])</span>
+
+
+<div class="viewcode-block" id="Overlay.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        show all color layers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Overlay.deactivate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.view.html#dataArtist.figures.image.tools.view.Overlay.Overlay.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        hide all color layers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

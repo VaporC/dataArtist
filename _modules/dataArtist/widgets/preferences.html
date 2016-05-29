@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.preferences &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.preferences</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.preferences</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Widgets handling all dataArtist preferences</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.components.RabbitMQServer</span> <span class="kn">import</span> <span class="n">RabbitMQServer</span>
+<span class="kn">from</span> <span class="nn">dataArtist.components.WatchFolder</span> <span class="kn">import</span> <span class="n">WatchFolder</span>
+
+
+
+<div class="viewcode-block" id="PreferencesCommunication"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.PreferencesCommunication">[docs]</a><span class="k">class</span> <span class="nc">PreferencesCommunication</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Preferences for communication between dataArtist and other programs</span>
+<span class="sd">     - this is at the moment done using a RabbitMQ server</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+        
+        <span class="n">rab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rabbitMQServer</span> <span class="o">=</span> <span class="n">RabbitMQServer</span><span class="p">(</span><span class="n">gui</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span> <span class="o">=</span> <span class="n">wf</span> <span class="o">=</span> <span class="n">WatchFolder</span><span class="p">(</span><span class="n">gui</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span>
+        <span class="c">#CONNECT SAVE/RESTORE:</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_restore</span><span class="p">)</span>  
+        <span class="c">#CONNECT CLOSE</span>
+        <span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">lastWindowClosed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">rab</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+
+        <span class="c">#LAYOUT:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="c">#WATCH FOLDER</span>
+        <span class="c">#############</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_watchFolder</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Watch folder&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_watchFolder</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_watchFolderChanged</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">cb_watchFolder</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_opts</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder_opts</span><span class="p">)</span>
+        <span class="n">gl</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_opts</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_opts</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="o">.</span><span class="n">setReadOnly</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">btn</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;Change&#39;</span><span class="p">)</span>
+        <span class="n">btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderChanged</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cb_filesOnly</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Files only&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cb_filesOnly</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">wf</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;files only&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_watchFolder</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> 
+                                <span class="n">wf</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="s">&#39;files only&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cb_filesOnly</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span> <span class="p">)</span>
+
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;refreshrate [msec]&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">wf</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;refreshrate&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRateChanged</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>       
+
+        <span class="c">#RABBIT MQ</span>
+        <span class="c">##########</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Allow inter-process communication</span><span class="se">\n</span><span class="s">using the RabbitMQ server&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_allowRabbitMQchanged</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Confirm received messages&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;corfirmPosts&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">toggled</span> <span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span>
+                                                    <span class="s">&#39;corfirmPosts&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_opts</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rab_opts</span><span class="p">)</span>
+        <span class="n">gl</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_opts</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_opts</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;refreshrate [msec]&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;refreshrate&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span>
+                                                    <span class="s">&#39;refreshrate&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;host&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le_host</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le_host</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le_host</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> 
+                                <span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="s">&#39;host&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">le_host</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;timeout [msec]&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> 
+                                <span class="n">rab</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="s">&#39;timeout&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;&lt;b&gt;....listen to queues named:&lt;/b&gt;&#39;</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rab</span><span class="o">.</span><span class="n">listenTo</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()):</span>
+            <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">queue</span><span class="p">),</span> <span class="mi">4</span><span class="o">+</span><span class="n">n</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">__doc__</span><span class="p">),</span> <span class="mi">4</span><span class="o">+</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+ 
+
+
+    <span class="k">def</span> <span class="nf">_watchFolderChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checked</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_opts</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">checked</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">checked</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+      
+      
+    <span class="k">def</span> <span class="nf">_wf_refRateChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;refreshrate&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_wf_folderChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;folder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>            
+
+
+    <span class="k">def</span> <span class="nf">_allowRabbitMQchanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checked</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">checked</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rabbitMQServer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="c">#maybe rabbitMQ is not installed</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errm</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QErrorMessage</span><span class="p">()</span> <span class="c">#needs to assign to self, otherwise garbage collected</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errm</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+                <span class="k">return</span>     
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rabbitMQServer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_opts</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">checked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">checked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustSize</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="c">#TODO: add server.opts.[activated]</span>
+        <span class="c">#TODO: only save server.opts</span>
+        <span class="c">#TODO. create def update to read from server.opts</span>
+<span class="c">#         session.addContentToSave({</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;pcommunication&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;WatchFolderOpts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wf</span><span class="o">.</span><span class="n">opts</span><span class="p">,</span>        
+                                  
+            <span class="s">&#39;RMQ_refreshRate&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+            <span class="s">&#39;RMQ_host&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">le_host</span><span class="o">.</span><span class="n">text</span><span class="p">()),</span>
+            <span class="s">&#39;RMQ_timeout&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+            <span class="s">&#39;RMQ_activated&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+            <span class="s">&#39;RMQ_confirmPosts&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+                                <span class="p">}</span>
+        
+            
+    <span class="k">def</span> <span class="nf">_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;pcommunication&#39;</span><span class="p">]</span>
+
+        <span class="n">wf</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="s">&#39;WatchFolderOpts&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_refRate</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">wf</span><span class="p">[</span><span class="s">&#39;refreshrate&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cb_filesOnly</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">wf</span><span class="p">[</span><span class="s">&#39;files only&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wf_folderEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">wf</span><span class="p">[</span><span class="s">&#39;folder&#39;</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rab_refRate</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;RMQ_refreshRate&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le_host</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;RMQ_host&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_timeout</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;RMQ_timeout&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_confirm</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;RMQ_confirmPosts&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cb_allowRabbit</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;RMQ_activated&#39;</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="ChooseProfile"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.ChooseProfile">[docs]</a><span class="k">class</span> <span class="nc">ChooseProfile</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> 
+
+        <span class="n">lab</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Profile:&#39;</span><span class="p">)</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;The chosen profile influences the visibility of tool bars.</span>
+<span class="s">Changes are only effective after restarting the program.&#39;&#39;&#39;</span>
+        <span class="n">lab</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+        
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">cb</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">(</span> <span class="s">&#39;simple&#39;</span><span class="p">,</span> <span class="s">&#39;electroluminescence&#39;</span><span class="p">)</span>
+        <span class="n">cb</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cb</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">items</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">app_opts</span><span class="p">[</span><span class="s">&#39;profile&#39;</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">app_opts</span><span class="p">[</span><span class="s">&#39;profile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;simple&#39;</span>
+            <span class="k">pass</span>
+        <span class="n">cb</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span>
+                                <span class="n">session</span><span class="o">.</span><span class="n">app_opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span>
+                                <span class="s">&#39;profile&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cb</span><span class="o">.</span><span class="n">currentText</span><span class="p">())))</span>
+        
+        <span class="n">l</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">lab</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PreferencesView"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.PreferencesView">[docs]</a><span class="k">class</span> <span class="nc">PreferencesView</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    General view preferences, like the colour theme</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+        <span class="c">#TODO: make pyqtgraph optics(colortheme...) directly changeable - not just</span>
+        <span class="c">#      at reload</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span>
+        <span class="c">#CONNECT SAVE/RESTORE:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_restore</span><span class="p">)</span>
+        <span class="c">#LAYOUT:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_colorTheme</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Color theme&#39;</span><span class="p">)</span> 
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_colorTheme</span><span class="p">)</span>
+         
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="o">.</span><span class="n">addItems</span><span class="p">((</span> <span class="s">&#39;dark&#39;</span><span class="p">,</span> <span class="s">&#39;bright&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                                <span class="bp">self</span><span class="o">.</span><span class="n">setColorTheme</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="o">.</span><span class="n">currentText</span><span class="p">()))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_antialiasting</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Antialiasting&#39;</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_antialiasting</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_antialiasting</span><span class="o">.</span><span class="n">stateChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setAntialiasting</span><span class="p">)</span>
+
+        <span class="n">combo_profile</span> <span class="o">=</span> <span class="n">ChooseProfile</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">combo_profile</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_setAntialiasting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">setConfigOption</span><span class="p">(</span><span class="s">&#39;antialias&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ws</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">workspaces</span><span class="p">():</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;pview&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&#39;colorTheme&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()}</span>
+
+            
+    <span class="k">def</span> <span class="nf">_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_colorTheme</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pview&#39;</span><span class="p">][</span><span class="s">&#39;colorTheme&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="PreferencesView.setColorTheme"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.PreferencesView.setColorTheme">[docs]</a>    <span class="k">def</span> <span class="nf">setColorTheme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theme</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">theme</span> <span class="o">==</span> <span class="s">&#39;dark&#39;</span><span class="p">:</span>
+            <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">setConfigOption</span><span class="p">(</span><span class="s">&#39;foreground&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">setConfigOption</span><span class="p">(</span><span class="s">&#39;background&#39;</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">theme</span> <span class="o">==</span> <span class="s">&quot;bright&quot;</span><span class="p">:</span>
+            <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">setConfigOption</span><span class="p">(</span><span class="s">&#39;foreground&#39;</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">setConfigOption</span><span class="p">(</span><span class="s">&#39;background&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&#39;theme </span><span class="si">%s</span><span class="s"> unknown&#39;</span> <span class="o">%</span><span class="n">theme</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">ws</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">workspaces</span><span class="p">():</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span></div></div>
+<span class="c">#             for d in ws.displays():#doesn&#39;t acknowledge tools prefs</span>
+<span class="c">#                 d.reloadWidget()</span>
+
+
+<div class="viewcode-block" id="PreferencesImport"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.PreferencesImport">[docs]</a><span class="k">class</span> <span class="nc">PreferencesImport</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Preferences for importing files</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">separated</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">together</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">inCurrentDisplay</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">inImportDisplay</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">importFilesPolicy</span> <span class="o">=</span> <span class="n">together</span>
+    <span class="n">showImportDialog</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">loadImportedFiles</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+        <span class="c">#CONNECT SAVE/RESTORE:</span>
+        <span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">)</span>
+        <span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_restore</span><span class="p">)</span>
+        <span class="c">#LAYOUT:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_multifiles</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Import multiple files&#39;</span><span class="p">)</span> 
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_multifiles</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">addItems</span><span class="p">((</span> <span class="s">&#39;separated&#39;</span><span class="p">,</span> <span class="s">&#39;together&#39;</span><span class="p">,</span>
+                                     <span class="s">&#39;in current display&#39;</span><span class="p">,</span>
+                                     <span class="s">&#39;in import display&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">importFilesPolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_importChanged</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;load files&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span>
+                                    <span class="s">&#39;loadImportedFiles&#39;</span><span class="p">,</span> <span class="n">checked</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Show import dialog&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showImportDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span>
+                                    <span class="s">&#39;showImportDialog&#39;</span><span class="p">,</span> <span class="n">checked</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_importChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">importFilesPolicy</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">currentWorkspace</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">inImportDisplay</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">setCurrentDisplayToImportDisplay</span><span class="p">()</span>   
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">unsetImportDisplay</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;pimport&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="c">#         session.addContentToSave({</span>
+            <span class="s">&#39;importOption&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">(),</span>
+            <span class="s">&#39;loadFiles&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+            <span class="s">&#39;showDialog&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()}</span>
+<span class="c">#         , &#39;preferences&#39;,&#39;import.txt&#39;)</span>
+
+            
+    <span class="k">def</span> <span class="nf">_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span>  <span class="n">state</span><span class="p">[</span><span class="s">&#39;pimport&#39;</span><span class="p">]</span><span class="c">#eval(session.getSavedContent(&#39;preferences&#39;,&#39;import.txt&#39;))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;importOption&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;loadFiles&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_ask</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;showDialog&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="PreferencesImport.updateSettings"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.preferences.PreferencesImport.updateSettings">[docs]</a>    <span class="k">def</span> <span class="nf">updateSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pref</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update all setting to the given instance</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">pref</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">combo_import</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="p">)</span>
+        <span class="c">#pref.showImportDialog = self.related.btn_ask.isChecked()</span>
+        <span class="n">pref</span><span class="o">.</span><span class="n">btn_ask</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showImportDialog</span><span class="p">)</span>
+        <span class="c">#self.loadImportedFiles = self.related.btn_loadFiles.isChecked()</span>
+        <span class="n">pref</span><span class="o">.</span><span class="n">btn_loadFiles</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loadImportedFiles</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

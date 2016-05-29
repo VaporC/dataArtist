@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.measurement.HistogramROI &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.measurement.HistogramROI</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.measurement.HistogramROI</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">_ROI</span> <span class="kn">import</span> <span class="n">ROIArea</span><span class="p">,</span> <span class="n">ROITool</span>
+
+
+
+<div class="viewcode-block" id="HistogramROI"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.HistogramROI.HistogramROI">[docs]</a><span class="k">class</span> <span class="nc">HistogramROI</span><span class="p">(</span><span class="n">ROITool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    add averaged regions of interest (ROI)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;histogramROI.svg&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">ROITool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI01Slave</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitBins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Limit number of bins&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;If False: number of bins is calculated by max(img)-min(img)&#39;</span><span class="p">})</span>     
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitBins</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                        <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pNBins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitBins</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;number of bins&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">100</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mf">1e4</span><span class="p">],</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitRange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Limit Range&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>     
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitRange</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+                        <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span> <span class="p">)</span>  
+              
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRangeFrom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitRange</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;From&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">**</span><span class="mi">24</span><span class="p">],</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>  
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRangeTo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitRange</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;To&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">**</span><span class="mi">24</span><span class="p">],</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        
+        <span class="c">#update view when parameters changed:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLimitBins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pNBins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitRange</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">pRangeFrom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRangeTo</span><span class="p">):</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                    <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">updateView</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span>  <span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span><span class="p">])</span>
+        
+
+<div class="viewcode-block" id="HistogramROI.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.HistogramROI.HistogramROI.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">slave</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">ROI</span> <span class="o">=</span> <span class="n">_HistogramROIArea</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(),</span> <span class="s">&#39;N Pixels&#39;</span><span class="p">)</span> 
+        
+        <span class="c">#USE THE LAST ROI SLAVE DISPLAY IF APPLICABLE:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI01Slave</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI01Slave</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="n">slave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI01Slave</span>
+                
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">ROI</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">slave</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#CREATE A NEW SLAVE DISPLAY</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ROI01Slave</span> <span class="o">=</span> <span class="n">slave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span> 
+                        <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> 
+                        <span class="n">title</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> of </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">shortName</span><span class="p">())</span> 
+                                              <span class="p">)</span>
+        <span class="c">#SET DATA:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">index</span><span class="o">=</span><span class="bp">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pPlotAll</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span>
+        
+        <span class="c">#take middle of current position</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">viewRange</span><span class="p">()</span>  
+        <span class="n">p</span> <span class="o">=</span> <span class="p">((</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="c">#CREATE NEW ROI:</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">ROI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> 
+                    <span class="n">slave</span><span class="p">,</span> 
+                    <span class="n">name</span><span class="p">,</span> 
+                    <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                    <span class="n">pen</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span><span class="p">)</span><span class="o">%</span><span class="mi">6</span><span class="p">),</span>
+                    <span class="n">pos</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROIs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">roi</span></div>
+
+
+<div class="viewcode-block" id="HistogramROI.getSymbol"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.HistogramROI.HistogramROI.getSymbol">[docs]</a>    <span class="k">def</span> <span class="nf">getSymbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c">#one point</span>
+            <span class="k">return</span> <span class="s">&#39;o&#39;</span></div></div>
+
+
+
+<span class="k">class</span> <span class="nc">_HistogramROIArea</span><span class="p">(</span><span class="n">ROIArea</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    a histogram of the image</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;Histogram&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ROIArea</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ROIArea</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">masterDisplay</span><span class="o">.</span><span class="n">layerNames</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slaveDisplay</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span>
+                                                <span class="n">layer</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> - </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">n</span><span class="p">)))</span>
+
+
+    <span class="k">def</span> <span class="nf">updateView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#COORDS</span>
+        <span class="n">px</span><span class="p">,</span><span class="n">py</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">x0</span><span class="p">,</span><span class="n">y0</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getCoords</span><span class="p">()</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x0</span><span class="o">+</span><span class="n">px</span><span class="p">)))</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x1</span><span class="o">+</span><span class="n">px</span><span class="p">))</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">y0</span><span class="o">+</span><span class="n">py</span><span class="p">)))</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">y1</span><span class="o">+</span><span class="n">py</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">px</span><span class="p">,</span><span class="n">py</span><span class="p">)</span>
+ 
+        <span class="n">simg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span>
+        <span class="k">if</span> <span class="n">simg</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">simg</span> <span class="o">=</span> <span class="p">[</span><span class="n">simg</span><span class="p">]</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">pRangeFrom</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">pRangeTo</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+       
+        <span class="k">for</span> <span class="n">img</span><span class="p">,</span> <span class="n">plot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">simg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">):</span>
+        <span class="c">#DATA</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">img_cut</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">]</span>
+                <span class="n">nBins</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">pLimitRange</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                    <span class="n">img_cut</span><span class="p">[</span><span class="n">img_cut</span><span class="o">&lt;</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">img_cut</span><span class="p">[</span><span class="n">img_cut</span><span class="o">&gt;</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">nBins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="n">f</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">pLimitBins</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                    <span class="n">nBins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">pNBins</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+                
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">nBins</span><span class="p">:</span>
+                    <span class="n">nBins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img_cut</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">img_cut</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">nBins</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+                        <span class="c">#e.g. when scaling 0-1</span>
+                        <span class="n">nBins</span> <span class="o">=</span> <span class="mi">100</span>   
+                <span class="n">hist</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">img_cut</span><span class="p">,</span> <span class="n">nBins</span><span class="p">)</span>    
+                <span class="c">#TODO: take mean of the bin edges</span>
+                <span class="n">plot</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">hist</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">),</span><span class="n">err</span><span class="p">:</span>
+                <span class="c"># out out bounds</span>
+                <span class="k">print</span> <span class="n">err</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

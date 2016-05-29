@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.Workspace &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.Workspace</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.Workspace</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">weakref</span>
+
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.Console</span> <span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span> <span class="nn">fancytools.fcollections.naturalSorting</span> <span class="kn">import</span> <span class="n">naturalSorting</span>
+<span class="kn">from</span> <span class="nn">fancytools.fcollections.WeakList</span> <span class="kn">import</span> <span class="n">WeakList</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.DisplayPrefTabs</span> <span class="kn">import</span> <span class="n">DisplayPrefTabs</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.MiddleDockArea</span> <span class="kn">import</span> <span class="n">MiddleDockArea</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.docks</span> <span class="kn">import</span> <span class="n">DockTable</span><span class="p">,</span> <span class="n">DockTextEditor</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.DisplayDock</span> <span class="kn">import</span> <span class="n">DisplayDock</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.dialogs.ImportDialog</span> <span class="kn">import</span> <span class="n">ImportDialog</span>
+
+
+
+<div class="viewcode-block" id="Workspace"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace">[docs]</a><span class="k">class</span> <span class="nc">Workspace</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    One workspace of dataArtist.gui containing:</span>
+<span class="sd">    * multiple displays</span>
+<span class="sd">    * toolbars</span>
+<span class="sd">    * a side panel with display preferences</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+        
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#number of opened displays</span>
+        <span class="c">#BUILD MAIN DOCKAREAS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">streamOut</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> 
+                               <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">streamErr</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">setMinimumHeight</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span> <span class="o">=</span> <span class="n">DisplayPrefTabs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">currentChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabChanged</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span> <span class="o">=</span> <span class="n">MiddleDockArea</span><span class="p">()</span>
+        
+        <span class="c">#LAYOUT:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="c">#remove space between statusbar and console:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">contentsMargins</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">setBottom</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="c">#middle - displays and message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="c">#0=horiz, 1=vert</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="p">)</span>
+        <span class="c">#hide console by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="o">.</span><span class="n">moveSplitter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="c"># (410, 1)</span>
+        <span class="c">#add areas to centralWidget     </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="c">#0=horiz, 1=vert</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="p">)</span>
+        <span class="c">#display pref tabs with fixed size:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="o">.</span><span class="n">setStretchFactor</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setActive</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Workspace.number"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.number">[docs]</a>    <span class="k">def</span> <span class="nf">number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return the number of this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">centralWidget</span><span class="p">()</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="Workspace.setPrintView"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.setPrintView">[docs]</a>    <span class="k">def</span> <span class="nf">setPrintView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boolean</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Hide dock labels and QSplitter handle if True</span>
+<span class="sd">        for a nice and printable view</span>
+<span class="sd">        &#39;&#39;&#39;</span> 
+        <span class="n">containers</span><span class="p">,</span> <span class="n">docks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">findAll</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">boolean</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="s">&#39;black&#39;</span> <span class="k">if</span> <span class="n">pg</span><span class="o">.</span><span class="n">getConfigOption</span><span class="p">(</span><span class="s">&#39;background&#39;</span><span class="p">)</span><span class="o">==</span><span class="s">&#39;k&#39;</span> <span class="k">else</span> <span class="s">&#39;white&#39;</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">hideTitleBar</span><span class="p">()</span> 
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">:</span>
+                <span class="k">if</span>  <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">):</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s">&quot;QSplitter::handle{background-color: </span><span class="si">%s</span><span class="s">;}&quot;</span> <span class="o">%</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">showTitleBar</span><span class="p">()</span> 
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">:</span>
+                <span class="k">if</span>  <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">):</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.saveState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c">#GENERAL</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;middleSplitter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;vertSplitter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()</span>
+        <span class="c">#DISPLAYS</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displaydict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">display</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">))</span>
+            <span class="n">l</span><span class="p">[</span><span class="s">&#39;display_</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;displays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="c"># ={name:(name,nDim)}</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;currentDisplay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span><span class="o">.</span><span class="n">number</span> <span class="k">if</span> <span class="n">d</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;nDisplays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span>
+        <span class="n">l</span><span class="p">[</span><span class="s">&#39;displayLayout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="k">else</span> <span class="bp">None</span>
+<span class="c">#         dis = self.displays()</span>
+<span class="c">#         if dis:</span>
+<span class="c">#             for d in dis:</span>
+<span class="c">#                 l[&#39;display_%i&#39; %d.number] = d.saveState()</span>
+<span class="c">#             self.changeDisplay(dis[0])</span>
+        <span class="c">#TABLES   </span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">()</span>
+        <span class="n">lt</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="s">&#39;tables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span><span class="c">#{n:t.name() for n,t in enumerate(tables)}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+            <span class="n">lt</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">table</span><span class="p">()</span>
+            
+        <span class="c">#NOTEPADS</span>
+        <span class="n">notepads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notepads</span><span class="p">()</span>
+        <span class="n">lt</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="s">&#39;notepads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">notepads</span><span class="p">:</span>
+            <span class="n">lt</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">toHtml</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">l</span></div>
+            
+        
+<div class="viewcode-block" id="Workspace.restoreState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="c">#         path = (&#39;workspace&#39;,&#39;%s&#39; %self.number())</span>
+<span class="c">#         l =  session.getSavedContent(*path +(&#39;general.txt&#39;,) )</span>
+<span class="c">#         l = eval(l)</span>
+<span class="c">#         l = state[&#39;workspace_%i&#39; %self.number()]</span>
+        <span class="c">#GENERAL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_splitter</span><span class="o">.</span><span class="n">setSizes</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;middleSplitter&#39;</span><span class="p">])</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_splitter</span><span class="o">.</span><span class="n">setSizes</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;vertSplitter&#39;</span><span class="p">])</span> 
+        <span class="c">#DISPLAYS</span>
+        <span class="n">currentDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">currN</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;currentDisplay&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">nDim</span><span class="p">)</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;displays&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="n">number</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">nDim</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeToolBars</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;display_</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">number</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">number</span> <span class="o">==</span> <span class="n">currN</span><span class="p">:</span>
+                <span class="n">currentDisplay</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="c">#TABLES   </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">():</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;tables&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addTableDock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">dt</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">importTable</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>   
+<span class="c">#             p = session.getSavedFile(*path+(&#39;tables&#39;, &#39;%s.csv&#39; %n) )</span>
+<span class="c">#             dt.widgets[0].restore(p)</span>
+        <span class="c">#NOTEPADS</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notepads</span><span class="p">():</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;notepads&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addTextDock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">dt</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setHtml</span><span class="p">(</span><span class="n">content</span>
+<span class="c">#                                        session.getSavedContent(*path+(</span>
+<span class="c">#                                                     &#39;notepads&#39;, &#39;%s.html&#39; %n) )</span>
+                                       <span class="p">)</span>
+        <span class="c">#LAYOUT</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;displayLayout&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;displayLayout&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;nDisplays&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">currentDisplay</span><span class="p">:</span>
+            <span class="c">#remove old:</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">removeToolBar</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span><span class="n">currentDisplay</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.integrateDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.integrateDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">integrateDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        integrate a new display into the workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">)</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">sigClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span>
+                                                <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">display</span><span class="p">))</span> <span class="p">)</span>
+        <span class="c">#close this tab too if the display is closed:</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">closed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_displayClosed</span><span class="p">)</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">tab</span><span class="p">,</span> <span class="s">&quot;[</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span><span class="n">display</span><span class="o">.</span><span class="n">number</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">addDock</span><span class="p">(</span><span class="n">display</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_displayClosed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">removeTab</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">tab</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">l</span><span class="p">:</span>
+            <span class="c">#select an other display</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#remove remaining toolbars</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">removeToolBar</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="o">=</span> <span class="bp">None</span>
+ 
+
+<div class="viewcode-block" id="Workspace.displays"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.displays">[docs]</a>    <span class="k">def</span> <span class="nf">displays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return a list of displays within this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">WeakList</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> 
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">DisplayDock</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="Workspace.tables"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.tables">[docs]</a>    <span class="k">def</span> <span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return a list of tables within this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> 
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">DockTable</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="Workspace.notepads"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.notepads">[docs]</a>    <span class="k">def</span> <span class="nf">notepads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return a list of notepads within this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> 
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">DockTextEditor</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="Workspace.changeDisplayNumber"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.changeDisplayNumber">[docs]</a>    <span class="k">def</span> <span class="nf">changeDisplayNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        change to display of given [number]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displaydict</span><span class="p">()[</span><span class="n">number</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.displaydict"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.displaydict">[docs]</a>    <span class="k">def</span> <span class="nf">displaydict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns dict{number:displayInstance}</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+            
+        
+<div class="viewcode-block" id="Workspace.setActive"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.setActive">[docs]</a>    <span class="k">def</span> <span class="nf">setActive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        activate this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeToolBars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">setActive</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Workspace.setInactive"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.setInactive">[docs]</a>    <span class="k">def</span> <span class="nf">setInactive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        deactivate this workspace</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_removeCurrentToolBars</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">setInactive</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_removeCurrentToolBars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">removeToolBar</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span> 
+
+
+<div class="viewcode-block" id="Workspace.close"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setInactive</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">widget</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">docks</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+            
+
+<div class="viewcode-block" id="Workspace.tabChanged"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.tabChanged">[docs]</a>    <span class="k">def</span> <span class="nf">tabChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        also change the display combined to the changed tab</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tab</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="s">&#39;display&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">display</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.changeDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.changeDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">changeDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        show tab, symbolActive and the toolbars of the changed display</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="o">!=</span> <span class="n">display</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setSelected</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="c">#add a symbol to the active display:</span>
+            <span class="n">display</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setSelected</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="c">#set global toolbar to the toolbars of the active display:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeToolBars</span><span class="p">(</span><span class="n">display</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="o">=</span> <span class="n">display</span>
+            <span class="c">#activate this tab if its display is clicked:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">tab</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Workspace.reload"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reload all display and current toolbars</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">removeToolBar</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">reloadWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeToolBars</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span> </div>
+
+
+<div class="viewcode-block" id="Workspace.getCurrentDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.getCurrentDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayPrefTabs</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span><span class="o">.</span><span class="n">display</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span><span class="c">#there is no display so far</span>
+            <span class="k">return</span> <span class="bp">None</span></div>
+  
+  
+<span class="c">#     def getDisplayNumber(self, number):</span>
+<span class="c">#         for d in self.displays():</span>
+<span class="c">#             if d.number == number:</span>
+<span class="c">#                 return d</span>
+
+
+<div class="viewcode-block" id="Workspace.moveCurrentDisplayToOtherWorkspace"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.moveCurrentDisplayToOtherWorkspace">[docs]</a>    <span class="k">def</span> <span class="nf">moveCurrentDisplayToOtherWorkspace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspsace</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;no display chosen&#39;</span><span class="p">)</span>
+        <span class="c">#at the moment display is a weakproxy</span>
+        <span class="c">#executing this returns the original class:</span>
+            <span class="c">#TODO: find better solution</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">__repr__</span><span class="o">.</span><span class="n">__self__</span>
+        <span class="n">workspsace</span><span class="o">.</span><span class="n">integrateDisplay</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_removeCurrentToolBars</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeDisplay</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+      
+      
+<div class="viewcode-block" id="Workspace.changeToolBars"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.changeToolBars">[docs]</a>    <span class="k">def</span> <span class="nf">changeToolBars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        remove old and show new toolbars - if there are selected</span>
+<span class="sd">        apply position of last display.widget.toolbars</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">:</span><span class="c"># and display !=d:</span>
+            <span class="c">#save old layout</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">isSelected</span><span class="p">():</span>  
+                    <span class="n">bar</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">toolBarArea</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+                    <span class="n">bar</span><span class="o">.</span><span class="n">hasBreak</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">toolBarBreak</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+            <span class="c">#save order:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">bar</span><span class="p">:</span>
+                                      <span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">bar</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()))</span>
+            <span class="c">#remove old:</span>
+            <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">removeToolBar</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+            <span class="c">#is displays are of same kind:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">:</span>
+                <span class="c">#apply sequence of old display to new one:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span>
+                <span class="k">def</span> <span class="nf">findBar</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">bar</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">n</span>
+                <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">findBar</span><span class="p">)</span>
+        
+        <span class="c">#add new toolbars:</span>
+        <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">bar</span><span class="o">.</span><span class="n">position</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">addToolBar</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">bar</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">hasBreak</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">insertToolBarBreak</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">menu_toolbars</span><span class="o">.</span><span class="n">a_show</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">bar</span><span class="o">.</span><span class="n">isSelected</span><span class="p">():</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Workspace.addShowToolBarAction"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.addShowToolBarAction">[docs]</a>    <span class="k">def</span> <span class="nf">addShowToolBarAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+                <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">toggleViewAction</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Workspace.toggleShowSelectedToolbars"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.toggleShowSelectedToolbars">[docs]</a>    <span class="k">def</span> <span class="nf">toggleShowSelectedToolbars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_active_display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">isSelected</span><span class="p">():</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Workspace.addTableDock"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.addTableDock">[docs]</a>    <span class="k">def</span> <span class="nf">addTableDock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a new table to the dock area</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;table </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">())</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">DockTable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">addDock</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+    
+    
+<div class="viewcode-block" id="Workspace.addTextDock"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.addTextDock">[docs]</a>    <span class="k">def</span> <span class="nf">addTextDock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a new notepad to the dock area</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;notepad </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">notepads</span><span class="p">())</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">DockTextEditor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="o">.</span><span class="n">addDock</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="Workspace.addDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.addDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">addDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        create and integrate a new display</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;number&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">number</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_displays</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">display</span> <span class="o">=</span> <span class="n">DisplayDock</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrateDisplay</span><span class="p">(</span><span class="n">display</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">display</span></div>
+
+
+<div class="viewcode-block" id="Workspace.copyViewToClipboard"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.copyViewToClipboard">[docs]</a>    <span class="k">def</span> <span class="nf">copyViewToClipboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">grabWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">area_middle</span><span class="p">)</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">clipboard</span><span class="p">()</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Copied view to clipboard.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.copyCurrentDisplayToClipboard"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.copyCurrentDisplayToClipboard">[docs]</a>    <span class="k">def</span> <span class="nf">copyCurrentDisplayToClipboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">grabWidget</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">clipboard</span><span class="p">()</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Copied current display to clipboard.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.setCurrentDisplayToImportDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.setCurrentDisplayToImportDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">setCurrentDisplayToImportDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return whether successful</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setImportDisplay</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+        
+    <span class="k">def</span> <span class="nf">_setImportDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unsetImportDisplay</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">closeButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Set current display [</span><span class="si">%s</span><span class="s">] as import display&#39;</span> <span class="o">%</span><span class="n">d</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Workspace.unsetImportDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.unsetImportDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">unsetImportDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">closeButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Unset current display [</span><span class="si">%s</span><span class="s">] as import display&#39;</span> <span class="o">%</span><span class="n">d</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span> <span class="o">=</span> <span class="bp">None</span></div>
+
+
+<div class="viewcode-block" id="Workspace.addFiles"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Workspace.Workspace.addFiles">[docs]</a>    <span class="k">def</span> <span class="nf">addFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        check the importPolicy: if = ask: show import dialog to ask user</span>
+<span class="sd">        if import together: import all files together in one display</span>
+<span class="sd">        else: import separated</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c">#sort by names:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">naturalSorting</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+        <span class="c">#show import dialog, if wished, choose there to take import settings from</span>
+        <span class="c">#a)import dialog b)preferences-&gt;import</span>
+        <span class="n">pref</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">pref_import</span>
+        <span class="k">if</span> <span class="n">pref</span><span class="o">.</span><span class="n">showImportDialog</span><span class="p">:</span>
+            <span class="n">dial</span> <span class="o">=</span> <span class="n">ImportDialog</span><span class="p">(</span><span class="n">pref</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+            <span class="n">dial</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dial</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+                <span class="k">return</span>
+        <span class="c">#add files in current display:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">pref</span><span class="o">.</span><span class="n">importFilesPolicy</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pref</span><span class="o">.</span><span class="n">inCurrentDisplay</span><span class="p">,</span> <span class="n">pref</span><span class="o">.</span><span class="n">inImportDisplay</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">pref</span><span class="o">.</span><span class="n">inCurrentDisplay</span><span class="p">:</span>
+                <span class="n">display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentDisplay</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_display</span><span class="c">#DisplayNumber(pref.displayNumber)            </span>
+            <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+                <span class="n">display</span><span class="o">.</span><span class="n">addFiles</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">openfiles</span><span class="o">=</span><span class="n">pref</span><span class="o">.</span><span class="n">loadImportedFiles</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#if there is no display yet: create a new one:</span>
+                <span class="n">display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">openfiles</span><span class="o">=</span><span class="n">pref</span><span class="o">.</span><span class="n">loadImportedFiles</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pref</span><span class="o">.</span><span class="n">inImportDisplay</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_setImportDisplay</span><span class="p">(</span><span class="n">display</span><span class="p">)</span>
+                    
+        <span class="c">#import all files in one new display:</span>
+        <span class="k">elif</span> <span class="n">pref</span><span class="o">.</span><span class="n">importFilesPolicy</span> <span class="o">==</span> <span class="n">pref</span><span class="o">.</span><span class="n">together</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">openfiles</span><span class="o">=</span><span class="n">pref</span><span class="o">.</span><span class="n">loadImportedFiles</span><span class="p">)</span>
+        <span class="c">#import files in separate displays:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="c"># import each file separate</span>
+                <span class="c"># also give a list when there is only one file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="n">p</span><span class="p">],</span> <span class="n">openfiles</span><span class="o">=</span><span class="n">pref</span><span class="o">.</span><span class="n">loadImportedFiles</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

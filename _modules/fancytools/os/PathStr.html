@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fancytools.os.PathStr &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>fancytools.os.PathStr</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fancytools.os.PathStr</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<span class="n">escape_dict</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;</span><span class="se">\a</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\a&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\b</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\b&#39;</span><span class="p">,</span>
+             <span class="s">&#39;\c&#39;</span><span class="p">:</span><span class="s">r&#39;\c&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\f</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\f&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\n&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\r&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\t&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\v</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\v&#39;</span><span class="p">,</span>
+              <span class="c">#&#39;\x&#39;:r&#39;\x&#39;,#cannot do \x - otherwise exception</span>
+             <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\&quot;&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\0&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\1</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\1&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\2</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\2&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\3</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\3&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\4</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\4&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\5</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\5&#39;</span><span class="p">,</span>
+             <span class="s">&#39;</span><span class="se">\6</span><span class="s">&#39;</span><span class="p">:</span><span class="s">r&#39;\6&#39;</span><span class="p">,</span>
+             <span class="c">#&#39;\7&#39;:r&#39;\7&#39;,#same as \a is ASCI</span>
+             <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">raw</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a raw string representation of text&quot;&quot;&quot;</span>
+    <span class="n">new_string</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">new_string</span><span class="o">+=</span><span class="n">escape_dict</span><span class="p">[</span><span class="n">char</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> 
+            <span class="n">new_string</span><span class="o">+=</span><span class="n">char</span>
+    <span class="k">return</span> <span class="n">new_string</span>
+
+
+
+<span class="k">class</span> <span class="nc">PathStr</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    easy path-string handling and manipulation using os.path and shutil</span>
+<span class="sd">    </span>
+<span class="sd">    Windows only: there is no need of transforming</span>
+<span class="sd">    \ to \\ - it will be done automatically when a PathStr instance is created</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; p = PathStr.home()</span>
+<span class="sd">    &gt;&gt;&gt; print p.isdir()</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; print p.exists()</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; d_list = [p.join(x) for x in p.listdir()]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;transform raw-string and / to \ depending on the os&#39;&#39;&#39;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">raw</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">home</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;return the home/user directory&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s">&quot;~&quot;</span><span class="p">))</span>
+    
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getcwd</span><span class="p">(</span><span class="n">moduleName</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get current path either from the temp folder used by pyinstaller:</span>
+<span class="sd">        </span>
+<span class="sd">            * apps &#39;sys._MEIPASS&#39; if packed with --onefile option</span>
+<span class="sd">        </span>
+<span class="sd">        or</span>
+<span class="sd">        </span>
+<span class="sd">            * os.getcwd()</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">_MEIPASS</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">moduleName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c">#pyinstaller create one temp folder</span>
+                <span class="c">#to separate e.g. media directories from each package it is useful</span>
+                <span class="c">#to build its file-tree like this /temp/[mainPackage]/</span>
+                <span class="c">#to get the main package PathStr need a derived instance</span>
+                <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">moduleName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">p</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+
+
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;add a file/name to this PathStr instance&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;return whether PathStr instance exists as a file/folder&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">abspath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;open and read the file is existent&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">basename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;move this file/folder the [dst]&#39;&#39;&#39;</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dname</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+
+    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_file_name</span><span class="p">):</span>
+        <span class="n">newname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_file_name</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newname</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">newname</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">filetype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+
+
+    <span class="k">def</span> <span class="nf">setFiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="s">&#39;.&#39;</span> <span class="o">+</span> <span class="n">ftype</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">isfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">isdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">listdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return a first of path to all files within that folder</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ftype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">isfile</span><span class="p">()</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">filetype</span><span class="p">()</span><span class="o">==</span><span class="n">ftype</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">isfile</span><span class="p">()]</span>
+
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#TODO: iter and listdir as generator object</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listdir</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">([])</span>
+
+
+    <span class="k">def</span> <span class="nf">all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a list of all files within this folder</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,1145 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets package &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="index.html"/>
+        <link rel="up" title="dataArtist package" href="dataArtist.html"/>
+        <link rel="next" title="dataArtist.widgets.dialogs package" href="dataArtist.widgets.dialogs.html"/>
+        <link rel="prev" title="dataArtist.modding.ownReader package" href="dataArtist.modding.ownReader.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dataArtist.html">dataArtist package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dataArtist.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.components.html">dataArtist.components package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.figures.html">dataArtist.figures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.input.html">dataArtist.input package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.items.html">dataArtist.items package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.modding.html">dataArtist.modding package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">dataArtist.widgets package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.Automation">dataArtist.widgets.Automation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.DisplayDock">dataArtist.widgets.DisplayDock module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.DisplayPrefTabs">dataArtist.widgets.DisplayPrefTabs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.GlobalTool">dataArtist.widgets.GlobalTool module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.GlobalTools">dataArtist.widgets.GlobalTools module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.ImageTool">dataArtist.widgets.ImageTool module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.MiddleDockArea">dataArtist.widgets.MiddleDockArea module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.ParameterMenu">dataArtist.widgets.ParameterMenu module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.ProgressBar">dataArtist.widgets.ProgressBar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.StatusBar">dataArtist.widgets.StatusBar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.Tool">dataArtist.widgets.Tool module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.Toolbars">dataArtist.widgets.Toolbars module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.UndoRedo">dataArtist.widgets.UndoRedo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.Workspace">dataArtist.widgets.Workspace module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.docks">dataArtist.widgets.docks module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.widgets.preferences">dataArtist.widgets.preferences module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.html#module-dataArtist.functions">dataArtist.functions module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="dataArtist.html">dataArtist package</a> &raquo;</li>
+      
+    <li>dataArtist.widgets package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/dataArtist.widgets.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dataArtist.widgets">
+<span id="dataartist-widgets-package"></span><h1>dataArtist.widgets package<a class="headerlink" href="#module-dataArtist.widgets" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataArtist.widgets.dialogs.html">dataArtist.widgets.dialogs package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.widgets.dialogs.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.widgets.dialogs.html#module-dataArtist.widgets.dialogs.ChooseFileReaderDialog">dataArtist.widgets.dialogs.ChooseFileReaderDialog module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.widgets.dialogs.html#module-dataArtist.widgets.dialogs.DifferentShapeDialog">dataArtist.widgets.dialogs.DifferentShapeDialog module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.widgets.dialogs.html#module-dataArtist.widgets.dialogs.FirstStartDialog">dataArtist.widgets.dialogs.FirstStartDialog module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.widgets.dialogs.html#module-dataArtist.widgets.dialogs.ImportDialog">dataArtist.widgets.dialogs.ImportDialog module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dataArtist.widgets.Automation">
+<span id="dataartist-widgets-automation-module"></span><h2>dataArtist.widgets.Automation module<a class="headerlink" href="#module-dataArtist.widgets.Automation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.Automation.Automation">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.Automation.</code><code class="descname">Automation</code><span class="sig-paren">(</span><em>display</em>, <em>splitter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>Widget for easy automation within dataArtist, providing:</p>
+<ul class="simple">
+<li>On/Of switch</li>
+<li>&#8216;Collect&#8217; button to grab the address of tool buttons and it&#8217;s parameters</li>
+<li>&#8216;Import&#8217; list to load saved scripts</li>
+<li>Multiple script editors listed as Tabs</li>
+<li>&#8216;Run on new input&#8217; - Activate active script as soon as the input has changed</li>
+<li>&#8216;Run&#8217; - run active script now</li>
+</ul>
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.checkWidgetIsActive">
+<code class="descname">checkWidgetIsActive</code><span class="sig-paren">(</span><em>widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.checkWidgetIsActive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.checkWidgetIsActive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.collectWidgets">
+<code class="descname">collectWidgets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.collectWidgets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.collectWidgets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a Tool button or a parameter within the tools menu
+and add it to the active script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.toggle">
+<code class="descname">toggle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.toggle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.toggle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start/Stop the active script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.toggleDataChanged">
+<code class="descname">toggleDataChanged</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.toggleDataChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.toggleDataChanged" title="Permalink to this definition">¶</a></dt>
+<dd><p>toggle run settings allow running for data changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.Automation.toggleNewData">
+<code class="descname">toggleNewData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#Automation.toggleNewData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.Automation.toggleNewData" title="Permalink to this definition">¶</a></dt>
+<dd><p>toggle run settings allow running for new data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.Automation.ScriptTab">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.Automation.</code><code class="descname">ScriptTab</code><span class="sig-paren">(</span><em>automation</em>, <em>refreshrate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#ScriptTab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.ScriptTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fancywidgets.pyQtBased.CodeEditor.CodeEditor</span></code></p>
+<p>A Tab containing:
+* a code editor
+* a QThread to run the script
+* method addTool() to add tools or toolParameters to the code editor</p>
+<dl class="method">
+<dt id="dataArtist.widgets.Automation.ScriptTab.addTool">
+<code class="descname">addTool</code><span class="sig-paren">(</span><em>widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Automation.html#ScriptTab.addTool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Automation.ScriptTab.addTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>append a tool or tool-parameter to the end of the editor text</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.DisplayDock">
+<span id="dataartist-widgets-displaydock-module"></span><h2>dataArtist.widgets.DisplayDock module<a class="headerlink" href="#module-dataArtist.widgets.DisplayDock" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.DisplayDock.</code><code class="descname">DisplayDock</code><span class="sig-paren">(</span><em>number</em>, <em>workspace</em>, <em>origin=None</em>, <em>index=None</em>, <em>names=None</em>, <em>title=''</em>, <em>data=None</em>, <em>axes=None</em>, <em>info=None</em>, <em>changes=None</em>, <em>openfiles=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.widgets.docks.DockBase" title="dataArtist.widgets.docks.DockBase"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.widgets.docks.DockBase</span></code></a></p>
+<p>A Dock container to...</p>
+<ul>
+<li><dl class="first docutils">
+<dt>OPEN and DISPLAY given input within a fitting display widget</dt>
+<dd><p class="first last">(e.g. display.Image for images)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>adding, (re)moving, copying input LAYERS (e.g. multiple plots</dt>
+<dd><p class="first last">or images of the same size)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">choosing the right TOOLS for the corresponding display widget</p>
+</li>
+<li><p class="first">creating PREFERENCES in INFORMATION about the input</p>
+</li>
+</ul>
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.adaptParamsToWidget">
+<code class="descname">adaptParamsToWidget</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.adaptParamsToWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.adaptParamsToWidget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.addFiles">
+<code class="descname">addFiles</code><span class="sig-paren">(</span><em>fnames</em>, <em>openfiles=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.addFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.addFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add input from file(s) to the stack
+-&gt; read input
+-&gt; add layer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.addLayer">
+<code class="descname">addLayer</code><span class="sig-paren">(</span><em>data=None</em>, <em>filename=None</em>, <em>label=None</em>, <em>origin=None</em>, <em>index=None</em>, <em>info=None</em>, <em>changes=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.addLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.addLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new layer to the stack</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.addLayers">
+<code class="descname">addLayers</code><span class="sig-paren">(</span><em>datas</em>, <em>fnames</em>, <em>labels=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.addLayers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.addLayers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.backupChangedLayer">
+<code class="descname">backupChangedLayer</code><span class="sig-paren">(</span><em>backup=None</em>, <em>changes=None</em>, <em>index=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.backupChangedLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.backupChangedLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.changeAllLayers">
+<code class="descname">changeAllLayers</code><span class="sig-paren">(</span><em>data=None</em>, <em>changes=None</em>, <em>backup=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.changeAllLayers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.changeAllLayers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.changeLayer">
+<code class="descname">changeLayer</code><span class="sig-paren">(</span><em>data=None</em>, <em>changes=None</em>, <em>index=None</em>, <em>backup=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.changeLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.changeLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFile">
+<code class="descname">changeLayerFile</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.changeLayerFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>change the origin file of layer of [index]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFiles">
+<code class="descname">changeLayerFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.changeLayerFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.changeWidget">
+<code class="descname">changeWidget</code><span class="sig-paren">(</span><em>widgetCls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.changeWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.changeWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>change the display widget class and setup the toolbar</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.clicked">
+<code class="descname">clicked</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.clicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>emits the signal &#8216;closed&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.closed">
+<code class="descname">closed</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.closed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToNewDisplay">
+<code class="descname">copyLayerToNewDisplay</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.copyLayerToNewDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToNewDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToOtherDisplay">
+<code class="descname">copyLayerToOtherDisplay</code><span class="sig-paren">(</span><em>index</em>, <em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.copyLayerToOtherDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToOtherDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.duplicate">
+<code class="descname">duplicate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.duplicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a new display with the same data and axes</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.filenames">
+<code class="descname">filenames</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.filenames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.insertRemovedLayer">
+<code class="descname">insertRemovedLayer</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.insertRemovedLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.insertRemovedLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a layer moved to [index]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.isClosed">
+<code class="descname">isClosed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.isClosed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.isClosed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.layerIndex">
+<code class="descname">layerIndex</code><span class="sig-paren">(</span><em>filename</em>, <em>layername</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.layerIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.layerIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.layerNames">
+<code class="descname">layerNames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.layerNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.layerNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the names of all data layers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.mousePressEvent">
+<code class="descname">mousePressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>emits the signal &#8216;clicked&#8217; if it is activated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToNewDisplay">
+<code class="descname">moveLayerToNewDisplay</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.moveLayerToNewDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToNewDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToOtherDisplay">
+<code class="descname">moveLayerToOtherDisplay</code><span class="sig-paren">(</span><em>index</em>, <em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.moveLayerToOtherDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToOtherDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.openFilesFunctions">
+<code class="descname">openFilesFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.openFilesFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.openFilesFunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.reloadWidget">
+<code class="descname">reloadWidget</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.reloadWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.reloadWidget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.removeLayer">
+<code class="descname">removeLayer</code><span class="sig-paren">(</span><em>index</em>, <em>toMove=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.removeLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.removeLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove a data layer
+toMove=True =&gt; this layer will be moved within the stack</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.removeLayers">
+<code class="descname">removeLayers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.removeLayers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.removeLayers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.shortName">
+<code class="descname">shortName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.shortName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.shortName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.showToolBar">
+<code class="descname">showToolBar</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.showToolBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.showToolBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>show an other toolbar of the same display.widget
+if hidden</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.sigLayerChanged">
+<code class="descname">sigLayerChanged</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.sigLayerChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.sigNewLayer">
+<code class="descname">sigNewLayer</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.sigNewLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.tools">
+<code class="descname">tools</code><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.tools" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayDock.DisplayDock.updateInput">
+<code class="descname">updateInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayDock.html#DisplayDock.updateInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayDock.DisplayDock.updateInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the input coming from file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.DisplayPrefTabs">
+<span id="dataartist-widgets-displaypreftabs-module"></span><h2>dataArtist.widgets.DisplayPrefTabs module<a class="headerlink" href="#module-dataArtist.widgets.DisplayPrefTabs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.DisplayPrefTabs.</code><code class="descname">DisplayPrefTabs</code><a class="reference internal" href="_modules/dataArtist/widgets/DisplayPrefTabs.html#DisplayPrefTabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fancywidgets.pyQtBased.FwTabWidget.FwTabWidget</span></code></p>
+<p>hide tabs-area if no tabs added</p>
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs.addTab">
+<code class="descname">addTab</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayPrefTabs.html#DisplayPrefTabs.addTab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs.addTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>show is a tab is added</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs.removeTab">
+<code class="descname">removeTab</code><span class="sig-paren">(</span><em>tab</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/DisplayPrefTabs.html#DisplayPrefTabs.removeTab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.DisplayPrefTabs.DisplayPrefTabs.removeTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>hide if there are no tabs</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.GlobalTool">
+<span id="dataartist-widgets-globaltool-module"></span><h2>dataArtist.widgets.GlobalTool module<a class="headerlink" href="#module-dataArtist.widgets.GlobalTool" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.GlobalTool.GlobalTool">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.GlobalTool.</code><code class="descname">GlobalTool</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/GlobalTool.html#GlobalTool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.GlobalTool.GlobalTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.widgets.Tool.Tool" title="dataArtist.widgets.Tool.Tool"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.widgets.Tool.Tool</span></code></a></p>
+<p>Tool, accessible for all display widgets of the same class.
+to be shown in the top right corner of the gui</p>
+<dl class="attribute">
+<dt id="dataArtist.widgets.GlobalTool.GlobalTool.display">
+<code class="descname">display</code><a class="headerlink" href="#dataArtist.widgets.GlobalTool.GlobalTool.display" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the current of the last valid display</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.GlobalTools">
+<span id="dataartist-widgets-globaltools-module"></span><h2>dataArtist.widgets.GlobalTools module<a class="headerlink" href="#module-dataArtist.widgets.GlobalTools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.GlobalTools.GlobalTools">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.GlobalTools.</code><code class="descname">GlobalTools</code><a class="reference internal" href="_modules/dataArtist/widgets/GlobalTools.html#GlobalTools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.GlobalTools.GlobalTools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>Widget containing all global tools</p>
+<dl class="method">
+<dt id="dataArtist.widgets.GlobalTools.GlobalTools.addWidget">
+<code class="descname">addWidget</code><span class="sig-paren">(</span><em>w</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/GlobalTools.html#GlobalTools.addWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.GlobalTools.GlobalTools.addWidget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.ImageTool">
+<span id="dataartist-widgets-imagetool-module"></span><h2>dataArtist.widgets.ImageTool module<a class="headerlink" href="#module-dataArtist.widgets.ImageTool" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.ImageTool.ImageTool">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.ImageTool.</code><code class="descname">ImageTool</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ImageTool.html#ImageTool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ImageTool.ImageTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.widgets.Tool.Tool" title="dataArtist.widgets.Tool.Tool"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.widgets.Tool.Tool</span></code></a></p>
+<dl class="method">
+<dt id="dataArtist.widgets.ImageTool.ImageTool.getImageOrFilenames">
+<code class="descname">getImageOrFilenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ImageTool.html#ImageTool.getImageOrFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ImageTool.ImageTool.getImageOrFilenames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.MiddleDockArea">
+<span id="dataartist-widgets-middledockarea-module"></span><h2>dataArtist.widgets.MiddleDockArea module<a class="headerlink" href="#module-dataArtist.widgets.MiddleDockArea" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.MiddleDockArea.MiddleDockArea">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.MiddleDockArea.</code><code class="descname">MiddleDockArea</code><span class="sig-paren">(</span><em>max_docks_xy=(2</em>, <em>2)</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/MiddleDockArea.html#MiddleDockArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.MiddleDockArea.MiddleDockArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fancywidgets.pyqtgraphBased.DockArea.DockArea</span></code></p>
+<p>Main area of the gui which shows some text
+when there are no displays</p>
+<dl class="method">
+<dt id="dataArtist.widgets.MiddleDockArea.MiddleDockArea.addDock">
+<code class="descname">addDock</code><span class="sig-paren">(</span><em>dock</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/MiddleDockArea.html#MiddleDockArea.addDock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.MiddleDockArea.MiddleDockArea.addDock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.ParameterMenu">
+<span id="dataartist-widgets-parametermenu-module"></span><h2>dataArtist.widgets.ParameterMenu module<a class="headerlink" href="#module-dataArtist.widgets.ParameterMenu" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.ParameterMenu.ParameterMenu">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.ParameterMenu.</code><code class="descname">ParameterMenu</code><span class="sig-paren">(</span><em>tool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ParameterMenu.html#ParameterMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ParameterMenu.ParameterMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMenu</span></code></p>
+<p>A QMenu embedding a ParameterTree</p>
+<dl class="method">
+<dt id="dataArtist.widgets.ParameterMenu.ParameterMenu.resizeToContent">
+<code class="descname">resizeToContent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ParameterMenu.html#ParameterMenu.resizeToContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ParameterMenu.ParameterMenu.resizeToContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>set a fixed minimum width and calculate the height from
+the height of all rows</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.ProgressBar">
+<span id="dataartist-widgets-progressbar-module"></span><h2>dataArtist.widgets.ProgressBar module<a class="headerlink" href="#module-dataArtist.widgets.ProgressBar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.ProgressBar.ProgressBar">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.ProgressBar.</code><code class="descname">ProgressBar</code><span class="sig-paren">(</span><em>statusbar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ProgressBar.html#ProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ProgressBar.ProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>A general propose procress bar
+e.g. used when files are imported or tools are executed.</p>
+<dl class="method">
+<dt id="dataArtist.widgets.ProgressBar.ProgressBar.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/ProgressBar.html#ProgressBar.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.ProgressBar.ProgressBar.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.StatusBar">
+<span id="dataartist-widgets-statusbar-module"></span><h2>dataArtist.widgets.StatusBar module<a class="headerlink" href="#module-dataArtist.widgets.StatusBar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.StatusBar.StatusBar">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.StatusBar.</code><code class="descname">StatusBar</code><a class="reference internal" href="_modules/dataArtist/widgets/StatusBar.html#StatusBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.StatusBar.StatusBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QStatusBar</span></code></p>
+<dl class="method">
+<dt id="dataArtist.widgets.StatusBar.StatusBar.showError">
+<code class="descname">showError</code><span class="sig-paren">(</span><em>msg</em>, <em>time_ms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/StatusBar.html#StatusBar.showError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.StatusBar.StatusBar.showError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show error message in red color</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.Tool">
+<span id="dataartist-widgets-tool-module"></span><h2>dataArtist.widgets.Tool module<a class="headerlink" href="#module-dataArtist.widgets.Tool" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.Tool.Tool">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.Tool.</code><code class="descname">Tool</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QToolButton</span></code></p>
+<p>Base class for all display.widget.tools</p>
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.addAction">
+<code class="descname">addAction</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.addAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.addAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>only show drop-down menu option if menu is filled with entries</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.buildOtherDisplayLayersMenu">
+<code class="descname">buildOtherDisplayLayersMenu</code><span class="sig-paren">(</span><em>menu</em>, <em>triggerFn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.buildOtherDisplayLayersMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.buildOtherDisplayLayersMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>fill the menu with all available layers within other displays
+this function of often connected with the menu.aboutToShow signal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.buildOtherDisplaysMenu">
+<code class="descname">buildOtherDisplaysMenu</code><span class="sig-paren">(</span><em>menu</em>, <em>triggerFn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.buildOtherDisplaysMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.buildOtherDisplaysMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>fill the menu with all available displays
+this function of often connected with the menu.aboutToShow signal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.createResultInDisplayParam">
+<code class="descname">createResultInDisplayParam</code><span class="sig-paren">(</span><em>parent</em>, <em>value='[NEW</em>, <em>OVERRIDE]'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.createResultInDisplayParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.createResultInDisplayParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.handleOutput">
+<code class="descname">handleOutput</code><span class="sig-paren">(</span><em>out</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.handleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.handleOutput" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.mouseCoord">
+<code class="descname">mouseCoord</code><span class="sig-paren">(</span><em>evt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.mouseCoord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.mouseCoord" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the mouse coordinates</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.Tool.Tool.reinit">
+<code class="descname">reinit</code><em class="property"> = False</em><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.reinit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.returnToolOnClick">
+<code class="descname">returnToolOnClick</code><span class="sig-paren">(</span><em>activate</em>, <em>returnMethod</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.returnToolOnClick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.returnToolOnClick" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>if activate=True:</dt>
+<dd>run [returnMethod(self)] when this tool is clicked</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.setMenu">
+<code class="descname">setMenu</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.setMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.setMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>only show drop-down menu option if menu is filled with entries</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.setParameterMenu">
+<code class="descname">setParameterMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.setParameterMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.setParameterMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.showGlobalTool">
+<code class="descname">showGlobalTool</code><span class="sig-paren">(</span><em>toolCls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.showGlobalTool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.showGlobalTool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.startThread">
+<code class="descname">startThread</code><span class="sig-paren">(</span><em>runfn</em>, <em>donefn=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.startThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.startThread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Tool.Tool.toggle">
+<code class="descname">toggle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Tool.html#Tool.toggle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Tool.Tool.toggle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.Toolbars">
+<span id="dataartist-widgets-toolbars-module"></span><h2>dataArtist.widgets.Toolbars module<a class="headerlink" href="#module-dataArtist.widgets.Toolbars" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="dataArtist.widgets.Toolbars.build">
+<code class="descclassname">dataArtist.widgets.Toolbars.</code><code class="descname">build</code><span class="sig-paren">(</span><em>widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Toolbars.html#build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Toolbars.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>create and return a list of toolbars for the given [displayWidget]</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.UndoRedo">
+<span id="dataartist-widgets-undoredo-module"></span><h2>dataArtist.widgets.UndoRedo module<a class="headerlink" href="#module-dataArtist.widgets.UndoRedo" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.UndoRedo.</code><code class="descname">UndoRedo</code><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>Widget containing an undo and redo button +
+tool-button menu to choose the current step in history</p>
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>display</em>, <em>name</em>, <em>undoFn</em>, <em>redoFn</em>, <em>dataFn=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.cleanMenu">
+<code class="descname">cleanMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.cleanMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.cleanMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.displayClosed">
+<code class="descname">displayClosed</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.displayClosed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.displayClosed" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove all undos/redos from the closed display</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.isActive">
+<code class="descname">isActive</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.isActive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.isActive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.redo">
+<code class="descname">redo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.redo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.redo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.setActive">
+<code class="descname">setActive</code><span class="sig-paren">(</span><em>active</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.setActive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.setActive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.UndoRedo.UndoRedo.undo">
+<code class="descname">undo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/UndoRedo.html#UndoRedo.undo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.UndoRedo.UndoRedo.undo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.Workspace">
+<span id="dataartist-widgets-workspace-module"></span><h2>dataArtist.widgets.Workspace module<a class="headerlink" href="#module-dataArtist.widgets.Workspace" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.Workspace.Workspace">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.Workspace.</code><code class="descname">Workspace</code><span class="sig-paren">(</span><em>gui</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>One workspace of dataArtist.gui containing:
+* multiple displays
+* toolbars
+* a side panel with display preferences</p>
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.addDisplay">
+<code class="descname">addDisplay</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.addDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.addDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>create and integrate a new display</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.addFiles">
+<code class="descname">addFiles</code><span class="sig-paren">(</span><em>names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.addFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.addFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the importPolicy: if = ask: show import dialog to ask user
+if import together: import all files together in one display
+else: import separated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.addShowToolBarAction">
+<code class="descname">addShowToolBarAction</code><span class="sig-paren">(</span><em>menu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.addShowToolBarAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.addShowToolBarAction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.addTableDock">
+<code class="descname">addTableDock</code><span class="sig-paren">(</span><em>name=None</em>, <em>text=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.addTableDock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.addTableDock" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a new table to the dock area</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.addTextDock">
+<code class="descname">addTextDock</code><span class="sig-paren">(</span><em>name=None</em>, <em>text=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.addTextDock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.addTextDock" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a new notepad to the dock area</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.changeDisplay">
+<code class="descname">changeDisplay</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.changeDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.changeDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>show tab, symbolActive and the toolbars of the changed display</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.changeDisplayNumber">
+<code class="descname">changeDisplayNumber</code><span class="sig-paren">(</span><em>number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.changeDisplayNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.changeDisplayNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>change to display of given [number]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.changeToolBars">
+<code class="descname">changeToolBars</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.changeToolBars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.changeToolBars" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove old and show new toolbars - if there are selected
+apply position of last display.widget.toolbars</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.copyCurrentDisplayToClipboard">
+<code class="descname">copyCurrentDisplayToClipboard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.copyCurrentDisplayToClipboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.copyCurrentDisplayToClipboard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.copyViewToClipboard">
+<code class="descname">copyViewToClipboard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.copyViewToClipboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.copyViewToClipboard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.displaydict">
+<code class="descname">displaydict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.displaydict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.displaydict" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dict{number:displayInstance}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.displays">
+<code class="descname">displays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.displays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.displays" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of displays within this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.getCurrentDisplay">
+<code class="descname">getCurrentDisplay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.getCurrentDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.getCurrentDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.integrateDisplay">
+<code class="descname">integrateDisplay</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.integrateDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.integrateDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>integrate a new display into the workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.moveCurrentDisplayToOtherWorkspace">
+<code class="descname">moveCurrentDisplayToOtherWorkspace</code><span class="sig-paren">(</span><em>workspsace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.moveCurrentDisplayToOtherWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.moveCurrentDisplayToOtherWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.notepads">
+<code class="descname">notepads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.notepads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.notepads" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of notepads within this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.number">
+<code class="descname">number</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.number" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>reload all display and current toolbars</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.setActive">
+<code class="descname">setActive</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.setActive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.setActive" title="Permalink to this definition">¶</a></dt>
+<dd><p>activate this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.setCurrentDisplayToImportDisplay">
+<code class="descname">setCurrentDisplayToImportDisplay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.setCurrentDisplayToImportDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.setCurrentDisplayToImportDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>return whether successful</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.setInactive">
+<code class="descname">setInactive</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.setInactive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.setInactive" title="Permalink to this definition">¶</a></dt>
+<dd><p>deactivate this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.setPrintView">
+<code class="descname">setPrintView</code><span class="sig-paren">(</span><em>boolean</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.setPrintView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.setPrintView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hide dock labels and QSplitter handle if True
+for a nice and printable view</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.tabChanged">
+<code class="descname">tabChanged</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.tabChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.tabChanged" title="Permalink to this definition">¶</a></dt>
+<dd><p>also change the display combined to the changed tab</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.tables">
+<code class="descname">tables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of tables within this workspace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.toggleShowSelectedToolbars">
+<code class="descname">toggleShowSelectedToolbars</code><span class="sig-paren">(</span><em>show</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.toggleShowSelectedToolbars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.toggleShowSelectedToolbars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.Workspace.Workspace.unsetImportDisplay">
+<code class="descname">unsetImportDisplay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/Workspace.html#Workspace.unsetImportDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.Workspace.Workspace.unsetImportDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.docks">
+<span id="dataartist-widgets-docks-module"></span><h2>dataArtist.widgets.docks module<a class="headerlink" href="#module-dataArtist.widgets.docks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.widgets.docks.DockBase">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.docks.</code><code class="descname">DockBase</code><span class="sig-paren">(</span><em>name</em>, <em>area=None</em>, <em>size=(1</em>, <em>1)</em>, <em>widget=None</em>, <em>hideTitle=False</em>, <em>autoOrientation=False</em>, <em>closable=True</em>, <em>minimizable=True</em>, <em>maximizable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/docks.html#DockBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.docks.DockBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fancywidgets.pyqtgraphBased.Dock.Dock</span></code></p>
+<dl class="method">
+<dt id="dataArtist.widgets.docks.DockBase.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/docks.html#DockBase.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.docks.DockBase.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.docks.DockTable">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.docks.</code><code class="descname">DockTable</code><span class="sig-paren">(</span><em>name='unnamed table'</em>, <em>text=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/docks.html#DockTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.docks.DockTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.widgets.docks.DockBase" title="dataArtist.widgets.docks.DockBase"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.widgets.docks.DockBase</span></code></a></p>
+<p>create dock from table</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.docks.DockTextEditor">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.docks.</code><code class="descname">DockTextEditor</code><span class="sig-paren">(</span><em>name='unnamed text'</em>, <em>text=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/docks.html#DockTextEditor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.docks.DockTextEditor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.widgets.docks.DockBase" title="dataArtist.widgets.docks.DockBase"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.widgets.docks.DockBase</span></code></a></p>
+<p>create dock from textEditor</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.widgets.preferences">
+<span id="dataartist-widgets-preferences-module"></span><h2>dataArtist.widgets.preferences module<a class="headerlink" href="#module-dataArtist.widgets.preferences" title="Permalink to this headline">¶</a></h2>
+<p>Widgets handling all dataArtist preferences</p>
+<dl class="class">
+<dt id="dataArtist.widgets.preferences.ChooseProfile">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.preferences.</code><code class="descname">ChooseProfile</code><span class="sig-paren">(</span><em>session</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#ChooseProfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.ChooseProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.preferences.PreferencesCommunication">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.preferences.</code><code class="descname">PreferencesCommunication</code><span class="sig-paren">(</span><em>gui</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#PreferencesCommunication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesCommunication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<dl class="docutils">
+<dt>Preferences for communication between dataArtist and other programs</dt>
+<dd><ul class="first last simple">
+<li>this is at the moment done using a RabbitMQ server</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.preferences.PreferencesImport">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.preferences.</code><code class="descname">PreferencesImport</code><span class="sig-paren">(</span><em>gui</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#PreferencesImport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>Preferences for importing files</p>
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.importFilesPolicy">
+<code class="descname">importFilesPolicy</code><em class="property"> = 1</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.importFilesPolicy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.inCurrentDisplay">
+<code class="descname">inCurrentDisplay</code><em class="property"> = 2</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.inCurrentDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.inImportDisplay">
+<code class="descname">inImportDisplay</code><em class="property"> = 3</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.inImportDisplay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.loadImportedFiles">
+<code class="descname">loadImportedFiles</code><em class="property"> = True</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.loadImportedFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.separated">
+<code class="descname">separated</code><em class="property"> = 0</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.separated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.showImportDialog">
+<code class="descname">showImportDialog</code><em class="property"> = True</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.showImportDialog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.together">
+<code class="descname">together</code><em class="property"> = 1</em><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.together" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.widgets.preferences.PreferencesImport.updateSettings">
+<code class="descname">updateSettings</code><span class="sig-paren">(</span><em>pref</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#PreferencesImport.updateSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesImport.updateSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>update all setting to the given instance</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.widgets.preferences.PreferencesView">
+<em class="property">class </em><code class="descclassname">dataArtist.widgets.preferences.</code><code class="descname">PreferencesView</code><span class="sig-paren">(</span><em>gui</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#PreferencesView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>General view preferences, like the colour theme</p>
+<dl class="method">
+<dt id="dataArtist.widgets.preferences.PreferencesView.setColorTheme">
+<code class="descname">setColorTheme</code><span class="sig-paren">(</span><em>theme</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/widgets/preferences.html#PreferencesView.setColorTheme"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.widgets.preferences.PreferencesView.setColorTheme" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataArtist.widgets.dialogs.html" class="btn btn-neutral float-right" title="dataArtist.widgets.dialogs package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dataArtist.modding.ownReader.html" class="btn btn-neutral" title="dataArtist.modding.ownReader package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

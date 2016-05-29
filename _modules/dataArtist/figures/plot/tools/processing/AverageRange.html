@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.plot.tools.processing.AverageRange &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.plot.tools.processing.AverageRange</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.plot.tools.processing.AverageRange</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">import</span> <span class="n">LinearRegionItem</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+
+<div class="viewcode-block" id="AverageRange"><a class="viewcode-back" href="../../../../../../dataArtist.figures.plot.tools.processing.html#dataArtist.figures.plot.tools.processing.AverageRange.AverageRange">[docs]</a><span class="k">class</span> <span class="nc">AverageRange</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    average the y values of all plots within a given range</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;averageRange.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotDisplay</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotDisplay</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outStd</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;All&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pAllChanged</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Live&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pLiveChanged</span><span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStart</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Start&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+             
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStop</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Stop&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStd</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Standard deviation&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+
+    <span class="k">def</span> <span class="nf">_pLiveChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">live</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">live</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">LinearRegionItem</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+                <span class="c"># Add the LinearRegionItem to the ViewBox, but tell the ViewBox to exclude this </span>
+                <span class="c"># item when doing auto-range calculations.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">ignoreBounds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updatePStartStop</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regionChanged</span> <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">if</span> <span class="n">live</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regionChanged</span> <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_regionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">getRegion</span><span class="p">()</span> <span class="p">)</span>
+
+          
+    <span class="k">def</span> <span class="nf">_pAllChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="ow">not</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="nb">all</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_updatePStartStop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="n">mn</span><span class="p">,</span> <span class="n">mx</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">getRegion</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStart</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">mn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStop</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">mx</span><span class="p">)</span>
+        
+
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">curves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">curves</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pStd</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">yStd</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">curve</span> <span class="ow">in</span> <span class="n">curves</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">limits</span><span class="p">:</span>
+                <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">xData</span><span class="o">&gt;=</span><span class="n">limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">xData</span><span class="o">&gt;=</span><span class="n">limits</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">b2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">b2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">b1</span><span class="p">,</span><span class="n">b2</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span><span class="bp">None</span>
+                
+            <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">yData</span><span class="p">[</span><span class="n">b1</span><span class="p">:</span><span class="n">b2</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">yStd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">yData</span><span class="p">[</span><span class="n">b1</span><span class="p">:</span><span class="n">b2</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span> 
+                    <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                    <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">((</span><span class="s">&#39;stack&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> 
+                    <span class="n">title</span><span class="o">=</span><span class="s">&#39;ROI&#39;</span><span class="p">,</span>
+                    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ROI&#39;</span><span class="p">],</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outStd</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outStd</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outStd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span> 
+                        <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                        <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">((</span><span class="s">&#39;stack&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> 
+                        <span class="n">title</span><span class="o">=</span><span class="s">&#39;ROI - std&#39;</span><span class="p">,</span>
+                        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ROI - std&#39;</span><span class="p">],</span>
+                        <span class="n">data</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="n">yStd</span><span class="p">)])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outStd</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">yStd</span><span class="p">)</span>         
+
+
+<div class="viewcode-block" id="AverageRange.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.plot.tools.processing.html#dataArtist.figures.plot.tools.processing.AverageRange.AverageRange.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAll</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pStart</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pStop</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">limits</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

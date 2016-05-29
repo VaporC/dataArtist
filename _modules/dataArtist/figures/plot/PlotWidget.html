@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.plot.PlotWidget &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.plot.PlotWidget</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.plot.PlotWidget</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">import</span> <span class="n">PlotWidget</span> <span class="k">as</span> <span class="n">pgPlotWidget</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.fcollections.ProxyList</span> <span class="kn">import</span> <span class="n">ProxyList</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.figures.DisplayWidget</span> <span class="kn">import</span> <span class="n">DisplayWidget</span>
+<span class="kn">from</span> <span class="nn">dataArtist.figures._PyqtgraphgDisplayBase</span> <span class="kn">import</span> <span class="n">PyqtgraphgDisplayBase</span>
+
+
+
+<div class="viewcode-block" id="PlotWidget"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget">[docs]</a><span class="k">class</span> <span class="nc">PlotWidget</span><span class="p">(</span><span class="n">DisplayWidget</span><span class="p">,</span> <span class="n">pgPlotWidget</span><span class="p">,</span> <span class="n">PyqtgraphgDisplayBase</span><span class="p">):</span>
+    <span class="n">dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">axisOrientation</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;left&#39;</span><span class="p">]</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;trend.svg&#39;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        
+        <span class="n">axisItems</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axisOrientation</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axes</span><span class="p">[:</span><span class="mi">2</span><span class="p">]):</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">setOrientation</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">axisItems</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span> <span class="o">=</span> <span class="n">a</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">setPen</span><span class="p">()</span> <span class="c"># update colour theme</span>
+        <span class="n">pgPlotWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axisItems</span><span class="o">=</span><span class="n">axisItems</span><span class="p">)</span>
+        <span class="n">PyqtgraphgDisplayBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPlotItem</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">addLegend</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># this is mostly used for fast and easy access to all curve values</span>
+        <span class="c"># within the Automatic-script:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">ProxyList</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#ADD MULTIPLE LAYERS</span>
+            <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">c</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">c</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">)):</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">c</span><span class="p">))</span>                                
+
+        <span class="c">#UPDATE CURVE NAMES:</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">sigLayerNameChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">index</span><span class="p">,</span> <span class="n">txt</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">txt</span><span class="p">))</span>
+
+
+
+<div class="viewcode-block" id="PlotWidget.saveState"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;view&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;layerNames&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">):</span>
+            <span class="n">state</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%i</span><span class="s">_x&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">xData</span>
+            <span class="n">state</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%i</span><span class="s">_y&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">yData</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.restoreState"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;view&#39;</span><span class="p">])</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;layerNames&#39;</span><span class="p">]</span>
+        <span class="c">#DATA</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%i</span><span class="s">_x&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%i</span><span class="s">_y&#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+            
+        <span class="n">DisplayWidget</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></div>
+
+
+
+
+
+<span class="c"># </span>
+<span class="c">#     def save(self, session, path):</span>
+<span class="c">#         l = {}</span>
+<span class="c">#         l[&#39;view&#39;] = self.view.vb.getState()</span>
+<span class="c">#         l[&#39;layerNames&#39;] = [c.label.text for c in self.curves]</span>
+<span class="c">#         session.addContentToSave(l, *path+(&#39;widget.txt&#39;,))</span>
+<span class="c">#         #DATA</span>
+<span class="c">#         p = session.createSavePath(*path+(&#39;data&#39;,&#39;&#39;))</span>
+<span class="c">#         </span>
+<span class="c">#         def saveInThread():</span>
+<span class="c">#             for n, c in enumerate(self.curves):</span>
+<span class="c">#                 np.save(p.join(&#39;%s.npy&#39;%n),[c.xData, c.yData])</span>
+<span class="c">#         </span>
+<span class="c">#         #this one can take time, so:</span>
+<span class="c">#         session.saveThread.tasks.append(saveInThread)      </span>
+<span class="c"># </span>
+<span class="c">#         DisplayWidget.save(self, session, path)</span>
+<span class="c"># </span>
+<span class="c"># </span>
+<span class="c">#     def restore(self, session, path):</span>
+<span class="c">#         self.clear()</span>
+<span class="c"># </span>
+<span class="c">#         l =  eval(session.getSavedContent(*path+(&#39;widget.txt&#39;,)) )</span>
+<span class="c">#         self.view.vb.setState(l[&#39;view&#39;])</span>
+<span class="c">#         names = l[&#39;layerNames&#39;]</span>
+<span class="c">#         #DATA</span>
+<span class="c">#         for n, name in enumerate(names):</span>
+<span class="c">#             data = np.load(session.getSavedFile(*path+(&#39;data/%s.npy&#39; %n,)))</span>
+<span class="c">#             self.addLayer(name, data=tuple(data))</span>
+<span class="c">#         </span>
+<span class="c">#         DisplayWidget.restore(self, session, path)</span>
+    
+
+<div class="viewcode-block" id="PlotWidget.clear"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>    </div>
+
+
+<div class="viewcode-block" id="PlotWidget.close"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span><span class="c">#free memory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pgPlotWidget</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.getData"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.getData">[docs]</a>    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return listOf(x_vals, v_vals)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+            
+<div class="viewcode-block" id="PlotWidget.removeLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.removeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">toMove</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">toMove</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_movedCurve</span> <span class="o">=</span> <span class="n">c</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">c</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.insertLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.insertLayer">[docs]</a>    <span class="k">def</span> <span class="nf">insertLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;pen&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;pen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plotItem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#this should word, but doesn&#39;t </span>
+<span class="c">#             if isinstance(data,_PlotData):</span>
+            <span class="c">#working but uncool workaround:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_PlotData&#39;</span><span class="p">):</span>
+            
+                <span class="n">p</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+                
+                <span class="n">p</span> <span class="o">=</span> <span class="n">_PlotData</span><span class="p">(</span><span class="n">plotItem</span><span class="p">)</span>
+            <span class="n">plotItem</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">_PlotData</span><span class="p">(</span><span class="n">plotItem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">plotItem</span><span class="p">)</span> 
+        <span class="n">plotItem</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotItem</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">getLabel</span><span class="p">(</span><span class="n">plotItem</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">plotItem</span><span class="c">#weakref.proxy(plotItem)</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.insertMovedLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.insertMovedLayer">[docs]</a>    <span class="k">def</span> <span class="nf">insertMovedLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_movedCurve</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_movedCurve</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_movedCurve</span> </div>
+
+
+<div class="viewcode-block" id="PlotWidget.addLayer"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.addLayer">[docs]</a>    <span class="k">def</span> <span class="nf">addLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;unnamed&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertLayer</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">),</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.update"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span><span class="c">#own plotdata</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_PlotData</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">xData</span> <span class="o">=</span> <span class="n">x</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">yData</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_PlotData</span><span class="p">):</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span>
+                        <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                        <span class="n">c</span><span class="o">.</span><span class="n">xData</span> <span class="o">=</span> <span class="n">x</span>
+                        <span class="n">c</span><span class="o">.</span><span class="n">yData</span> <span class="o">=</span> <span class="n">y</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="n">pen</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">label</span><span class="p">[</span><span class="n">n</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="PlotWidget.updateView"><a class="viewcode-back" href="../../../../dataArtist.figures.plot.html#dataArtist.figures.plot.PlotWidget.PlotWidget.updateView">[docs]</a>    <span class="k">def</span> <span class="nf">updateView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">changed</span><span class="p">:</span>
+                <span class="c">#ensure that updateItems gets the new x and yData:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">xDisp</span> <span class="o">=</span> <span class="bp">None</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">updateItems</span><span class="p">()</span> 
+                <span class="n">d</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span></div></div>
+
+
+
+<span class="k">class</span> <span class="nc">_PlotData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Convenience class for easy and fast access to the plot data</span>
+<span class="sd">    Access normally through the automation script.</span>
+<span class="sd">    </span>
+<span class="sd">    to access all layers, use &#39;d.l&#39; (=display.layer)</span>
+<span class="sd">    to access on specific layer use &#39;d.l2&#39; or &#39;d.l[2]&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    to change x or y values, do sth. like:</span>
+<span class="sd">    d.l.y += 100  or d.l2.x[:10]*=2</span>
+<span class="sd">    </span>
+<span class="sd">    also slicing and interaction with each other are possible:</span>
+<span class="sd">    </span>
+<span class="sd">    d.l0[:10] += d.l10[:10]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotItem</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">plotItem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span><span class="p">))</span>
+    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span><span class="o">.</span><span class="n">dtype</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span>  
+    <span class="nd">@x.setter</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ProxyList</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;use x[:] to change all x values&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span>
+    <span class="nd">@y.setter</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ProxyList</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;use y[:] to change all y values&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">xData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">yData</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getY</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+ 
+
+    <span class="k">def</span> <span class="nf">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getY</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+    <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getY</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+    <span class="k">def</span> <span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getY</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">/=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getY</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_getY</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">_PlotData</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">y</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="bp">False</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_PlotData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;x: </span><span class="si">%s</span><span class="se">\n\t</span><span class="s">y:</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

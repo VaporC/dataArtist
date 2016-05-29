@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.components.RabbitMQServer &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.components.RabbitMQServer</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.components.RabbitMQServer</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">puka</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+
+
+
+<div class="viewcode-block" id="RabbitMQServer"><a class="viewcode-back" href="../../../dataArtist.components.html#dataArtist.components.RabbitMQServer.RabbitMQServer">[docs]</a><span class="k">class</span> <span class="nc">RabbitMQServer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A server for communicating between different programs </span>
+<span class="sd">    and remote control using RabbitMQ</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;refreshrate&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="c">#ms</span>
+                  <span class="s">&#39;host&#39;</span><span class="p">:</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;timeout&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="c">#ms</span>
+                  <span class="s">&#39;corfirmPosts&#39;</span><span class="p">:</span><span class="bp">False</span>
+                  <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">listenTo</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;addFile&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">addFilePath</span><span class="p">,</span>
+                         <span class="s">&#39;changeActiveDisplay&#39;</span><span class="p">:</span><span class="k">lambda</span> <span class="n">number</span><span class="p">:</span> 
+                                <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">currentWorkspace</span><span class="p">()</span><span class="o">.</span><span class="n">changeDisplayNumber</span><span class="p">(</span><span class="n">number</span><span class="p">),</span>
+                         <span class="s">&#39;showDisplay&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">showDisplay</span><span class="p">,</span>
+                         <span class="s">&#39;runScriptFromName&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">runScriptFromName</span><span class="p">,</span>
+                         <span class="p">}</span>
+
+    
+<div class="viewcode-block" id="RabbitMQServer.start"><a class="viewcode-back" href="../../../dataArtist.components.html#dataArtist.components.RabbitMQServer.RabbitMQServer.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        configure the server and check the </span>
+<span class="sd">        message-inbox every self.opts[&#39;refeshrate&#39;]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkInbox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;refreshrate&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="RabbitMQServer.checkInbox"><a class="viewcode-back" href="../../../dataArtist.components.html#dataArtist.components.RabbitMQServer.RabbitMQServer.checkInbox">[docs]</a>    <span class="k">def</span> <span class="nf">checkInbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check all self.listentO keys</span>
+<span class="sd">           and execute connected method</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">promise</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">promises</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">msg_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">promise</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;timeout&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1000.0</span><span class="p">)</span><span class="c">#wait for 10ms</span>
+            <span class="k">if</span> <span class="n">msg_result</span><span class="p">:</span>
+                <span class="c">#MESSAGE RECEIVED</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">msg_result</span><span class="p">[</span><span class="s">&#39;body&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;corfirmPosts&#39;</span><span class="p">]:</span>
+                    <span class="c">#PRINT CONFIRMATION</span>
+                    <span class="k">print</span> <span class="s">&quot; [R] </span><span class="si">%s</span><span class="s"> -&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg_result</span><span class="p">[</span><span class="s">&#39;routing_key&#39;</span><span class="p">],</span> <span class="n">b</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="s">&#39;STOP&#39;</span><span class="p">:</span>
+                    <span class="c">#stop listening to that channel:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">promises</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">promise</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">action</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
+            
+       
+<div class="viewcode-block" id="RabbitMQServer.configure"><a class="viewcode-back" href="../../../dataArtist.components.html#dataArtist.components.RabbitMQServer.RabbitMQServer.configure">[docs]</a>    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">puka</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="s">&quot;amqp://</span><span class="si">%s</span><span class="s">/&quot;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">promise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t connect to RabbitMQ. Please visit https://www.rabbitmq.com/download.html and install it.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">promise</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">promises</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listenTo</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="c">#INITITALIZE ALL QUEUES</span>
+            <span class="n">promise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">promise</span><span class="p">)</span>
+            <span class="n">consume_promise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">promises</span><span class="p">[</span><span class="n">consume_promise</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span></div>
+        
+
+<div class="viewcode-block" id="RabbitMQServer.stop"><a class="viewcode-back" href="../../../dataArtist.components.html#dataArtist.components.RabbitMQServer.RabbitMQServer.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">isActive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="p">([])</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">RabbitMQServer</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

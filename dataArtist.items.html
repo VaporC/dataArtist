@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items package &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="index.html"/>
+        <link rel="up" title="dataArtist package" href="dataArtist.html"/>
+        <link rel="next" title="dataArtist.modding package" href="dataArtist.modding.html"/>
+        <link rel="prev" title="dataArtist.input.reader package" href="dataArtist.input.reader.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dataArtist.html">dataArtist package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dataArtist.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.components.html">dataArtist.components package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.figures.html">dataArtist.figures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.input.html">dataArtist.input package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">dataArtist.items package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.ColorLayerItem">dataArtist.items.ColorLayerItem module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.FreehandItem">dataArtist.items.FreehandItem module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.GridROI">dataArtist.items.GridROI module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.PseudoSquareROI">dataArtist.items.PseudoSquareROI module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.QPainterPath">dataArtist.items.QPainterPath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.UnregGridROI">dataArtist.items.UnregGridROI module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dataArtist.items.axis">dataArtist.items.axis module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.modding.html">dataArtist.modding package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataArtist.widgets.html">dataArtist.widgets package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArtist.html#module-dataArtist.functions">dataArtist.functions module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="dataArtist.html">dataArtist package</a> &raquo;</li>
+      
+    <li>dataArtist.items package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/dataArtist.items.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dataArtist.items">
+<span id="dataartist-items-package"></span><h1>dataArtist.items package<a class="headerlink" href="#module-dataArtist.items" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dataArtist.items.ColorLayerItem">
+<span id="dataartist-items-colorlayeritem-module"></span><h2>dataArtist.items.ColorLayerItem module<a class="headerlink" href="#module-dataArtist.items.ColorLayerItem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem">
+<em class="property">class </em><code class="descclassname">dataArtist.items.ColorLayerItem.</code><code class="descname">ColorLayerItem</code><span class="sig-paren">(</span><em>image</em>, <em>imageWidget</em>, <em>alpha=0.5</em>, <em>color=4294901760L</em>, <em>histogram=None</em>, <em>pos=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ImageItem.ImageItem</span></code></p>
+<p>An color overlay for ImageWidget.
+The transparency is given through the [image] array.</p>
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.changeLayer">
+<code class="descname">changeLayer</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.changeLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.changeLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>update to show the colour overlay corresponding to the layer index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.getQColor">
+<code class="descname">getQColor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.getQColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.getQColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.setAlpha">
+<code class="descname">setAlpha</code><span class="sig-paren">(</span><em>alpha</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.setAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.setAlpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.setLayer">
+<code class="descname">setLayer</code><span class="sig-paren">(</span><em>layer</em>, <em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.setLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.setLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.setQColor">
+<code class="descname">setQColor</code><span class="sig-paren">(</span><em>qcolor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.setQColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.setQColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.updateImage">
+<code class="descname">updateImage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.updateImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.updateImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.ColorLayerItem.ColorLayerItem.updateLayer">
+<code class="descname">updateLayer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/ColorLayerItem.html#ColorLayerItem.updateLayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.ColorLayerItem.ColorLayerItem.updateLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.FreehandItem">
+<span id="dataartist-items-freehanditem-module"></span><h2>dataArtist.items.FreehandItem module<a class="headerlink" href="#module-dataArtist.items.FreehandItem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.FreehandItem.FreehandItem">
+<em class="property">class </em><code class="descclassname">dataArtist.items.FreehandItem.</code><code class="descname">FreehandItem</code><span class="sig-paren">(</span><em>parentItem=None</em>, <em>pen='w'</em>, <em>brush=None</em>, <em>elements=None</em>, <em>is_area=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.GraphicsObject.GraphicsObject</span></code></p>
+<p><strong>Bases:</strong> <code class="xref py py-class docutils literal"><span class="pre">GraphicsObject</span></code></p>
+<p>#TODO text
+Item displaying an isocurve of a 2D array.To align this item correctly with an
+ImageItem,call isocurve.setParentItem(image)</p>
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.boundingRect">
+<code class="descname">boundingRect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.boundingRect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.boundingRect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.closePath">
+<code class="descname">closePath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.closePath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.closePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.continuePath">
+<code class="descname">continuePath</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.continuePath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.continuePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.elements">
+<code class="descname">elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.paint">
+<code class="descname">paint</code><span class="sig-paren">(</span><em>p</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.paint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.painterPath">
+<code class="descname">painterPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.painterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.painterPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.setBrush">
+<code class="descname">setBrush</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.setBrush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.setBrush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the brush used to draw the isocurve. Arguments can be any that are valid
+for <code class="xref py py-func docutils literal"><span class="pre">mkBrush</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.setElements">
+<code class="descname">setElements</code><span class="sig-paren">(</span><em>elem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.setElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.setElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.setModify">
+<code class="descname">setModify</code><span class="sig-paren">(</span><em>modify</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.setModify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.setModify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.setPen">
+<code class="descname">setPen</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.setPen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.setPen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the pen used to draw the isocurve. Arguments can be any that are valid
+for <code class="xref py py-func docutils literal"><span class="pre">mkPen</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.FreehandItem.FreehandItem.startPath">
+<code class="descname">startPath</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/FreehandItem.html#FreehandItem.startPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.FreehandItem.FreehandItem.startPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.GridROI">
+<span id="dataartist-items-gridroi-module"></span><h2>dataArtist.items.GridROI module<a class="headerlink" href="#module-dataArtist.items.GridROI" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.GridROI.CellPseudoSquareROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.GridROI.</code><code class="descname">CellPseudoSquareROI</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CellPseudoSquareROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CellPseudoSquareROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dataArtist.items.GridROI._CellBase</span></code>, <a class="reference internal" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI" title="dataArtist.items.PseudoSquareROI.PseudoSquareROI"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.items.PseudoSquareROI.PseudoSquareROI</span></code></a></p>
+<dl class="method">
+<dt id="dataArtist.items.GridROI.CellPseudoSquareROI.painterPath">
+<code class="descname">painterPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CellPseudoSquareROI.painterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CellPseudoSquareROI.painterPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.CellPseudoSquareROI.setScaleCell">
+<code class="descname">setScaleCell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CellPseudoSquareROI.setScaleCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CellPseudoSquareROI.setScaleCell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.GridROI.CircleROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.GridROI.</code><code class="descname">CircleROI</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CircleROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CircleROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dataArtist.items.GridROI._CellBase</span></code>, <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.EllipseROI</span></code></p>
+<dl class="method">
+<dt id="dataArtist.items.GridROI.CircleROI.getMask">
+<code class="descname">getMask</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CircleROI.getMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CircleROI.getMask" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns bool array</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.CircleROI.painterPath">
+<code class="descname">painterPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CircleROI.painterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CircleROI.painterPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.CircleROI.setScaleCell">
+<code class="descname">setScaleCell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#CircleROI.setScaleCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.CircleROI.setScaleCell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.GridROI.GridROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.GridROI.</code><code class="descname">GridROI</code><span class="sig-paren">(</span><em>pos=[20, 20], size=[20, 20], grid=[4, 5], shape='Rect', gap=[0, 0], subgrid=([], []), subgrid_width=0.05, pen='w', **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.ROI</span></code></p>
+<p>An ROI displaying mini ROIs of different shapes as a grid</p>
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.getMask">
+<code class="descname">getMask</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.getMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.getMask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.hide">
+<code class="descname">hide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.hide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.hide" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.painterPath">
+<code class="descname">painterPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.painterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.painterPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a qpainterpath including all cells</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.refresh">
+<code class="descname">refresh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.refresh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.refresh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.saveState">
+<code class="descname">saveState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.saveState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.saveState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setAngle">
+<code class="descname">setAngle</code><span class="sig-paren">(</span><em>angle</em>, <em>update=True</em>, <em>finish=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setAngle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setBrush">
+<code class="descname">setBrush</code><span class="sig-paren">(</span><em>pen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setBrush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setBrush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setCellShape">
+<code class="descname">setCellShape</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setCellShape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setCellShape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setGrid">
+<code class="descname">setGrid</code><span class="sig-paren">(</span><em>x=None</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setGrid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setPen">
+<code class="descname">setPen</code><span class="sig-paren">(</span><em>pen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setPen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setPen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setPos">
+<code class="descname">setPos</code><span class="sig-paren">(</span><em>pos</em>, <em>update=True</em>, <em>finish=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setPos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setPos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setSize">
+<code class="descname">setSize</code><span class="sig-paren">(</span><em>size</em>, <em>update=True</em>, <em>finish=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setSubGrid">
+<code class="descname">setSubGrid</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setSubGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setSubGrid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.setViewBox">
+<code class="descname">setViewBox</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.setViewBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.setViewBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>add grid and its cells to the ViewBox</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.GridROI.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#GridROI.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.GridROI.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.GridROI.RectROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.GridROI.</code><code class="descname">RectROI</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#RectROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.RectROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.ROI</span></code>, <code class="xref py py-class docutils literal"><span class="pre">dataArtist.items.GridROI._CellBase</span></code></p>
+<dl class="method">
+<dt id="dataArtist.items.GridROI.RectROI.getMask">
+<code class="descname">getMask</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#RectROI.getMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.RectROI.getMask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.RectROI.painterPath">
+<code class="descname">painterPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#RectROI.painterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.RectROI.painterPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.RectROI.setScaleCell">
+<code class="descname">setScaleCell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#RectROI.setScaleCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.RectROI.setScaleCell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.GridROI.SubLine">
+<em class="property">class </em><code class="descclassname">dataArtist.items.GridROI.</code><code class="descname">SubLine</code><span class="sig-paren">(</span><em>cell</em>, <em>orientation</em>, <em>pos</em>, <em>thickness</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#SubLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.SubLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.ROI</span></code></p>
+<p>one line for the subgrid</p>
+<dl class="method">
+<dt id="dataArtist.items.GridROI.SubLine.fromState">
+<code class="descname">fromState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#SubLine.fromState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.SubLine.fromState" title="Permalink to this definition">¶</a></dt>
+<dd><p>update thickness and position from current state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.SubLine.setScaleLine">
+<code class="descname">setScaleLine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#SubLine.setScaleLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.SubLine.setScaleLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.SubLine.updatePos">
+<code class="descname">updatePos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#SubLine.updatePos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.SubLine.updatePos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.GridROI.SubLine.updateSize">
+<code class="descname">updateSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/GridROI.html#SubLine.updateSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.GridROI.SubLine.updateSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.PseudoSquareROI">
+<span id="dataartist-items-pseudosquareroi-module"></span><h2>dataArtist.items.PseudoSquareROI module<a class="headerlink" href="#module-dataArtist.items.PseudoSquareROI" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.PseudoSquareROI.PseudoSquareROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.PseudoSquareROI.</code><code class="descname">PseudoSquareROI</code><span class="sig-paren">(</span><em>pos, size=[1, 1], ratioEllispeRectangle=1.2, **args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/PseudoSquareROI.html#PseudoSquareROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.ROI</span></code></p>
+<p>ROI built by intersection of an ellipse and a rectangle.</p>
+<dl class="method">
+<dt id="dataArtist.items.PseudoSquareROI.PseudoSquareROI.getArrayRegion">
+<code class="descname">getArrayRegion</code><span class="sig-paren">(</span><em>arr</em>, <em>img=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/PseudoSquareROI.html#PseudoSquareROI.getArrayRegion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI.getArrayRegion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the result of ROI.getArrayRegion() masked by the elliptical shape
+of the ROI. Regions outside the ellipse are set to 0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.PseudoSquareROI.PseudoSquareROI.getMask">
+<code class="descname">getMask</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/PseudoSquareROI.html#PseudoSquareROI.getMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI.getMask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.PseudoSquareROI.PseudoSquareROI.paint">
+<code class="descname">paint</code><span class="sig-paren">(</span><em>p</em>, <em>opt</em>, <em>widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/PseudoSquareROI.html#PseudoSquareROI.paint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.PseudoSquareROI.PseudoSquareROI.setRatioEllispeRect">
+<code class="descname">setRatioEllispeRect</code><span class="sig-paren">(</span><em>ratio</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/PseudoSquareROI.html#PseudoSquareROI.setRatioEllispeRect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.PseudoSquareROI.PseudoSquareROI.setRatioEllispeRect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.QPainterPath">
+<span id="dataartist-items-qpainterpath-module"></span><h2>dataArtist.items.QPainterPath module<a class="headerlink" href="#module-dataArtist.items.QPainterPath" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.QPainterPath.QPainterPath">
+<em class="property">class </em><code class="descclassname">dataArtist.items.QPainterPath.</code><code class="descname">QPainterPath</code><a class="reference internal" href="_modules/dataArtist/items/QPainterPath.html#QPainterPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.QPainterPath.QPainterPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QPainterPath</span></code></p>
+<p>QainterPath with added methods to calculate
+area, mean, min, max</p>
+<dl class="method">
+<dt id="dataArtist.items.QPainterPath.QPainterPath.calcArea">
+<code class="descname">calcArea</code><span class="sig-paren">(</span><em>precision=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/QPainterPath.html#QPainterPath.calcArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.QPainterPath.QPainterPath.calcArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>QPainterPath area calculation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.QPainterPath.QPainterPath.calcMax">
+<code class="descname">calcMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/QPainterPath.html#QPainterPath.calcMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.QPainterPath.QPainterPath.calcMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.QPainterPath.QPainterPath.calcMean">
+<code class="descname">calcMean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/QPainterPath.html#QPainterPath.calcMean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.QPainterPath.QPainterPath.calcMean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.QPainterPath.QPainterPath.calcMin">
+<code class="descname">calcMin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/QPainterPath.html#QPainterPath.calcMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.QPainterPath.QPainterPath.calcMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.UnregGridROI">
+<span id="dataartist-items-unreggridroi-module"></span><h2>dataArtist.items.UnregGridROI module<a class="headerlink" href="#module-dataArtist.items.UnregGridROI" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.UnregGridROI.UnregGridROI">
+<em class="property">class </em><code class="descclassname">dataArtist.items.UnregGridROI.</code><code class="descname">UnregGridROI</code><span class="sig-paren">(</span><em>nCells</em>, <em>edges=None</em>, <em>pos=(0</em>, <em>0)</em>, <em>size=(1</em>, <em>1)</em>, <em>**args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/UnregGridROI.html#UnregGridROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.UnregGridROI.UnregGridROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.ROI.PolyLineROI</span></code></p>
+<dl class="method">
+<dt id="dataArtist.items.UnregGridROI.UnregGridROI.edges">
+<code class="descname">edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/UnregGridROI.html#UnregGridROI.edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.UnregGridROI.UnregGridROI.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>return array containing the 4 edges of the grid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.UnregGridROI.UnregGridROI.points">
+<code class="descname">points</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/UnregGridROI.html#UnregGridROI.points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.UnregGridROI.UnregGridROI.points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.UnregGridROI.UnregGridROI.setPoints">
+<code class="descname">setPoints</code><span class="sig-paren">(</span><em>points</em>, <em>closed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/UnregGridROI.html#UnregGridROI.setPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.UnregGridROI.UnregGridROI.setPoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dataArtist.items.axis">
+<span id="dataartist-items-axis-module"></span><h2>dataArtist.items.axis module<a class="headerlink" href="#module-dataArtist.items.axis" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataArtist.items.axis.AxesContainer">
+<em class="property">class </em><code class="descclassname">dataArtist.items.axis.</code><code class="descname">AxesContainer</code><span class="sig-paren">(</span><em>display</em>, <em>axes</em>, <em>pStack</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#AxesContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.AxesContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<p>A list of all axes that belong to a display
+all axes-parameters are within self.p respective axis.p</p>
+<dl class="method">
+<dt id="dataArtist.items.axis.AxesContainer.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>axis</em>, <em>orientation='bottom'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#AxesContainer.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.AxesContainer.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.AxesContainer.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>index=None</em>, <em>orientation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#AxesContainer.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.AxesContainer.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>make a copy of all or given axes indices</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.AxesContainer.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#AxesContainer.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.AxesContainer.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.axis.Axis">
+<em class="property">class </em><code class="descclassname">dataArtist.items.axis.</code><code class="descname">Axis</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>orientation</em>, <em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#Axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.Axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyqtgraph_karl.graphicsItems.AxisItem.AxisItem</span></code></p>
+<p>A display axis</p>
+<dl class="method">
+<dt id="dataArtist.items.axis.Axis.duplicate">
+<code class="descname">duplicate</code><span class="sig-paren">(</span><em>orientation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#Axis.duplicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.Axis.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>make a duplicate of this axiswith the same parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.Axis.linkToAxis">
+<code class="descname">linkToAxis</code><span class="sig-paren">(</span><em>axis=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#Axis.linkToAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.Axis.linkToAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>connect parameter changes to the given axis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.Axis.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#Axis.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.Axis.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.Axis.unlinkFromAxis">
+<code class="descname">unlinkFromAxis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#Axis.unlinkFromAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.Axis.unlinkFromAxis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dataArtist.items.axis.StackAxis">
+<em class="property">class </em><code class="descclassname">dataArtist.items.axis.</code><code class="descname">StackAxis</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#StackAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.StackAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dataArtist.items.axis.Axis" title="dataArtist.items.axis.Axis"><code class="xref py py-class docutils literal"><span class="pre">dataArtist.items.axis.Axis</span></code></a></p>
+<p>Axis representing the dimension built by all input layers (stack)</p>
+<dl class="method">
+<dt id="dataArtist.items.axis.StackAxis.getNextStackValue">
+<code class="descname">getNextStackValue</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#StackAxis.getNextStackValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.StackAxis.getNextStackValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dataArtist.items.axis.StackAxis.registerStackParam">
+<code class="descname">registerStackParam</code><span class="sig-paren">(</span><em>pStack</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataArtist/items/axis.html#StackAxis.registerStackParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataArtist.items.axis.StackAxis.registerStackParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataArtist.modding.html" class="btn btn-neutral float-right" title="dataArtist.modding package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dataArtist.input.reader.html" class="btn btn-neutral" title="dataArtist.input.reader package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

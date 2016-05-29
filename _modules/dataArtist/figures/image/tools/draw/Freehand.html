@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.draw.Freehand &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.draw.Freehand</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.draw.Freehand</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.functions</span> <span class="kn">import</span> <span class="n">mkPen</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+<span class="kn">from</span> <span class="nn">dataArtist.items.FreehandItem</span> <span class="kn">import</span> <span class="n">FreehandItem</span>
+
+
+
+<div class="viewcode-block" id="Freehand"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.draw.html#dataArtist.figures.image.tools.draw.Freehand.Freehand">[docs]</a><span class="k">class</span> <span class="nc">Freehand</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;freehand.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#min time difference to add a line to qpainterpath </span>
+        <span class="c">#when drawing in [ms]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DT</span> <span class="o">=</span> <span class="mi">25</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QTime</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pa</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_removePath</span><span class="p">)</span>
+
+        <span class="n">pNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;New&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span> 
+        <span class="n">pNew</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_newCurve</span><span class="p">)</span>
+        <span class="n">pNew</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">hide</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_newCurve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+       
+        <span class="n">pen</span> <span class="o">=</span> <span class="n">mkPen</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">curIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;empty&#39;</span><span class="p">,</span>
+            <span class="s">&#39;isGroup&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;removable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;renamable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;autoIncrementName&#39;</span><span class="p">:</span><span class="bp">True</span>
+            <span class="p">})</span> 
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">FreehandItem</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">imageItem</span><span class="p">,</span> <span class="n">pen</span><span class="p">)</span>
+
+        <span class="n">pAdd</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Add&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="p">})</span> 
+        <span class="n">pAdd</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_appendToPath</span><span class="p">)</span>
+        <span class="n">pAdd</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">hide</span><span class="p">)</span>
+
+        <span class="n">pMod</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Modify&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">})</span> 
+        <span class="n">pMod</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modifyPath</span><span class="p">)</span>
+        <span class="n">pMod</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">hide</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initDraw</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">pen</span><span class="o">.</span><span class="n">color</span><span class="p">()</span>
+        <span class="n">pLineColor</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Line color&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;color&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">color</span><span class="p">,</span>
+            <span class="s">&#39;path&#39;</span><span class="p">:</span><span class="n">path</span><span class="p">})</span> 
+        <span class="n">pLineColor</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_changeLineColor</span><span class="p">)</span>
+
+        <span class="n">br</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="n">br</span><span class="o">.</span><span class="n">setAlpha</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">br</span><span class="p">)</span>
+        
+        <span class="n">pFillColor</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Fill color&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;color&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">br</span><span class="p">,</span>
+            <span class="s">&#39;path&#39;</span><span class="p">:</span><span class="n">path</span><span class="p">})</span> 
+        <span class="n">pFillColor</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_changeFillColor</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        
+
+    <span class="k">def</span> <span class="nf">_initDraw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mouseDragEvent</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">mouseDragEvent</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">mouseDragEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_changeLineColor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">]</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_changeFillColor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">]</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_modifyPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_getPathIndex</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">parent</span><span class="p">())]</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isModify</span><span class="p">:</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s">&#39;Modify&#39;</span><span class="p">)</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">setModify</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s">&#39;Done Modify&#39;</span><span class="p">)</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">setModify</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_getPathIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">childs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_appendToPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getPathIndex</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">parent</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initDraw</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        
+        <span class="c">## Scale or translate based on mouse button</span>
+        <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span> <span class="o">|</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">MidButton</span><span class="p">):</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouseCoord</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">curIndex</span><span class="p">]</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+            
+            <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">isFinish</span><span class="p">():</span>  <span class="c">## This is the final move in the drag; change the view scale now</span>
+                <span class="c">#p.closePath()</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">mouseDragEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mouseDragEvent</span>
+                <span class="c">#del self._mouseDragEvent</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">elapsed</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DT</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">restart</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">isStart</span><span class="p">():</span>
+                        <span class="n">p</span><span class="o">.</span><span class="n">startPath</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">p</span><span class="o">.</span><span class="n">continuePath</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_removePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Freehand.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.draw.html#dataArtist.figures.image.tools.draw.Freehand.Freehand.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Freehand.deactivate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.draw.html#dataArtist.figures.image.tools.draw.Freehand.Freehand.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

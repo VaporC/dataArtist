@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.input.reader.RAWimage &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.input.reader.RAWimage</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.input.reader.RAWimage</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree.parameterTypes</span> <span class="kn">import</span> <span class="n">GroupParameter</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">_ReaderBase</span> <span class="kn">import</span> <span class="n">ReaderBase</span>
+
+
+<span class="n">STR_TO_DTYPE</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">((</span> <span class="p">(</span><span class="s">&#39;8-bit&#39;</span><span class="p">,</span><span class="s">&#39;u1&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s">&#39;16-bit Signed&#39;</span><span class="p">,</span><span class="s">&#39;i2&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s">&#39;16-bit Unsigned&#39;</span><span class="p">,</span><span class="s">&#39;u2&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s">&#39;32-bit Signed&#39;</span><span class="p">,</span><span class="s">&#39;i4&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s">&#39;32-bit Unsigned&#39;</span><span class="p">,</span><span class="s">&#39;u4&#39;</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s">&#39;32-bit Real/floating point&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),</span>
+                             <span class="p">)</span> <span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="RAWimage"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.RAWimage.RAWimage">[docs]</a><span class="k">class</span> <span class="nc">RAWimage</span><span class="p">(</span><span class="n">ReaderBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Read RAW images</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ftypes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;raw&#39;</span><span class="p">,</span> <span class="s">&#39;bin&#39;</span><span class="p">)</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">]</span>   
+    <span class="c">#preferred = True</span>
+    <span class="n">forceSetup</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span> <span class="o">=</span> <span class="n">_Preferences</span><span class="p">()</span>
+
+        <span class="n">ReaderBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    
+<div class="viewcode-block" id="RAWimage.open"><a class="viewcode-back" href="../../../../dataArtist.input.reader.html#dataArtist.input.reader.RAWimage.RAWimage.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span> 
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">STR_TO_DTYPE</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">pDType</span><span class="o">.</span><span class="n">value</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">pLittleEndian</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="s">&#39;&gt;&#39;</span><span class="o">+</span> <span class="n">dt</span>
+
+        <span class="n">s0</span><span class="p">,</span><span class="n">s1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">pWidth</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span><span class="n">p</span><span class="o">.</span><span class="n">pHeight</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">s0</span><span class="o">*</span><span class="n">s1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s0</span><span class="p">,</span><span class="n">s1</span><span class="p">)</span> <span class="c">#, order=&#39;F&#39;</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c">#array shape doesn&#39;t match actual size</span>
+            <span class="n">s1</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">s0</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s0</span><span class="p">,</span><span class="n">s1</span><span class="p">)</span>
+            
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toFloat</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">pToFloat</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">pForceFloat64</span><span class="o">.</span><span class="n">value</span><span class="p">())</span> 
+
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">labels</span></div></div>
+
+
+
+
+<span class="k">class</span> <span class="nc">_Preferences</span><span class="p">(</span><span class="n">GroupParameter</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39; RAW image import&#39;</span><span class="p">):</span>
+        
+        <span class="n">GroupParameter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Image type&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;16-bit Unsigned&#39;</span><span class="p">,</span>
+                <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="n">STR_TO_DTYPE</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLittleEndian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Little-endian byte order&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pWidth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Width&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1024</span><span class="p">,</span>
+                <span class="s">&#39;unit&#39;</span><span class="p">:</span><span class="s">&#39;pixels&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHeight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Height&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1024</span><span class="p">,</span>
+                <span class="s">&#39;unit&#39;</span><span class="p">:</span><span class="s">&#39;pixels&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pToFloat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;transform to float&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pForceFloat64</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pToFloat</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Force double precision (64bit)&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pToFloat</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span><span class="n">v</span><span class="p">:</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">pForceFloat64</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

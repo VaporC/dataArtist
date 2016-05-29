@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.filter.CV2Denoise &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.filter.CV2Denoise</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.filter.CV2Denoise</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="kn">import</span> <span class="n">median_filter</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span> 
+
+
+<div class="viewcode-block" id="CV2Denoise"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.filter.html#dataArtist.figures.image.tools.filter.CV2Denoise.CV2Denoise">[docs]</a><span class="k">class</span> <span class="nc">CV2Denoise</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    use Non-local Means Denoising algorithm given by OpenCV</span>
+<span class="sd">    works on grey, coloured single and multiple images</span>
+<span class="sd">    IMPORTANT: works only on uint8 images images(0-255)</span>
+<span class="sd">                -&gt; converts to this value, if not done already</span>
+<span class="sd">    </span>
+<span class="sd">    http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_photo/py_non_local_means/py_non_local_means.html</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;CV2denoise.svg&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setupMenu</span><span class="p">)</span>
+                            
+        <span class="bp">self</span><span class="o">.</span><span class="n">createResultInDisplayParam</span><span class="p">(</span><span class="n">pa</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pConvMethod</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;conversion method (to 8bit)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;scale&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="s">&#39;clip&#39;</span><span class="p">,</span> <span class="s">&#39;scale&#39;</span><span class="p">]})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Optional (expand to setup)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;empty&#39;</span><span class="p">,</span>
+            <span class="s">&#39;expanded&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;isgroup&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTemplateWindowSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;templateWindowSize &#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">],</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Size in pixels of the template patch that is used </span>
+<span class="s">            to compute weights. Should be odd. Recommended value 7 pixels&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">7</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pSearchWindowSize</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;searchWindowSize  &#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">],</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Size in pixels of the window that is used to compute </span>
+<span class="s">            weighted average for given pixel. Should be odd. Affect </span>
+<span class="s">            performance linearly: greater searchWindowsSize - </span>
+<span class="s">            greater denoising time. Recommended value 21 pixels&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">21</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;h&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Parameter regulating filter strength. </span>
+<span class="s">            Big h value perfectly removes noise but also removes image </span>
+<span class="s">            details, smaller h value preserves details but also </span>
+<span class="s">            preserves some noise&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]})</span>
+
+        <span class="c">#only color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHForColorComponents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;hForColorComponents &#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;The same as h but for color components. </span>
+<span class="s">            For most images value equals 10 will be enought to remove </span>
+<span class="s">            colored noise and do not distort colors&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]})</span>
+
+        <span class="c">#only stack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;imgToDenoiseIndex &#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Target image to denoise index in srcImgs sequence&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]})</span>
+        <span class="c">#only stack </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;temporalWindowSize &#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Number of surrounding images to use for target image denoising. </span>
+<span class="s">            Should be odd. Images from imgToDenoiseIndex - </span>
+<span class="s">            temporalWindowSize / 2 to imgToDenoiseIndex - temporalWindowSize </span>
+<span class="s">            / 2 from srcImgs will be used to denoise srcImgs[imgToDenoiseIndex]&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAddChangesLayer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Add changes layer&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+            <span class="p">})</span>
+
+
+    <span class="k">def</span> <span class="nf">_setupMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        setup for self.function and self.args taken from http://docs.opencv.org/master/modules/photo/doc/denoising.html</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="c">#find the fitting function for the image:        </span>
+        <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="c"># coloured image stack</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fastNlMeansDenoisingColoredMulti</span> 
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;expanded&#39;</span><span class="p">]:</span>
+                <span class="c">#use defaults given by openCV</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">None</span><span class="p">,</span> <span class="c">#destination image</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pH</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pHColor</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pTemplateWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pSearchWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pHForColorComponents</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            
+        <span class="k">elif</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">filenames</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c"># grey scale image stack</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fastNlMeansDenoisingMulti</span> 
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;expanded&#39;</span><span class="p">]:</span>
+                    <span class="c">#use defaults given by openCV</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                                 <span class="bp">None</span><span class="p">,</span> <span class="c">#destination image</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pH</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                                 <span class="c">#self.pHColor.value(),</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pTemplateWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pSearchWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+      
+                <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pHForColorComponents</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#single coloured image</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fastNlMeansDenoisingColored</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;expanded&#39;</span><span class="p">]:</span>
+                    <span class="c">#use defaults given by openCV</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="c">#self.pImgToDenoiseIndex.value(), </span>
+                                 <span class="c">#self.pTemporalWindowSize.value(),</span>
+                                 <span class="bp">None</span><span class="p">,</span> <span class="c">#destination image</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pH</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+<span class="c">#                                  self.pHColor.value(),</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">pTemplateWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pSearchWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>               
+                                
+                <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pHForColorComponents</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#single grey scale image</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fastNlMeansDenoising</span> 
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOptional</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;expanded&#39;</span><span class="p">]:</span>
+                <span class="c">#use defaults given by openCV</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="c">#self.pImgToDenoiseIndex.value(), </span>
+                             <span class="c">#self.pTemporalWindowSize.value(),</span>
+                             <span class="bp">None</span><span class="p">,</span> <span class="c">#destination image</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pH</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="c">#self.pHColor.value(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pTemplateWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">pSearchWindowSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span> 
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pTemporalWindowSize</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pImgToDenoiseIndex</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pHForColorComponents</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="CV2Denoise.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.filter.html#dataArtist.figures.image.tools.filter.CV2Denoise.CV2Denoise.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setupMenu</span><span class="p">()</span>
+        
+        <span class="n">scale</span><span class="o">=</span><span class="n">mn</span><span class="o">=</span><span class="mi">0</span>
+        <span class="c">#TRANSFORM TO UINT8:</span>
+        <span class="n">orig_dtype</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="k">if</span> <span class="n">orig_dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pConvMethod</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;clip&#39;</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">image</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c">#scale</span>
+                <span class="n">med</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">mn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">med</span><span class="p">)</span>
+                <span class="n">image</span> <span class="o">-=</span> <span class="n">mn</span> <span class="c"># set min to 0</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">med</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+                <span class="n">image</span> <span class="o">/=</span> <span class="n">scale</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        
+        <span class="c">#if len(image)==1:</span>
+        <span class="c">#    image = image[0]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">startThread</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">mn</span><span class="o">=</span><span class="n">mn</span><span class="p">,</span> <span class="n">orig_dtype</span><span class="o">=</span><span class="n">orig_dtype</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_process</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mn</span><span class="p">,</span> <span class="n">orig_dtype</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processDone</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_processDone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handleOutput</span><span class="p">([</span><span class="n">out</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;CV2 Denoised&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAddChangesLayer</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span> <span class="o">-</span> <span class="n">out</span>
+            <span class="k">if</span> <span class="n">diff</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="s">&#39;CV2 denoised&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mn</span><span class="p">,</span> <span class="n">orig_dtype</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">image</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pConvMethod</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;scale&#39;</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">orig_dtype</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">*=</span> <span class="n">scale</span>
+                <span class="n">i</span><span class="o">+=</span><span class="n">mn</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

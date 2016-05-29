@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items.ColorLayerItem &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.items.ColorLayerItem</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.items.ColorLayerItem</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="n">RED</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span><span class="o">.</span><span class="n">rgb</span><span class="p">()</span>
+
+
+
+<div class="viewcode-block" id="ColorLayerItem"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem">[docs]</a><span class="k">class</span> <span class="nc">ColorLayerItem</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    An color overlay for ImageWidget.</span>
+<span class="sd">    The transparency is given through the [image] array.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">imageWidget</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="n">RED</span><span class="p">,</span> <span class="n">histogram</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogramPos</span> <span class="o">=</span> <span class="n">pos</span> <span class="c"># the position within a histogram to get the colour from</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span> <span class="o">=</span> <span class="n">imageWidget</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastInd</span> <span class="o">=</span> <span class="n">imageWidget</span><span class="o">.</span><span class="n">currentIndex</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c">#multiple images</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_lastInd</span><span class="p">]</span>
+            <span class="n">imageWidget</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">)</span>
+
+        <span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCompositionMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="o">.</span><span class="n">CompositionMode_SourceOver</span><span class="p">)</span>
+
+        <span class="c">#create an empty QImage:  </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initQImg</span><span class="p">()</span> 
+
+        <span class="k">if</span> <span class="n">histogram</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setHistogram</span><span class="p">(</span><span class="n">histogram</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateImage</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_initQImg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qimage</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                   <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format_ARGB32</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ColorLayerItem.changeLayer"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.changeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">changeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update to show the colour overlay corresponding to the layer index</span>
+<span class="sd">        &#39;&#39;&#39;</span>        
+        <span class="k">if</span> <span class="n">ind</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastInd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateImage</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lastInd</span> <span class="o">=</span> <span class="n">ind</span></div>
+
+
+<div class="viewcode-block" id="ColorLayerItem.getQColor"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.getQColor">[docs]</a>    <span class="k">def</span> <span class="nf">getQColor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">setAlpha</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">*</span><span class="mi">255</span><span class="p">))</span>
+        <span class="k">return</span>  <span class="n">c</span></div>
+
+
+<div class="viewcode-block" id="ColorLayerItem.setQColor"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.setQColor">[docs]</a>    <span class="k">def</span> <span class="nf">setQColor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qcolor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">qcolor</span><span class="o">.</span><span class="n">rgb</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAlpha</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">qcolor</span><span class="o">.</span><span class="n">alpha</span><span class="p">())</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span></div>
+      
+
+<div class="viewcode-block" id="ColorLayerItem.setLayer"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.setLayer">[docs]</a>    <span class="k">def</span> <span class="nf">setLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="k">elif</span> <span class="n">layer</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c">#multiple images</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initQImg</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateImage</span><span class="p">()</span></div>
+ 
+ 
+<div class="viewcode-block" id="ColorLayerItem.updateImage"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.updateImage">[docs]</a>    <span class="k">def</span> <span class="nf">updateImage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qalpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mkQImg</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateLayer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ColorLayerItem.setAlpha"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.setAlpha">[docs]</a>    <span class="k">def</span> <span class="nf">setAlpha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qalpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mkQImg</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateLayer</span><span class="p">()</span></div>
+        
+
+<div class="viewcode-block" id="ColorLayerItem.updateLayer"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.ColorLayerItem.ColorLayerItem.updateLayer">[docs]</a>    <span class="k">def</span> <span class="nf">updateLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#fill the color layer with the color:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qimage</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+        <span class="c">#add the alpha layer again because it is deleted after .fill:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qimage</span><span class="o">.</span><span class="n">setAlphaChannel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qalpha</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">updateViewRange</span><span class="p">()</span>    </div>
+
+
+    <span class="k">def</span> <span class="nf">_mkQImg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;create a QImage from self.image_full&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="n">mn</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">mx</span><span class="o">=</span><span class="bp">True</span><span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mn</span><span class="p">,</span><span class="n">mx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mn</span><span class="p">):</span>
+            <span class="n">mn</span><span class="p">,</span><span class="n">mx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span>
+        <span class="n">argb</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">makeARGB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="n">mn</span><span class="p">,</span><span class="n">mx</span><span class="p">])</span>
+        <span class="n">qalpha</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">makeQImage</span><span class="p">(</span><span class="n">argb</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">qalpha</span><span class="o">.</span><span class="n">convertToFormat</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format_Indexed8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">qalpha</span>
+
+
+    <span class="k">def</span> <span class="nf">_setHistogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">histogram</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        connect the changes in the color values of the histogram to _setColor</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">sigLevelsChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setColorViaHistogram</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">sigGradientChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">_setColorViaHistogram</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span> <span class="o">=</span> <span class="n">histogram</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">sigLevelsChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setColorViaHistogram</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">sigGradientChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setColorViaHistogram</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setColorViaHistogram</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_setColorViaHistogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#get boundaries from the histogram</span>
+        <span class="n">mn</span><span class="p">,</span><span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">getLevels</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mn</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogramPos</span> <span class="o">&lt;=</span> <span class="n">mx</span><span class="p">:</span>
+            <span class="c">#calc x as relative position (0-1) between the boundaries </span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogramPos</span> <span class="o">==</span> <span class="n">mn</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">histogramPos</span><span class="o">-</span><span class="n">mn</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">mx</span><span class="o">-</span><span class="n">mn</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">getColor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">rgb</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateLayer</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qimage</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rgba</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">updateViewRange</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

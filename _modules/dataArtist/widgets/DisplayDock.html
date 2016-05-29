@@ -1,0 +1,1335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.DisplayDock &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.DisplayDock</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.DisplayDock</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree</span> <span class="kn">import</span> <span class="n">ParameterTree</span><span class="p">,</span> <span class="n">Parameter</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree.parameterTypes</span> \
+                        <span class="kn">import</span> <span class="n">GroupParameter</span><span class="p">,</span> <span class="n">ListParameter</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+<span class="kn">from</span> <span class="nn">fancytools.fcollections.removeDuplicates</span> <span class="kn">import</span> <span class="n">removeDuplicates</span>
+
+<span class="c">#METADATA reader:</span>
+<span class="c"># from hachoir_core.error import HachoirError</span>
+<span class="c"># from hachoir_core.cmd_line import unicodeFilename</span>
+<span class="c"># from hachoir_parser import createParser</span>
+<span class="c"># from hachoir_metadata import extractMetadata</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Automation</span> <span class="kn">import</span> <span class="n">Automation</span>
+<span class="kn">from</span> <span class="nn">dataArtist.input.getFileReader</span> <span class="kn">import</span> <span class="n">getFileReader</span>
+<span class="kn">from</span> <span class="nn">dataArtist.items.axis</span> <span class="kn">import</span> <span class="n">AxesContainer</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.docks</span> <span class="kn">import</span> <span class="n">DockBase</span> <span class="k">as</span> <span class="n">Dock</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist</span> <span class="kn">import</span> <span class="n">figures</span>
+<span class="n">FIGURES</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">figures</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">figures</span>
+
+
+
+<div class="viewcode-block" id="DisplayDock"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock">[docs]</a><span class="k">class</span> <span class="nc">DisplayDock</span><span class="p">(</span><span class="n">Dock</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A Dock container to...</span>
+<span class="sd">    </span>
+<span class="sd">    * OPEN and DISPLAY given input within a fitting display widget </span>
+<span class="sd">         (e.g. display.Image for images)</span>
+<span class="sd">    * adding, (re)moving, copying input LAYERS (e.g. multiple plots </span>
+<span class="sd">         or images of the same size)</span>
+<span class="sd">    * choosing the right TOOLS for the corresponding display widget</span>
+<span class="sd">    * creating PREFERENCES in INFORMATION about the input </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">clicked</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    <span class="n">closed</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    <span class="n">sigLayerChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    <span class="n">sigNewLayer</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#self</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">openfiles</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        ============   ===============================================</span>
+<span class="sd">        Arguments      Description</span>
+<span class="sd">        ============   ===============================================        </span>
+<span class="sd">        number         The display number, like 1,2...</span>
+<span class="sd">        workspace      The workspace within the display is</span>
+<span class="sd">        names          Path(s) of input files to open</span>
+<span class="sd">        title          ... of the DisplayDock</span>
+<span class="sd">        data           ... to display within the corresponding widget</span>
+<span class="sd">        axes           Instance of AxesContainer with names and scales</span>
+<span class="sd">                       for the axes scaling the data</span>
+<span class="sd">        origin         The origin display</span>
+<span class="sd">        index          The index of the origin layer</span>
+<span class="sd">        info           informational text about the input</span>
+<span class="sd">        changes        Additional changes done to the data</span>
+<span class="sd">        openfiles      [True/False] whether to open the files</span>
+<span class="sd">                       given in [filenames]</span>
+<span class="sd">        ============   ===============================================</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">workspace</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isclosed</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c">#GET VALUES FROM ORIGIN DISPLAY</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extractInfoFromOrigin</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> 
+                                                               <span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;either filenames, data or axes must be given&#39;</span><span class="p">)</span>
+        <span class="n">one_layer</span> <span class="o">=</span> <span class="bp">False</span>
+        
+        <span class="c">#FORMAT FILENAMES TO A LIST OF FILENAMES:</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+            <span class="n">one_layer</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="n">docktitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDockTitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span><span class="n">names</span><span class="p">)</span>
+
+        <span class="c">#INIT SUPER CLASS</span>
+        <span class="n">Dock</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docktitle</span><span class="p">)</span>
+
+        <span class="c">#SETUP FILE READER:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span><span class="c">#--&gt;load input from file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">getFileReader</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="c">#GET AXES FROM INPUT READER IF NOT DEFINED YET:</span>
+            <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+                <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">axes</span>
+        <span class="c">#CREATE/FORMAT AXES IF INPUT GIVES AS DATA:</span>
+        <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+            <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;i&#39;</span><span class="p">,</span><span class="s">&#39;j&#39;</span><span class="p">][:</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;i&#39;</span><span class="p">,</span><span class="s">&#39;j&#39;</span><span class="p">][:</span><span class="n">axes</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">_StackParameter</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="c">#PARAMETERS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="s">&#39;empty&#39;</span><span class="p">)</span>
+
+        <span class="c">#TAB DISPLAYING PREFERENCES AND INPUT INFORMATION:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab</span> <span class="o">=</span> <span class="n">_DisplayTab</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="c">#FILL PARAMETERS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Title&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;str&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setWidgetTitle</span><span class="p">)</span>                        
+        <span class="n">pSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Size&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">})</span>
+        <span class="n">pSize</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setTitleSize</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitleFromLayer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;From layer&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitleFromLayer</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pTitleFromLayerChanged</span><span class="p">)</span>  
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitLayers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                  <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Limit Layers&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLimitLayers</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pLimitLayersChanged</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMaxLayers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitLayers</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Max. Layers&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mf">1e4</span><span class="p">]})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMaxLayers</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limitLayers</span><span class="p">)</span>
+ 
+        <span class="c">#HANDLING THE INPUT LAYERS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">AxesContainer</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">axes</span><span class="p">,</span> 
+                                  <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">))</span>
+        <span class="c">#ADD AXES PARAMETERS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="c">#LIST OF ALL FITTING DISPLAY FIGURES:</span>
+        <span class="n">widgetList</span> <span class="o">=</span> <span class="n">_DisplayFigureList</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c">#UPDATE DATA FROM FILE USING SPECIFIED PREFERENCES: </span>
+        <span class="c">#TODO: &#39;update&#39; should only update file based data and no processed data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">:</span>
+            <span class="n">pUpdate</span> <span class="o">=</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+                        <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Update&#39;</span><span class="p">,</span>
+                        <span class="p">})</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">preferences</span><span class="p">:</span>
+                <span class="n">pUpdate</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">preferences</span><span class="p">)</span>
+            <span class="n">pUpdate</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateInput</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">pUpdate</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">widgetList</span><span class="p">)</span>
+      
+        <span class="c">#INIT WIDGET</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeWidget</span><span class="p">(</span><span class="n">widgetList</span><span class="o">.</span><span class="n">getWidget</span><span class="p">())</span><span class="c">#, data, names)</span>
+        <span class="c">#ADD DATA</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addFiles</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">openfiles</span><span class="p">)</span>
+            <span class="c">#TODO: what to do with mixed file/non file input?</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">one_layer</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addLayers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_limitLayers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="c">#remove surplus layers</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span> <span class="o">-</span> <span class="n">val</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">children</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>  
+
+
+    <span class="k">def</span> <span class="nf">_pLimitLayersChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span><span class="n">val</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMaxLayers</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_limitLayers</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        
+
+    <span class="k">def</span> <span class="nf">_pTitleFromLayerChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span>
+        <span class="k">if</span> <span class="n">val</span><span class="p">:</span> 
+            <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setTitleFromCurrentLayer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setTitleFromCurrentLayer</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setTitleFromCurrentLayer</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setWidgetTitle</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pTitle</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+    
+
+    <span class="k">def</span> <span class="nf">_setWidgetTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_setTitleFromCurrentLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_getDockTitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        create a title for this display dock</span>
+
+<span class="sd">        names -&gt; list instances of PathStr</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">docktitle</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">] &#39;</span> <span class="o">%</span><span class="n">number</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">docktitle</span> <span class="o">+=</span> <span class="n">title</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c">#if multiple files imported:</span>
+            <span class="c">#FOLDER IN TITLE</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">dirname</span> <span class="o">=</span> <span class="s">&#39;~&#39;</span><span class="o">+</span><span class="n">dirname</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+            <span class="n">docktitle</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> files from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">dirname</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">names</span> <span class="ow">and</span> <span class="n">names</span> <span class="o">!=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]:</span>
+            <span class="c">#FILENAME IN TITLE</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">basename</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;(...)&#39;</span><span class="o">+</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">8</span><span class="p">:]</span>
+            <span class="n">docktitle</span> <span class="o">+=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="n">docktitle</span>
+        
+
+    <span class="k">def</span> <span class="nf">_extractInfoFromOrigin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> 
+                               <span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">docktitle</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get data, filenames, axes from the origin display</span>
+<span class="sd">        if there value is None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="n">origin</span><span class="p">:</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">origin</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">(</span><span class="n">index</span><span class="p">)]</span>
+
+                <span class="n">ch</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span>
+
+            <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">names</span> <span class="o">=</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">docktitle</span><span class="p">:</span>
+                <span class="n">docktitle</span> <span class="o">=</span> <span class="s">&#39;Child&#39;</span>
+            <span class="n">docktitle</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> of </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">docktitle</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">shortName</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">docktitle</span>
+
+
+<div class="viewcode-block" id="DisplayDock.shortName"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.shortName">[docs]</a>    <span class="k">def</span> <span class="nf">shortName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_getNDataLayers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        define number of data layers interpreting [data] and it&#39;s [axes]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+        <span class="c">#get number of dimensions (nDim) and shape without the need of an ndarray:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="c">#has no layers jet</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c">#stack with one layer or no stack:</span>
+            <span class="n">nlayers</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">l</span> <span class="o">==</span> <span class="n">ndim</span> <span class="ow">or</span> <span class="n">l</span> <span class="o">==</span> <span class="n">ndim</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c">#multiple layers:</span>
+            <span class="n">nlayers</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;number of axes doesn&#39;t fit to data shape&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nlayers</span>
+
+
+<div class="viewcode-block" id="DisplayDock.mousePressEvent"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        emits the signal &#39;clicked&#39; if it is activated</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.close"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        emits the signal &#39;closed&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Dock</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isclosed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">undoRedo</span><span class="o">.</span><span class="n">displayClosed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.isClosed"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.isClosed">[docs]</a>    <span class="k">def</span> <span class="nf">isClosed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isclosed</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        this method is to access display layers easily in the built-in python shell</span>
+<span class="sd">        </span>
+<span class="sd">        if attribute cannot be found:</span>
+<span class="sd">        return data or data-layer if attribute = &#39;l&#39; or &#39;l0&#39;...&#39;l[layerNumber]&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Dock</span><span class="o">.</span><span class="n">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;l&#39;</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">attr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;display </span><span class="si">%s</span><span class="s"> doesn&#39;t has attribute </span><span class="si">%s</span><span class="s">&quot;</span> 
+                                        <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span> <span class="n">attr</span><span class="p">))</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;display </span><span class="si">%s</span><span class="s"> doesn&#39;t has attribute </span><span class="si">%s</span><span class="s">&quot;</span> 
+                                        <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span> <span class="n">attr</span><span class="p">))</span>
+        
+        
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        this method is to access display layers easily in the built-in python shell</span>
+
+<span class="sd">        if attribute is &#39;l&#39; or &#39;l0&#39;...&#39;l[layerNumber]&#39;:</span>
+<span class="sd">            set all data of a certain data layer to [value]  </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;l&#39;</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">attr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="p">:</span>
+                <span class="c">#make sure that this display is updated through automation:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">checkWidgetIsActive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+                
+                <span class="n">nLayers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span>
+                <span class="c"># CASE &#39;l&#39;</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getNDataLayers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nLayers</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+                    <span class="c">#print value</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">nLayers</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c">#remove old layers:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLayers</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">layer</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span> 
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">a</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="c">#make sure that this display is updated through automation:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">checkWidgetIsActive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>
+
+                <span class="n">nLayers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span>
+                <span class="c"># CASE &#39;l0&#39;...&#39;l[n]&#39; </span>
+                <span class="n">a</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">nLayers</span><span class="p">:</span>
+                    <span class="c">#this index doesn&#39;t exist jet - so add a new layer</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">Dock</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DisplayDock.duplicate"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        create a new display with the same data and axes</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+            <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s">&#39;Duplicate&#39;</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">saveState</span><span class="p">())</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">saveState</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.adaptParamsToWidget"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.adaptParamsToWidget">[docs]</a>    <span class="k">def</span> <span class="nf">adaptParamsToWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">shows_one_layer_at_a_time</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTitleFromLayer</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+            <span class="c">#cannot set title from layer if all layers are displayed</span>
+            <span class="c">#at the same time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pTitleFromLayerChanged</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.changeWidget"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.changeWidget">[docs]</a>    <span class="k">def</span> <span class="nf">changeWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widgetCls</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        change the display widget class and setup the toolbar</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reloadWidgetCls</span><span class="p">(</span><span class="n">widgetCls</span><span class="p">)</span>
+        <span class="c">#to init the new toolbars:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptParamsToWidget</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.reloadWidget"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.reloadWidget">[docs]</a>    <span class="k">def</span> <span class="nf">reloadWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reloadWidgetCls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_reloadWidgetCls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widgetCls</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span> 
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">None</span>  
+        <span class="n">toolbars</span> <span class="o">=</span> <span class="bp">None</span>     
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+            <span class="n">toolbars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span>
+
+        <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layerNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">widgetCls</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> 
+                                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">toolbars</span><span class="o">=</span><span class="n">toolbars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+             
+        <span class="n">Dock</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="p">)</span>    
+        
+
+<div class="viewcode-block" id="DisplayDock.insertRemovedLayer"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.insertRemovedLayer">[docs]</a>    <span class="k">def</span> <span class="nf">insertRemovedLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Insert a layer moved to [index]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">insertMovedLayer</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.removeLayers"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.removeLayers">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">clearChildren</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.removeLayer"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.removeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">removeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">toMove</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        remove a data layer</span>
+<span class="sd">        toMove=True =&gt; this layer will be moved within the stack </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">toMove</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.copyLayerToOtherDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToOtherDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">copyLayerToOtherDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.moveLayerToOtherDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToOtherDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">moveLayerToOtherDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.copyLayerToNewDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.copyLayerToNewDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">copyLayerToNewDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+            <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span> </div>
+
+
+<div class="viewcode-block" id="DisplayDock.moveLayerToNewDisplay"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.moveLayerToNewDisplay">[docs]</a>    <span class="k">def</span> <span class="nf">moveLayerToNewDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copyLayerToNewDisplay</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.layerNames"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.layerNames">[docs]</a>    <span class="k">def</span> <span class="nf">layerNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return the names of all data layers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">children</span><span class="p">()]</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_getLayerLabel</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&#39;unknown&#39;</span>
+            <span class="k">return</span> <span class="n">label</span>
+        <span class="k">if</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">basename</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> - </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fname</span>
+        
+
+<div class="viewcode-block" id="DisplayDock.addLayer"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.addLayer">[docs]</a>    <span class="k">def</span> <span class="nf">addLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add a new layer to the stack</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span>  <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extractInfoFromOrigin</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> 
+                                    <span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getLayerLabel</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="c">#ADD TO PARAMETER TREE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">buildLayer</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> 
+                              <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
+                              <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="o">.</span><span class="n">stack</span> <span class="k">if</span> <span class="n">origin</span> <span class="k">else</span> <span class="bp">None</span><span class="p">,</span> 
+                              <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="n">changes</span><span class="p">)</span>
+        <span class="c">#WIDGET</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">moveLayerToNewImage</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Move this layer to new display&#39;</span>
+            <span class="c">#couldn&#39;t add new layer to stack: create a new display to show it            </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> 
+                <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">])</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#LIMIT LAYERS</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLimitLayers</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> 
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMaxLayers</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="c">#AUTOMATION</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigNewLayer</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">layer</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.backupChangedLayer"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.backupChangedLayer">[docs]</a>    <span class="k">def</span> <span class="nf">backupChangedLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c">#UNDO/REDO</span>
+        <span class="n">ur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">undoRedo</span>
+        <span class="k">if</span> <span class="n">ur</span><span class="o">.</span><span class="n">isActive</span><span class="p">():</span>
+            <span class="c">#index = kwargs.get(&#39;index&#39;, None)</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span>
+            <span class="k">if</span> <span class="n">backup</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">getData</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">return</span>
+                <span class="n">backup</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortName</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">+=</span> <span class="s">&quot;-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">index</span>
+            <span class="n">name</span> <span class="o">+=</span> <span class="s">&quot;: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">changes</span>
+
+            <span class="n">ur</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">display</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> 
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> 
+                <span class="n">undoFn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">backup</span><span class="p">:</span> 
+                            <span class="bp">self</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="s">&#39;undo&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> 
+                                             <span class="n">backup</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">redoFn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">index</span><span class="p">:</span> 
+                            <span class="bp">self</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="s">&#39;redo&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> 
+                                             <span class="n">backup</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">dataFn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="o">=</span><span class="n">index</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="n">widget</span><span class="p">:</span> 
+                    <span class="n">w</span><span class="o">.</span><span class="n">getData</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.changeAllLayers"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.changeAllLayers">[docs]</a>    <span class="k">def</span> <span class="nf">changeAllLayers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">backup</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backupChangedLayer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">changes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">updateView</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">addChange</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigLayerChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.changeLayer"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.changeLayer">[docs]</a>    <span class="k">def</span> <span class="nf">changeLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">backup</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backupChangedLayer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">changes</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">updateView</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">addChange</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigLayerChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+            
+            
+<div class="viewcode-block" id="DisplayDock.showToolBar"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.showToolBar">[docs]</a>    <span class="k">def</span> <span class="nf">showToolBar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        show an other toolbar of the same display.widget</span>
+<span class="sd">        if hidden</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#make given toolbar tool visible</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">toolbars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">setSelected</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Toolbar [</span><span class="si">%s</span><span class="s">] doesnt exist&#39;</span> <span class="o">%</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">t</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.changeLayerFiles"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFiles">[docs]</a>    <span class="k">def</span> <span class="nf">changeLayerFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="s">&#39;*.&#39;</span><span class="o">+</span> <span class="s">&#39; *.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">ftypes</span><span class="p">)</span>
+        <span class="n">fnames</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getOpenFileNames</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">filt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fnames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeLayers</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addFiles</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.changeLayerFile"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.changeLayerFile">[docs]</a>    <span class="k">def</span> <span class="nf">changeLayerFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        change the origin file of layer of [index]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">filt</span> <span class="o">=</span> <span class="s">&#39;*.&#39;</span><span class="o">+</span> <span class="s">&#39; *.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">ftypes</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span>
+                    <span class="nb">filter</span><span class="o">=</span><span class="n">filt</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">dirname</span><span class="p">())</span>        
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_readFiles</span><span class="p">([</span><span class="n">fname</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updateFiles</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">removeDuplicates</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="DisplayDock.layerIndex"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.layerIndex">[docs]</a>    <span class="k">def</span> <span class="nf">layerIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">layername</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">filename</span> <span class="ow">and</span> <span class="n">ch</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;layername&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">layername</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+                 
+<div class="viewcode-block" id="DisplayDock.updateInput"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.updateInput">[docs]</a>    <span class="k">def</span> <span class="nf">updateInput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Update the input coming from file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_readFiles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updateFiles</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_updateFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">fnames</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>        
+        <span class="n">old_fnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span>
+        <span class="n">old_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;layername&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="s">&#39;reloaded at &#39;</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">fnames</span> <span class="o">==</span> <span class="n">old_fnames</span> <span class="ow">and</span> <span class="n">labels</span> <span class="o">==</span> <span class="n">old_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changeAllLayers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="n">changes</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#layers cannot be easily exchanged, so:</span>
+            <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">fnames</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layerIndex</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>      
+                    <span class="bp">self</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> 
+                        <span class="n">changes</span><span class="o">=</span><span class="s">&#39;reloaded at &#39;</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span><span class="p">),</span>
+                        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c">#TODO: insert layer behind last filename layer</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">l</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+                
+
+<div class="viewcode-block" id="DisplayDock.addLayers"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.addLayers">[docs]</a>    <span class="k">def</span> <span class="nf">addLayers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">fnames</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">fnames</span><span class="p">,</span> <span class="n">datas</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">l</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.addFiles"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.addFiles">[docs]</a>    <span class="k">def</span> <span class="nf">addFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">,</span> <span class="n">openfiles</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add input from file(s) to the stack</span>
+<span class="sd">        -&gt; read input</span>
+<span class="sd">        -&gt; add layer</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">fnames</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ff</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;file &#39;</span><span class="si">%s</span><span class="s">&#39; already in display &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+                <span class="c">#fnames.remove(f)</span>
+        <span class="k">if</span> <span class="n">fnames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">getFileReader</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">openfiles</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_readFiles</span><span class="p">(</span><span class="n">fnames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addLayers</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addLayers</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">fnames</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.saveState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c">#         path += (&#39;display&#39;,str(self.number))</span>
+        <span class="c">#layers</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;stack&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+        <span class="c">#automation</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;automation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span> 
+        <span class="c">#parameters</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>    
+<span class="c">#         session.addContentToSave(self.p.saveState(), *path+(&#39;parameters.txt&#39;,))</span>
+        <span class="c">#dock</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;dock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">maximized</span>
+<span class="c">#         session.addContentToSave(self.label.maximized, *path+(&#39;dock.txt&#39;,))</span>
+        <span class="c">#to init the current toolbars:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> 
+        <span class="c">#widget</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;widget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+   
+   
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">tools</span>
+
+
+<div class="viewcode-block" id="DisplayDock.restoreState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="c">#layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;stack&#39;</span><span class="p">])</span>
+        <span class="c">#automation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">automation</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;automation&#39;</span><span class="p">])</span>  
+        <span class="c">#parameters</span>
+        <span class="c">#TODO: this is not clean - stack is mentioned above and already restore its parameters...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">_valuesChanged</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">])</span>
+        <span class="c">#widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;widget&#39;</span><span class="p">])</span>
+        <span class="c">#dock</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;dock&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maximize</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DisplayDock.openFilesFunctions"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.DisplayDock.DisplayDock.openFilesFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">openFilesFunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_readFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">dataFunction</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">done</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span> <span class="c"># nothing connected so far</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">done</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dataFunction</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">_DisplayTab</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A QSplitter containing...</span>
+<span class="sd">    * Automation</span>
+<span class="sd">    * Display Preferences </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="c">#0=horiz, 1=vert) </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">automation</span> <span class="o">=</span> <span class="n">Automation</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefs</span> <span class="o">=</span> <span class="n">_PreferencesWidget</span><span class="p">(</span><span class="n">display</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">automation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">)</span>
+
+
+
+<span class="k">class</span> <span class="nc">_PreferencesWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Format &#39;Preferences&#39;-ParameterTree</span>
+<span class="sd">    and add a Title on top </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="c">#PAREMETERTREE</span>
+        <span class="n">pref</span> <span class="o">=</span> <span class="n">ParameterTree</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">showHeader</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> 
+        <span class="n">h</span> <span class="o">=</span> <span class="n">pref</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">setResizeMode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QHeaderView</span><span class="o">.</span><span class="n">Stretch</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">setStretchLastSection</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c">#TITLE</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;&lt;b&gt;Preferences&lt;/b&#39;</span><span class="p">))</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">pref</span><span class="p">)</span> 
+
+
+
+<span class="k">class</span> <span class="nc">_DisplayFigureList</span><span class="p">(</span><span class="n">ListParameter</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    ListParameter showing all display FIGURES available </span>
+<span class="sd">    for the dimensions of the input</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+
+        <span class="n">names</span><span class="p">,</span> <span class="n">icons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getWidgetList</span><span class="p">()</span>
+
+        <span class="n">ListParameter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Figure&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="n">names</span><span class="p">,</span>
+                    <span class="s">&#39;icons&#39;</span><span class="p">:</span><span class="n">icons</span><span class="p">})</span>
+   
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">changeWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span><span class="p">[</span><span class="n">value</span><span class="p">]))</span>
+
+       
+    <span class="k">def</span> <span class="nf">getWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return the first widget in the list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span>
+     
+
+    <span class="k">def</span> <span class="nf">getWidgetList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">icons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#create a list with all possible displays according to the number of dimensions</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">FIGURES</span><span class="p">:</span>
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;dimensions&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dimensions</span><span class="p">:</span>
+                <span class="c">#is this display able to display our data?</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span>
+                    <span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;icon&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="p">)</span>                    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> doens&#39;t have needed attribute &#39;dimensions&#39;&quot;</span> <span class="o">%</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_figure</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">icons</span>
+      
+
+
+<span class="k">class</span> <span class="nc">_StackParameter</span><span class="p">(</span><span class="n">GroupParameter</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Parameter containing information about all input layers and </span>
+<span class="sd">    allowing to change their position within the stack</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">sigValuesChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c">#values</span>
+    <span class="n">sigLayerNameChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span><span class="c">#index, name</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+
+        <span class="n">mAll</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="s">&#39;All layers&#39;</span><span class="p">)</span>
+        <span class="n">mAll</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Change&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">changeLayerFiles</span><span class="p">)</span>
+        <span class="n">mAll</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Remove&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">removeLayers</span><span class="p">)</span>
+
+        <span class="n">GroupParameter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;   Layers&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;sliding&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;addToContextMenu&#39;</span><span class="p">:[</span><span class="n">mAll</span><span class="p">]})</span>
+        <span class="c">#IF A LAYER IS MOVED:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">removeLayer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> 
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;aboutToMove&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> \
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">insertRemovedLayer</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valuesChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valuesChanged</span><span class="p">)</span>
+        
+
+    <span class="k">def</span> <span class="nf">_extractFromOrigin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> 
+                           <span class="n">info</span><span class="p">,</span> <span class="n">changes</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get &#39;Info&#39; and &#39;Changes&#39; from origin StackParameter</span>
+<span class="sd">        append origin-changes with new changes</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">origin</span><span class="p">:</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">children</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">info</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="s">&#39;Info&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">---</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+            <span class="n">origin_changes</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="s">&#39;Changes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">origin_changes</span> <span class="o">+=</span> <span class="s">&#39;;</span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span><span class="n">v</span>
+            <span class="k">if</span> <span class="n">changes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>  
+                    <span class="n">changes</span> <span class="o">=</span> <span class="n">changes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">changes</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">origin_changes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">changes</span> <span class="o">=</span> <span class="n">origin_changes</span>  
+        <span class="k">return</span> <span class="n">info</span><span class="p">,</span> <span class="n">changes</span>
+
+
+    <span class="k">def</span> <span class="nf">_valuesChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        all layers create an additional stack-dimension with it&#39;s own values</span>
+<span class="sd">        e.g. a set of images, where every layer represents an image at another excitation time</span>
+<span class="sd">           could have stack.values = [1,5,10,15,20] [s] </span>
+<span class="sd">           as soon as the position of a layer changed or a layer is removed</span>
+<span class="sd">           these values (e.g.excitation times) have to updated as well</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigValuesChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c"># </span>
+<span class="c">#     def save(self, session, path):</span>
+<span class="c">#         &#39;&#39;&#39;</span>
+<span class="c">#         save parameter values to file &#39;stack.txt&#39;</span>
+<span class="c">#         &#39;&#39;&#39;</span>
+<span class="c">#         session.addContentToSave(self.saveState(), *path+(&#39;stack.txt&#39;,))</span>
+<span class="c">#      </span>
+ 
+    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        set parameter values using file &#39;stack.txt&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#DON&#39;T DO ANYTHING WHILE THE STACK IS UPDATED:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearChildren</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span><span class="p">)</span>
+        <span class="c">#REBUILD STACK:</span>
+<span class="c">#         l =  eval(session.getSavedContent(*path +(&#39;stack.txt&#39;,) )  )</span>
+        <span class="n">GroupParameter</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">buildLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                         <span class="n">info</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        for every layer of the stack add a parameter containing ...</span>
+<span class="sd">        * it&#39;s stack value</span>
+<span class="sd">        * an layer info field</span>
+<span class="sd">        * a layer changed field</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">info</span><span class="p">,</span> <span class="n">changes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extractFromOrigin</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">changes</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="c">#ADD OPTIONS TO THE CONTEXT MENU:</span>
+        <span class="n">mCopy</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="s">&#39;Copy&#39;</span><span class="p">)</span>
+        <span class="n">mMove</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="s">&#39;Move&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fname</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">menu_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">mCopy</span><span class="p">,</span> <span class="n">mMove</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">aFile</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;Change File&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">aFile</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">childs</span><span class="p">):</span> 
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">changeLayerFile</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">menu_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aFile</span><span class="p">)</span>
+        <span class="c">#CREATE AND ADD COPY-LAYER-TO OPTION TO PARAMETER:</span>
+        <span class="n">pLayer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+                <span class="s">&#39;isGroup&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">stackAxis</span><span class="o">.</span><span class="n">getNextStackValue</span><span class="p">(</span>
+                                            <span class="n">PathStr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">basename</span><span class="p">()),</span>
+                <span class="s">&#39;expanded&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+                <span class="s">&#39;removable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;autoIncrementName&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;renamable&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;readonly&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;addToContextMenu&#39;</span><span class="p">:</span><span class="n">menu_entries</span><span class="p">,</span>
+                
+                <span class="s">&#39;filename&#39;</span><span class="p">:</span><span class="n">fname</span><span class="p">,</span>
+                <span class="s">&#39;layername&#39;</span><span class="p">:</span><span class="n">label</span><span class="p">,</span>
+                <span class="p">})</span>
+        <span class="n">mCopy</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pLayer</span><span class="o">=</span><span class="n">pLayer</span><span class="p">,</span> <span class="n">mCopy</span><span class="o">=</span><span class="n">mCopy</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buildCopyToDisplayMenu</span><span class="p">(</span><span class="n">mCopy</span><span class="p">,</span> <span class="n">pLayer</span><span class="p">,</span> <span class="s">&#39;copy&#39;</span><span class="p">))</span>
+        <span class="n">mMove</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pLayer</span><span class="o">=</span><span class="n">pLayer</span><span class="p">,</span> <span class="n">mMove</span><span class="o">=</span><span class="n">mMove</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buildCopyToDisplayMenu</span><span class="p">(</span><span class="n">mMove</span><span class="p">,</span> <span class="n">pLayer</span><span class="p">,</span> <span class="s">&#39;move&#39;</span><span class="p">))</span>
+                
+        <span class="c">#UPDATE STACK VALUES:</span>
+        <span class="n">pLayer</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valuesChanged</span><span class="p">)</span>
+        <span class="c">#EMIT LAYERNAMESCHANGED:</span>
+        <span class="n">pLayer</span><span class="o">.</span><span class="n">sigNameChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sigLayerNameChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">children</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span> <span class="p">)</span>
+        <span class="c">#CHECK WHETHER INSERTED LAYER COMES FROM A MOVED ONE:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fnInsertRemovedLayer</span><span class="p">)</span>
+        <span class="c">#ADD LAYER INFO</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">finfo</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c">#read info from file:</span>
+                    <span class="n">finfo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileInfo</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="c"># + self.getMetaData(name)              </span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c">#    finfo = &#39;&#39; #not possible to read from file because maybe not a filename</span>
+            <span class="n">dinfo</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">dinfo</span> <span class="o">=</span> <span class="s">&#39;shape:</span><span class="se">\t</span><span class="si">%s</span><span class="se">\n</span><span class="s">dtype:</span><span class="se">\t</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="c">#data in not array</span>
+                    <span class="n">dinfo</span> <span class="o">=</span> <span class="s">&#39;length: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">---</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">finfo</span><span class="p">,</span> <span class="n">dinfo</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">):</span>
+            <span class="c">#CASE: layer was duplicated and [info] is a parameter</span>
+            <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+                <span class="n">pLayer</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">duplicate</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#info is given as text</span>
+            <span class="c">#LAYER INFO</span>
+            <span class="n">pLayer</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Info&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">info</span> <span class="k">if</span> <span class="n">info</span> <span class="o">!=</span><span class="bp">None</span> <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                <span class="s">&#39;readonly&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        <span class="c">#LAYER CHANGES</span>
+        <span class="n">pLayer</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;text&#39;</span><span class="p">,</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Changes&#39;</span><span class="p">,</span>
+            <span class="c">#&#39;TODO: every change through a tool/scripts operation to be added here&#39;,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">changes</span> <span class="k">if</span> <span class="n">changes</span> <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+            <span class="c">#&#39;readonly&#39;:True</span>
+            <span class="s">&#39;expanded&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span>
+            <span class="p">})</span>
+
+
+    <span class="k">def</span> <span class="nf">addChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span>
+     
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">change</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">change</span> <span class="o">=</span> <span class="p">[</span><span class="n">change</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+    
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>    
+                <span class="n">p</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="s">&#39;Changes&#39;</span><span class="p">)</span> 
+                <span class="n">v</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">expanded</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="n">change</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span>
+
+
+    <span class="k">def</span> <span class="nf">buildCopyToDisplayMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menuCopy</span><span class="p">,</span> <span class="n">paramFile</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        clear the context menu &#39;copy&#39;</span>
+<span class="sd">        add &#39;NEW&#39; to copy a layer to a new display</span>
+<span class="sd">        add names of all other displays</span>
+<span class="sd">        connect all actions to respective display methods</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menuCopy</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        
+        <span class="c">#NEW:</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s">&#39;copy&#39;</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">copyLayerToNewDisplay</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">moveLayerToNewDisplay</span>
+        
+        <span class="n">menuCopy</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;NEW&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span>  <span class="n">paramFile</span><span class="o">=</span><span class="n">paramFile</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">:</span>
+                <span class="n">m</span><span class="p">(</span><span class="n">paramFile</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">children</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">paramFile</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        
+        <span class="c">#OTHER DISPLAYS:      </span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s">&#39;copy&#39;</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">copyLayerToOtherDisplay</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">moveLayerToOtherDisplay</span>
+        
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">:</span>
+                <span class="n">menuCopy</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">paramFile</span><span class="o">=</span><span class="n">paramFile</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">:</span> 
+                        <span class="n">m</span><span class="p">(</span><span class="n">paramFile</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">children</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">paramFile</span><span class="p">),</span> <span class="n">d</span><span class="p">)</span>
+                                                                 <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">getFileInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return general information of the given [filename], like it&#39;s size</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QFileInfo</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">size_type</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Byte&#39;</span><span class="p">,</span> <span class="s">&#39;kB&#39;</span><span class="p">,</span> <span class="s">&#39;MB&#39;</span><span class="p">,</span> <span class="s">&#39;GB&#39;</span><span class="p">,</span> <span class="s">&#39;TB&#39;</span><span class="p">,</span> <span class="s">&#39;PB&#39;</span><span class="p">]</span>
+        <span class="n">size_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1024</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+            <span class="n">size_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="n">size</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%.3g</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">size_type</span><span class="p">[</span><span class="n">size_index</span><span class="p">])</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">fileName</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;&#39;File name:</span><span class="se">\t</span><span class="si">%s</span><span class="s"></span>
+<span class="s">Folder:</span><span class="se">\t</span><span class="si">%s</span><span class="s"></span>
+<span class="s">File type:</span><span class="se">\t</span><span class="si">%s</span><span class="s"></span>
+<span class="s">File size:</span><span class="se">\t</span><span class="si">%s</span><span class="s"></span>
+<span class="s">Last changed:</span><span class="se">\t</span><span class="si">%s</span><span class="s">&#39;&#39;&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">filePath</span><span class="p">()[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
+                       <span class="n">f</span><span class="o">.</span><span class="n">suffix</span><span class="p">(),</span> 
+                       <span class="n">size</span><span class="p">,</span> 
+                       <span class="n">f</span><span class="o">.</span><span class="n">lastModified</span><span class="p">()</span><span class="o">.</span><span class="n">toString</span><span class="p">())</span>
+
+    <span class="c">#TODO: not used at the moment</span>
+    <span class="c">#but useful</span>
+<span class="c">#     def getMetaData(self, filename):</span>
+<span class="c">#         &#39;&#39;&#39;</span>
+<span class="c">#         Find and format the meta data of [filename]</span>
+<span class="c">#         &#39;&#39;&#39;</span>
+<span class="c">#         text = &quot;&quot;</span>
+<span class="c">#         if  filename.filetype().lower() not in (&#39;tif&#39;, &#39;tiff&#39;):</span>
+<span class="c">#             #for all files except TIF</span>
+<span class="c">#             filename, realname = unicodeFilename(filename), filename</span>
+<span class="c">#             parser = createParser(filename, realname)  </span>
+<span class="c">#             if not parser:</span>
+<span class="c">#                 print  &quot;Unable to parse file&quot;</span>
+<span class="c">#             try:</span>
+<span class="c">#                 metadata = extractMetadata(parser)</span>
+<span class="c">#             except HachoirError, err:</span>
+<span class="c">#                 #AttributeError because hachoir uses  </span>
+<span class="c">#                 print &quot;Metadata extraction error: %s&quot; % unicode(err)</span>
+<span class="c">#                 metadata = None</span>
+<span class="c">#             if not metadata:</span>
+<span class="c">#                 print &quot;Unable to extract metadata&quot;</span>
+<span class="c">#             else:</span>
+<span class="c">#                 text = &quot;\n&quot;.join(metadata.exportPlaintext())</span>
+<span class="c">#         else:</span>
+<span class="c">#             #for TIF images</span>
+<span class="c">#             import exifread</span>
+<span class="c">#             # Open image file for reading (binary mode)</span>
+<span class="c">#             f = open(filename, &#39;rb&#39;)</span>
+<span class="c">#             # Return Exif tags</span>
+<span class="c">#             tag_dict = exifread.process_file(f)</span>
+<span class="c">#             for key, value in tag_dict.iteritems():</span>
+<span class="c">#                 text += &quot;%s: %s\n&quot; %(key, value)</span>
+<span class="c">#         return text</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

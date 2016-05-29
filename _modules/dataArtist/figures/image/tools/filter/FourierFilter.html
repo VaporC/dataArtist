@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.filter.FourierFilter &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.filter.FourierFilter</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.filter.FourierFilter</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">imgProcessor.filters.FourierFilter</span> <span class="kn">import</span> <span class="n">FourierFilter</span> <span class="k">as</span> <span class="n">FourierFilterProc</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+<div class="viewcode-block" id="FourierFilter"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.filter.html#dataArtist.figures.image.tools.filter.FourierFilter.FourierFilter">[docs]</a><span class="k">class</span> <span class="nc">FourierFilter</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Various FOURIER transformation based filters</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;fourierTransformation.svg&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+        <span class="c">#OUTPUT DISPLAYS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c">#MENU:</span>
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+
+        <span class="n">pUpdate</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Update&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;action&#39;</span><span class="p">})</span> 
+        <span class="n">pUpdate</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pHighPass</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;High pass&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span>    
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLowPass</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Low pass&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span> 
+        
+        <span class="n">pFilterValues</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Filter values&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;group&#39;</span><span class="p">})</span> 
+               
+        <span class="bp">self</span><span class="o">.</span><span class="n">pSmallerThreshold</span> <span class="o">=</span> <span class="n">pFilterValues</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;smaller than&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span>
+         
+        <span class="bp">self</span><span class="o">.</span><span class="n">pBiggerThreshold</span> <span class="o">=</span> <span class="n">pFilterValues</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;bigger than&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span>
+        
+        <span class="n">pDeleteArea</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Delete area&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;group&#39;</span><span class="p">})</span> 
+        
+        <span class="n">pDeleteAreaFrom</span> <span class="o">=</span> <span class="n">pDeleteArea</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;From&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;group&#39;</span><span class="p">})</span>  
+           
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAreaFromX</span> <span class="o">=</span> <span class="n">pDeleteAreaFrom</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;x&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAreaFromY</span> <span class="o">=</span> <span class="n">pDeleteAreaFrom</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;y&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span> 
+            
+        <span class="n">pDeleteAreaTo</span> <span class="o">=</span> <span class="n">pDeleteArea</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;To&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;group&#39;</span><span class="p">})</span>   
+          
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAreaToX</span> <span class="o">=</span> <span class="n">pDeleteAreaTo</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;x&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pAreaToY</span> <span class="o">=</span> <span class="n">pDeleteAreaTo</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;y&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]})</span>     
+        
+        <span class="n">pOutput</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Output&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;group&#39;</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDifferenceImage</span> <span class="o">=</span> <span class="n">pOutput</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Difference Image&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFourierImage</span> <span class="o">=</span> <span class="n">pOutput</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Fourier Image&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pProcessedFourierImage</span> <span class="o">=</span> <span class="n">pOutput</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Processed Fourier Image&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span> 
+
+
+<div class="viewcode-block" id="FourierFilter.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.filter.html#dataArtist.figures.image.tools.filter.FourierFilter.FourierFilter.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span> <span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;doesn&#39;t work on stacked images for now&quot;</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">FourierFilterProc</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">])</span>
+        
+        <span class="c">#FOURIER MAGNITUDE SPECTRUM:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pFourierImage</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                        <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">magnitudeSpectrum</span><span class="p">()],</span> 
+                        <span class="n">title</span><span class="o">=</span><span class="s">&#39;Fourier&#39;</span><span class="p">)</span>    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">magnitudeSpectrum</span><span class="p">(),</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c">#PROCESSING:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">highPassFilter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pHighPass</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">lowPassFilter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLowPass</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">suppressValuesSmallerThanThresholdToZero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pSmallerThreshold</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">suppressValuesBiggerThanThresholdToZero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pBiggerThreshold</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">deleteArea</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pAreaFromX</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAreaFromY</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                     <span class="bp">self</span><span class="o">.</span><span class="n">pAreaToX</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pAreaToY</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+
+        <span class="c">#RECONSTRUCTED IMAGE:</span>
+        <span class="n">reconstrImg</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">reconstructImage</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                                                <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                                                <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">reconstrImg</span><span class="p">],</span> 
+                                                <span class="n">title</span><span class="o">=</span><span class="s">&#39;Reconstructed&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">reconstrImg</span><span class="p">,</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c">#DIFFERENCE IMAGE</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDifferenceImage</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="n">diffImg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span> <span class="o">-</span> <span class="n">reconstrImg</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                                                <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                                                <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">diffImg</span><span class="p">],</span> 
+                                                <span class="n">title</span><span class="o">=</span><span class="s">&#39;Difference&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">diffImg</span><span class="p">,</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                
+        <span class="c">#PROCESSED FOURIER</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pProcessedFourierImage</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                                                    <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                                                    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">magnitudeSpectrum</span><span class="p">()],</span> 
+                                                    <span class="n">title</span><span class="o">=</span><span class="s">&#39;Processed fourier&#39;</span><span class="p">)</span>         
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">magnitudeSpectrum</span><span class="p">(),</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
+
+                
+<div class="viewcode-block" id="FourierFilter.deactivate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.filter.html#dataArtist.figures.image.tools.filter.FourierFilter.FourierFilter.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">differenceDisplay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstructedDisplay</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">procFourierDisplay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourierDisplay</span><span class="p">)]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

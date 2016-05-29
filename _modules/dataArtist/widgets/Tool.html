@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.Tool &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.Tool</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.Tool</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.ParameterMenu</span> <span class="kn">import</span> <span class="n">ParameterMenu</span>
+
+<span class="n">ICONFOLDER</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(</span><span class="s">&#39;dataArtist&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;media&quot;</span><span class="p">,</span><span class="s">&quot;icons&quot;</span><span class="p">)</span>
+
+
+
+<span class="k">class</span> <span class="nc">_ProcessThread</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Thread to be used in tool.activate in order not to block </span>
+<span class="sd">    the gui </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">sigDone</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">runfn</span><span class="p">,</span> <span class="n">donefn</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span> <span class="o">=</span> <span class="n">tool</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">progressBar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runfn</span> <span class="o">=</span> <span class="n">runfn</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigDone</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">donefn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigDone</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">donefn</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Processing </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill</span><span class="p">)</span>
+        
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runfn</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;tool activation aborted: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">cancel</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigDone</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        
+        
+
+<div class="viewcode-block" id="Tool"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool">[docs]</a><span class="k">class</span> <span class="nc">Tool</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Base class for all display.widget.tools</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">reinit</span> <span class="o">=</span> <span class="bp">False</span> <span class="c">#whether to execute activate()/deactivate() at restoreState()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+        <span class="c">#SET ICON</span>
+        <span class="n">icon</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;icon&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">icon</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon</span><span class="p">):</span>
+                <span class="n">icon</span> <span class="o">=</span> <span class="n">ICONFOLDER</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">icon</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setIcon</span> <span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">icon</span><span class="p">))</span>
+        <span class="c">#SET TOOLTIP</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span><span class="p">:</span>
+            <span class="c">#USING THE CLASS DOC</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="se">\n\t</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#USING THE CLASS NAME</span>
+            <span class="n">t</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="c">#SETUP CHECKABILITY:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;activate&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c">#if a tool has a method deactivate it should be checkable</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span> 
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deactivate</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setPopupMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">InstantPopup</span><span class="p">)</span>  
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Tool.showGlobalTool"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.showGlobalTool">[docs]</a>    <span class="k">def</span> <span class="nf">showGlobalTool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toolCls</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">gTools</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="n">toolCls</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">t</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">toolCls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span></div>
+            
+
+<div class="viewcode-block" id="Tool.createResultInDisplayParam"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.createResultInDisplayParam">[docs]</a>    <span class="k">def</span> <span class="nf">createResultInDisplayParam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s">&#39;[NEW, OVERRIDE]&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Result in display&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;menu&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buildResInDisplayMenu</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_buildResInDisplayMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">):</span>
+        
+        <span class="k">def</span> <span class="nf">addToParam</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="n">menu</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="n">layer</span>
+            
+        <span class="n">menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[NEW, OVERRIDE]&#39;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[NEW, OVERRIDE]&#39;</span><span class="p">))</span>
+        <span class="c">#a.setToolTip(&#39;Create once a new display, than replace values in there.&#39;)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[NEW, ADD]&#39;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[NEW, ADD]&#39;</span><span class="p">))</span>
+
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[ALLWAYS NEW]&#39;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[ALLWAYS NEW]&#39;</span><span class="p">))</span>
+        <span class="c"># a.setToolTip(&#39;Create every time a new&#39;)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[ADD]&#39;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[ADD]&#39;</span><span class="p">))</span>
+        <span class="c">#a.setToolTip(&#39;Add a new layer to the current display.&#39;)</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[REPLACE]&#39;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[REPLACE]&#39;</span><span class="p">))</span>
+        <span class="c">#a.setToolTip(&#39;Add the current layer to the current display.&#39;)</span>
+        
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;[ADD]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">:</span> <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[ADD to </span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span> <span class="n">d</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">layerNames</span><span class="p">()):</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="p">:</span> 
+                        <span class="n">addToParam</span><span class="p">(</span><span class="s">&#39;[REPLACE </span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="n">l</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+        
+
+<div class="viewcode-block" id="Tool.handleOutput"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.handleOutput">[docs]</a>    <span class="k">def</span> <span class="nf">handleOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="s">&#39;[ALLWAYS NEW]&#39;</span>
+        
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[ALLWAYS NEW]&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                    <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> 
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[NEW, OVERRIDE]&#39;</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[NEW, ADD]&#39;</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">display</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">d</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+                <span class="c">#NEW</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                        <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> 
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;names&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[NEW, OVERRIDE]&#39;</span><span class="p">:</span>
+                    <span class="c">#OVERRIDE</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">t</span>
+                    <span class="c">#ADD</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;names&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c">#TODO: changes filename in name or names ... in displaydock - make it consistent</span>
+            <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[REPLACE]&#39;</span><span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+            <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="s">&#39;[ADD]&#39;</span><span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#CHANGE OTHER DISPLAY</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">layer</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOutDisplay</span><span class="o">.</span><span class="n">display</span>
+                <span class="k">if</span> <span class="n">l</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">changeLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">l</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+                    
+
+<div class="viewcode-block" id="Tool.buildOtherDisplayLayersMenu"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.buildOtherDisplayLayersMenu">[docs]</a>    <span class="k">def</span> <span class="nf">buildOtherDisplayLayersMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">,</span> <span class="n">triggerFn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        fill the menu with all available layers within other displays</span>
+<span class="sd">        this function of often connected with the menu.aboutToShow signal</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c">#SUBMENU FOR ALL DISPLAYS</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+                <span class="c">#ACTION FOR ALL LAYERS</span>
+                <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">layerNames</span><span class="p">()):</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> - </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="p">))</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="n">l</span><span class="p">:</span> 
+                            <span class="n">triggerFn</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tool.buildOtherDisplaysMenu"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.buildOtherDisplaysMenu">[docs]</a>    <span class="k">def</span> <span class="nf">buildOtherDisplaysMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">,</span> <span class="n">triggerFn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        fill the menu with all available displays</span>
+<span class="sd">        this function of often connected with the menu.aboutToShow signal</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c">#SUBMENU FOR ALL DISPLAYS</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">displays</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">widget</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="p">):</span>
+                <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">())</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">:</span> 
+                            <span class="n">triggerFn</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_checkShowBtnMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">popupMode</span><span class="p">()</span> <span class="o">!=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">InstantPopup</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setPopupMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">MenuButtonPopup</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Tool.setMenu"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.setMenu">[docs]</a>    <span class="k">def</span> <span class="nf">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        only show drop-down menu option if menu is filled with entries</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkShowBtnMenu</span><span class="p">()</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tool.setParameterMenu"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.setParameterMenu">[docs]</a>    <span class="k">def</span> <span class="nf">setParameterMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span> <span class="o">=</span> <span class="n">ParameterMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span></div>
+    
+    
+<div class="viewcode-block" id="Tool.addAction"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.addAction">[docs]</a>    <span class="k">def</span> <span class="nf">addAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        only show drop-down menu option if menu is filled with entries</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkShowBtnMenu</span><span class="p">()</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tool.startThread"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.startThread">[docs]</a>    <span class="k">def</span> <span class="nf">startThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfn</span><span class="p">,</span> <span class="n">donefn</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="o">=</span> <span class="n">_ProcessThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfn</span><span class="p">,</span> <span class="n">donefn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        
+
+<div class="viewcode-block" id="Tool.toggle"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.toggle">[docs]</a>    <span class="k">def</span> <span class="nf">toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isCheckable</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">closed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">closed</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">pass</span> <span class="c">#&#39;instancemethod&#39; object is not connected</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Tool.saveState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span><span class="o">=</span><span class="p">{}</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;activated&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+        <span class="c">#self.saveToDict(l)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">state</span><span class="p">[</span><span class="s">&#39;menu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="p">()</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="Tool.restoreState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="p">()</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;menu&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">cnew</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;activated&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">cnew</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reinit</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cnew</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span></div>
+            
+  
+<div class="viewcode-block" id="Tool.returnToolOnClick"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.returnToolOnClick">[docs]</a>    <span class="k">def</span> <span class="nf">returnToolOnClick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">activate</span><span class="p">,</span> <span class="n">returnMethod</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        if activate=True:</span>
+<span class="sd">            run [returnMethod(self)] when this tool is clicked</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_returnMethod</span> <span class="o">=</span> <span class="n">returnMethod</span>
+        <span class="k">if</span> <span class="n">activate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_doReturnToolOnClick</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggle</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_doReturnToolOnClick</span><span class="p">)</span></div>
+        
+    
+    <span class="k">def</span> <span class="nf">_doReturnToolOnClick</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returnMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>    
+        
+
+<div class="viewcode-block" id="Tool.mouseCoord"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Tool.Tool.mouseCoord">[docs]</a>    <span class="k">def</span> <span class="nf">mouseCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">evt</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return the mouse coordinates</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#case clicked:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">):</span>
+            <span class="n">evt</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="n">mousePoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">mapSceneToView</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mousePoint</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">mousePoint</span><span class="o">.</span><span class="n">y</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

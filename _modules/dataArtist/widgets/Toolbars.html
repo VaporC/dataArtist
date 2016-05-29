@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.Toolbars &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.Toolbars</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.Toolbars</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span> 
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="c">############################</span>
+<span class="c"># a typical tool-packages __init__.py file might look like that:</span>
+<span class="c">#from ToolMod1 import ToolCls1 </span>
+<span class="c">#from ToolMod2 import ToolCls2 </span>
+<span class="c">#</span>
+<span class="c">#position=&#39;top&#39;,</span>
+<span class="c">#show=True, # OR {&quot;simple&quot;:True,&quot;electroluminescence&quot;:False}</span>
+<span class="c">#secondRow=False,#show tools normally in first toolbar row</span>
+<span class="c">#tools=set(ToolCls1, Toolcls2 ...) #to define tool position in toolbar</span>
+<span class="c">#color=None OR &#39;red&#39; ...</span>
+<span class="c">############################</span>
+
+<span class="n">TO_QT_POSITION</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;top&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">TopToolBarArea</span><span class="p">,</span>
+                  <span class="s">&#39;left&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftToolBarArea</span><span class="p">,</span>
+                  <span class="s">&#39;right&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">RightToolBarArea</span><span class="p">,</span>
+                  <span class="s">&#39;bottom&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">BottomToolBarArea</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="build"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.Toolbars.build">[docs]</a><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">widget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    create and return a list of toolbars for the given [displayWidget]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#get name of the corresponding tools package:</span>
+    <span class="n">pkg_name</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>   
+    <span class="n">pkg_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tools&#39;</span><span class="p">)</span>
+    <span class="n">pkg_name</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
+
+    <span class="n">pkg</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
+    <span class="n">bars</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">)</span>
+
+    <span class="n">l</span><span class="p">,</span><span class="n">l2</span> <span class="o">=</span> <span class="p">[],[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">bar_name</span><span class="p">,</span> <span class="n">bar_mod</span><span class="p">)</span> <span class="ow">in</span> <span class="n">bars</span><span class="p">:</span>
+        <span class="n">tools</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">bar_mod</span><span class="p">,</span> <span class="s">&#39;tools&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tools</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+            <span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">bar_mod</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tools</span><span class="p">):</span>
+        <span class="c">#EVERY FOLDER CONTAINING TOOLS BECOMES A TOOLBAR:</span>
+            <span class="n">toolbar</span> <span class="o">=</span> <span class="n">_ToolBar</span><span class="p">(</span><span class="n">bar_name</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">bar_mod</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">bar_mod</span><span class="p">,</span> <span class="s">&#39;secondRow&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+                <span class="c">#put all toolbars ment to be shown in a second row in other list:</span>
+                <span class="n">l2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">toolbar</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">toolbar</span><span class="p">)</span>
+    
+    <span class="c">#create the second row:</span>
+    <span class="k">if</span> <span class="n">l2</span><span class="p">:</span>
+        <span class="n">l2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hasBreak</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">l</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">_ToolBar</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QToolBar</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A ToolBar remembering it&#39;s position</span>
+<span class="sd">    and whether it&#39;s selected.</span>
+<span class="sd">    This allows to use one the same set of toolBars</span>
+<span class="sd">    for different display widgets of the same kind</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">toolClasses</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolBar</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CustomContextMenu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">customContextMenuRequested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_openContextMenu</span><span class="p">)</span>
+    
+        <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">islower</span><span class="p">()</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">islower</span><span class="p">():</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolClasses</span> <span class="o">=</span> <span class="n">toolClasses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toolsCreated</span> <span class="o">=</span> <span class="bp">False</span>
+        
+        <span class="c"># there is a central setup for the visibility of all </span>
+        <span class="c"># toolbars that have the same display widget:</span>
+        <span class="n">show</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="s">&#39;show&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">show</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c">#whether to show/hide a toolbar depends on the chosen profile:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">session</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">app_opts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;profile&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+            <span class="n">show</span> <span class="o">=</span> <span class="n">show</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">show</span><span class="p">,</span>
+                            <span class="n">TO_QT_POSITION</span><span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="s">&#39;position&#39;</span><span class="p">,</span><span class="s">&#39;top&#39;</span><span class="p">)],</span> 
+                            <span class="bp">False</span><span class="p">]</span><span class="c">#-&gt;hasBreak</span>
+
+<span class="c">#         #add logo to toolbar:</span>
+<span class="c">#         icon  = getattr(pkg, &#39;icon&#39;, None)</span>
+<span class="c">#         if icon:</span>
+<span class="c">#             #icon can ge given as direct path</span>
+<span class="c">#             if not os.path.exists(icon):</span>
+<span class="c">#                 #otherwise it is assumed that </span>
+<span class="c">#                 #the icon is to be found in the icon directory:</span>
+<span class="c">#                 icon = ICONFOLDER.join(icon) </span>
+<span class="c">#             s = ToolBarIcon(self, icon)</span>
+            
+            <span class="n">tip</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="s">&#39;__doc__&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="n">ttname</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="n">tip</span><span class="p">:</span>
+                <span class="n">ttname</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n\t</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">tip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="n">ttname</span><span class="p">)</span>
+       
+        <span class="c">#BACKGROUND COLOR:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="s">&#39;color&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#create a semi-transparent colour from</span>
+            <span class="c">#normal background color (grey)</span>
+            <span class="c">#and given color:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="mf">0.9</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">a</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">palette</span><span class="p">()</span>
+            <span class="n">bg</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backgroundRole</span><span class="p">())</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">bg</span><span class="o">.</span><span class="n">setRed</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">bg</span><span class="o">.</span><span class="n">red</span><span class="p">()</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">red</span><span class="p">())</span>
+            <span class="n">bg</span><span class="o">.</span><span class="n">setGreen</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">bg</span><span class="o">.</span><span class="n">green</span><span class="p">()</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">green</span><span class="p">())</span>
+            <span class="n">bg</span><span class="o">.</span><span class="n">setBlue</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">bg</span><span class="o">.</span><span class="n">blue</span><span class="p">()</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">blue</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setBackgroundRole</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPalette</span><span class="o">.</span><span class="n">Window</span><span class="p">)</span>       
+            <span class="n">p</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backgroundRole</span><span class="p">(),</span> <span class="n">bg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setPalette</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setAutoFillBackground</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setSelected</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nd">@position.setter</span>
+    <span class="k">def</span> <span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">NoToolBarArea</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">TopToolBarArea</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>  
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hasBreak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+    <span class="nd">@hasBreak.setter</span>
+    <span class="k">def</span> <span class="nf">hasBreak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>  
+
+
+    <span class="k">def</span> <span class="nf">_openContextMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">()</span>
+        <span class="c">#title:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">setSoftKeyRole</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="o">.</span><span class="n">NoSoftKey</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">setBold</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        
+        <span class="n">m</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&quot;Remove&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span><span class="o">.</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">pos</span><span class="p">))</span>
+
+            
+    <span class="k">def</span> <span class="nf">addTools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toolsCreated</span><span class="p">:</span>
+            <span class="c">#TO ALL TOOLS IN PACKAGE:</span>
+            <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolClasses</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c">#CREATE TOOL</span>
+                    <span class="n">tool</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">display</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">tool</span>
+                    <span class="c">#ADD TOOL</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">tool</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;ERROR loading toolbutton: &quot;</span><span class="p">,</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_toolsCreated</span> <span class="o">=</span> <span class="bp">True</span>
+   
+    
+    <span class="k">def</span> <span class="nf">removeTools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#REMOVE TOOL TO FREE SOME MEMORY</span>
+        <span class="c">#TODO: REMOVING A TOOL DOESN&#39;T FREE MEMORY AT THE MOMENT</span>
+        <span class="c">#      WHY? gc.collect(), tool.close(), tool.deletLater()...</span>
+        <span class="c">#      nothing works!</span>
+
+        <span class="c">#TODO: also remove this toolbar in other displays</span>
+        <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolClasses</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">tool</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span> <span class="c">#tool no created yet</span>
+        <span class="k">for</span> <span class="n">toolAction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChildren</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeAction</span><span class="p">(</span><span class="n">toolAction</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">toolAction</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toolsCreated</span> <span class="o">=</span> <span class="bp">False</span>
+                  
+  
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#ensure that all tools are loaded:</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolBar</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addTools</span><span class="p">()</span>
+
+ 
+<span class="c">#     def hide(self):</span>
+<span class="c">#         if not self.isSelected():</span>
+<span class="c">#             self.removeTools()</span>
+<span class="c">#         QtGui.QToolBar.hide(self)    </span>
+
+
+    <span class="k">def</span> <span class="nf">toggleViewAction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return an action to show/hide the toolbar</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionSelect</span>
+
+
+    <span class="k">def</span> <span class="nf">setSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">select</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        store whether is selected to restore when toolbar is changed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+<span class="c">#         if self.widget.__class__.selectedToolbars[self.name][0] == select:</span>
+<span class="c">#             return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isSelected</span><span class="p">()</span> <span class="o">==</span> <span class="n">select</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">select</span>
+        <span class="k">if</span> <span class="n">select</span><span class="p">:</span>
+            <span class="c">#self.addTools()</span>
+<span class="c">#             if not self._toolsCreated:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeTools</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">isSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">selectedToolbars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

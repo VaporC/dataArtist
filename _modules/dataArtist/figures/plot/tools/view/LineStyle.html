@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.plot.tools.view.LineStyle &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.plot.tools.view.LineStyle</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.plot.tools.view.LineStyle</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+
+<span class="n">STYLE2ENUM</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;SolidLine&#39;</span><span class="p">:</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">SolidLine</span><span class="p">,</span>
+         <span class="s">&#39;DashLine&#39;</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DashLine</span><span class="p">,</span>
+         <span class="s">&#39;DotLine&#39;</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DotLine</span><span class="p">,</span>
+         <span class="s">&#39;DashDotLine&#39;</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DashDotLine</span><span class="p">,</span>
+         <span class="s">&#39;DashDotDotLine&#39;</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DashDotDotLine</span><span class="p">,</span>
+         <span class="c">#&#39;CustomDashLine&#39;: QtCore.Qt.CustomDashLine,</span>
+         <span class="p">}</span>
+<span class="n">ENUM2STYLE</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">STYLE2ENUM</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="n">ENUM2STYLE</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+
+
+
+<div class="viewcode-block" id="LineStyle"><a class="viewcode-back" href="../../../../../../dataArtist.figures.plot.tools.view.html#dataArtist.figures.plot.tools.view.LineStyle.LineStyle">[docs]</a><span class="k">class</span> <span class="nc">LineStyle</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    change the graphs line style</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;lineStyle.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotDisplay</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotDisplay</span><span class="p">)</span>
+
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateMenu</span><span class="p">)</span>
+        <span class="c">#self._menu.aboutToHide.connect(self.clear)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;[All]&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;SolidLine&#39;</span><span class="p">,</span>
+                <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="n">ENUM2STYLE</span><span class="o">.</span><span class="n">values</span><span class="p">()})</span> 
+        <span class="n">p</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pAllChanged</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_pAllChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+ 
+<div class="viewcode-block" id="LineStyle.clear"><a class="viewcode-back" href="../../../../../../dataArtist.figures.plot.tools.view.html#dataArtist.figures.plot.tools.view.LineStyle.LineStyle.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">removeChild</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span></div>
+   
+
+    <span class="k">def</span> <span class="nf">_updateMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a parameter to change the graphs symbol for each layer</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">curves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">curves</span>
+
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">curves</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;Plot </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">pen</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;pen&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pen</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">):</span>
+                <span class="n">pen</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">mkPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;autoIncrementName&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="c">#set current color as first option:</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">ENUM2STYLE</span><span class="p">[</span><span class="n">pen</span><span class="o">.</span><span class="n">style</span><span class="p">()],</span>
+                    <span class="s">&#39;limits&#39;</span><span class="p">:</span><span class="n">ENUM2STYLE</span><span class="o">.</span><span class="n">values</span><span class="p">()})</span> 
+            <span class="c">#SET COLOR:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">pen</span><span class="p">:</span> 
+                <span class="p">[</span><span class="n">pen</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">STYLE2ENUM</span><span class="p">[</span><span class="n">val</span><span class="p">]),</span> <span class="n">item</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)])</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

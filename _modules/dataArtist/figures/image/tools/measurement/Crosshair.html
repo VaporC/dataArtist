@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.measurement.Crosshair &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.measurement.Crosshair</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.measurement.Crosshair</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+
+
+
+<div class="viewcode-block" id="Crosshair"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair">[docs]</a><span class="k">class</span> <span class="nc">Crosshair</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    Set points-of-interest and draw the image coordinated and </span>
+<span class="sd">    the selected pixel value</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;crosshair.svg&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span> <span class="o">=</span> <span class="bp">True</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;show&#39;</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggleShow</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span><span class="p">)</span> 
+        
+        <span class="n">areset</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;reset&#39;</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">areset</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">)</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">areset</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionShowCoord</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;show coordinates&#39;</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionShowCoord</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionShowCoord</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actionShowCoord</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Crosshair.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vLine</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hLine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sigMouseClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPOI</span><span class="p">)</span></div>
+    
+     
+<div class="viewcode-block" id="Crosshair.deactivate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vLine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hLine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sigMouseClicked</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPOI</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crosshair.build"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ScatterPlotItem</span><span class="p">(</span><span class="n">pen</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">brush</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateValues</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateValues</span><span class="p">)</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="p">)</span>
+        <span class="c">#draw text for crosshair</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">TextItem</span><span class="p">(</span>
+                            <span class="n">text</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> 
+                            <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> 
+                            <span class="n">html</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                            <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span><span class="p">),</span> 
+                            <span class="n">border</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                            <span class="n">fill</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">mkBrush</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> 
+                            <span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c">#draw lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vLine</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">InfiniteLine</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">movable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hLine</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">InfiniteLine</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">movable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c">#add to viewBox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vLine</span><span class="p">,</span> <span class="n">ignoreBounds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hLine</span><span class="p">,</span> <span class="n">ignoreBounds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">mouseMoved</span><span class="p">(</span><span class="n">evt</span><span class="p">):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">sceneBoundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">evt</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span><span class="n">evt</span><span class="o">.</span><span class="n">y</span><span class="p">()):</span>
+                <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouseCoord</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">icut</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">icut</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ix</span><span class="p">,</span><span class="n">iy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="n">icut</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">]</span>
+
+                    <span class="c"># set anchor of crosshair</span>
+                    <span class="k">if</span> <span class="n">evt</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">30</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span> <span class="o">=</span> <span class="mi">1</span><span class="c">#at upper corner</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">evt</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">sceneBoundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">width</span><span class="p">()):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span> <span class="o">=</span> <span class="mi">1</span> <span class="c">#at right corner</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="c">#set relative position of crosshair</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">anchor</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">Point</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span><span class="p">))</span>
+                    <span class="c">#set absolute position of crosshair</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+                    <span class="c">#move crosshair-lines to mousepos.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">vLine</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hLine</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">poiText</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getPOItext</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poiText</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">pass</span> <span class="c">#out of bounds</span>
+        <span class="c">#connect mouse-signals to new methods:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sigMouseMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">mouseMoved</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_getPOItext</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="c">#include axis scaling:</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">axes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">orientation</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;right&#39;</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">*=</span> <span class="n">a</span><span class="o">.</span><span class="n">scale</span>
+            <span class="k">elif</span> <span class="n">a</span><span class="o">.</span><span class="n">orientation</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;bottom&#39;</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">*=</span> <span class="n">a</span><span class="o">.</span><span class="n">scale</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionShowCoord</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s">&quot;x=</span><span class="si">%0.5g</span><span class="se">\n</span><span class="s">y=</span><span class="si">%0.5g</span><span class="se">\n</span><span class="s">z=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_updateValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getPOItext</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="c">#method also called when display closed</span>
+            <span class="c">#using try avoids: IndexError: too many indices for array</span>
+            <span class="k">pass</span>
+
+
+    <span class="k">def</span> <span class="nf">_setPOI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="n">mx</span><span class="p">,</span><span class="n">my</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouseCoord</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">addPoints</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">mx</span><span class="p">],</span>
+                <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">my</span><span class="p">],</span>
+                <span class="n">symbol</span><span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">textPOI</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">TextItem</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">poiText</span><span class="p">,</span> 
+            <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> 
+            <span class="n">html</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">anchor</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anchorX</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">anchorY</span><span class="p">),</span>
+            <span class="n">border</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">fill</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">mkBrush</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> 
+            <span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">textPOI</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span><span class="n">my</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textPOI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">textPOI</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Crosshair.reset"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateValues</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateValues</span><span class="p">)</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="Crosshair.toggleShow"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.toggleShow">[docs]</a>    <span class="k">def</span> <span class="nf">toggleShow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionHide</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crosshair</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Crosshair.transpose"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.measurement.html#dataArtist.figures.image.tools.measurement.Crosshair.Crosshair.transpose">[docs]</a>    <span class="k">def</span> <span class="nf">transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#TODO</span>
+        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiTextList</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">(</span><span class="n">xVals</span><span class="p">,</span><span class="n">yVals</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poiMarker</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">yVals</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">xVals</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

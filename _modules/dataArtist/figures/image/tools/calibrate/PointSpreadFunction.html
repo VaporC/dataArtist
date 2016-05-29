@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.calibrate.PointSpreadFunction &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.calibrate.PointSpreadFunction</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.calibrate.PointSpreadFunction</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">import</span> <span class="n">PolyLineROI</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+<span class="kn">from</span> <span class="nn">imgProcessor.measure.sharpness.SharpnessfromPoints</span> <span class="kn">import</span> <span class="n">SharpnessfromPointSources</span>
+<span class="kn">from</span> <span class="nn">dataArtist.figures.image.tools.globals.CalibrationFile</span> <span class="kn">import</span> <span class="n">CalibrationFile</span>
+
+
+
+<div class="viewcode-block" id="PointSpreadFunction"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.PointSpreadFunction.PointSpreadFunction">[docs]</a><span class="k">class</span> <span class="nc">PointSpreadFunction</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calculate the point spread function / absolute sharpness of an image</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;pointSpreadFunction.svg&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">calFileTool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showGlobalTool</span><span class="p">(</span><span class="n">CalibrationFile</span><span class="p">)</span>
+
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">createResultInDisplayParam</span><span class="p">(</span><span class="n">pa</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Method&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;multiple pin holes&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="s">&#39;multiple pin holes&#39;</span><span class="p">]})</span>
+
+        <span class="n">pSetBoundaries</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Set boundaries&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">})</span>
+        <span class="n">pSetBoundaries</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBoundaries</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pKSize</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Maximum kernel size (mxm)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">51</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">7</span><span class="p">,</span><span class="mi">101</span><span class="p">]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDrawPoints</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Draw found points&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFilterLow</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Filter low values&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;slider&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">],</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFilterLow</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updatePSF</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Update calibration&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateCalibration</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_updatePSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sharp</span><span class="o">.</span><span class="n">psf</span><span class="p">(</span><span class="n">filter_below</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_setBoundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_createROI</span><span class="p">()</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s">&#39;Show/Hide boundaries&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_createROI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="c">#if w.image.ndim == 3:</span>
+        <span class="c">#    s = s[1:]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span> <span class="o">=</span> <span class="n">PolyLineROI</span><span class="p">([[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.2</span><span class="p">],</span> 
+                                        <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.2</span><span class="p">],</span> 
+                                        <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.8</span><span class="p">]],</span> 
+                                       <span class="n">closed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                       <span class="n">pen</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">translatable</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">mouseHovering</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="c">#PREVENT CREATION OF SUB SEGMENTS:</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">mouseClickEvent</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="bp">None</span>
+
+            <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="p">)</span>    
+
+
+<div class="viewcode-block" id="PointSpreadFunction.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.PointSpreadFunction.PointSpreadFunction.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;need to set boundaries first&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createROI</span><span class="p">()</span>
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="c">#has to be y,x due to different conventions:        </span>
+        <span class="n">corners</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[(</span> <span class="n">h</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">()</span><span class="o">+</span><span class="n">y0</span><span class="p">,</span> <span class="n">h</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">()</span><span class="o">+</span><span class="n">x0</span> <span class="p">)</span>  
+                               <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadROI</span><span class="o">.</span><span class="n">handles</span><span class="p">]</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sharp</span> <span class="o">=</span> <span class="n">SharpnessfromPointSources</span><span class="p">(</span>
+                        <span class="n">max_kernel_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pKSize</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sharp</span><span class="o">.</span><span class="n">addImg</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">corners</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDrawPoints</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="n">lay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sharp</span><span class="o">.</span><span class="n">drawPoints</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">lay</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;found PSF pin holes&#39;</span><span class="p">)</span>
+               
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span><span class="o">.</span><span class="n">isClosed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span> 
+                            <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> 
+                            <span class="n">title</span><span class="o">=</span><span class="s">&#39;Point spread function&#39;</span><span class="p">)</span>
+            
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sharp</span><span class="o">.</span><span class="n">psf</span><span class="p">(</span><span class="n">filter_below</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pFilterLow</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;PSF&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFilterLow</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PointSpreadFunction.updateCalibration"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.PointSpreadFunction.PointSpreadFunction.updateCalibration">[docs]</a>    <span class="k">def</span> <span class="nf">updateCalibration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outDisplay</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">]</span>
+<span class="c">#         if im.ndim == 3:</span>
+<span class="c">#             im = im[w.currentIndex]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calFileTool</span><span class="o">.</span><span class="n">updatePSF</span><span class="p">(</span><span class="n">im</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items.axis &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.items.axis</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.items.axis</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyqtgraphBased.parametertree</span> <span class="kn">import</span> <span class="n">Parameter</span>
+   
+
+
+<div class="viewcode-block" id="AxesContainer"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.AxesContainer">[docs]</a><span class="k">class</span> <span class="nc">AxesContainer</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A list of all axes that belong to a display</span>
+<span class="sd">    all axes-parameters are within self.p respective axis.p</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">pStack</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Axes&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;group&#39;</span><span class="p">)</span> 
+        <span class="n">pSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;size&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">9</span><span class="p">})</span>
+        <span class="n">pSize</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">setFontSize</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+                                      
+        <span class="n">orientations</span> <span class="o">=</span><span class="p">[</span> <span class="s">&#39;bottom&#39;</span><span class="p">,</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="s">&#39;bottom&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+            
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axes</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">orientations</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+        
+        <span class="c">#CREATE STACK AXIS - an axis representing the stack of datasets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackAxis</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="s">&#39;stackAxis&#39;</span><span class="p">,</span> 
+                                 <span class="n">StackAxis</span><span class="p">(</span><span class="s">&#39;(Stack)&#39;</span><span class="p">,</span> <span class="s">&#39;n&#39;</span><span class="p">,</span> <span class="n">orientations</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackAxis</span><span class="o">.</span><span class="n">registerStackParam</span><span class="p">(</span><span class="n">pStack</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stackAxis</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="AxesContainer.remove"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.AxesContainer.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span></div>
+   
+   
+    <span class="k">def</span> <span class="nf">_getAxisName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;(</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span><span class="nb">list</span><span class="o">.</span><span class="n">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+     
+     
+<div class="viewcode-block" id="AxesContainer.append"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.AxesContainer.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s">&#39;bottom&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="c">#create axis if only a name is given:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getAxisName</span><span class="p">(),</span> <span class="n">axis</span><span class="p">,</span> <span class="n">orientation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">axis</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="c">#TODO: update after scale - define which scale               </span>
+        <span class="c">#axe.pScale.sigValueChanged.connect(lambda param, x: self.display.widget.item.setScale(x))                </span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span></div>
+        <span class="c">#axis.container = self</span>
+
+
+<div class="viewcode-block" id="AxesContainer.copy"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.AxesContainer.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        make a copy of all or given axes indices</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#prepare index</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#copy all axes</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="c">#except of the stack axis - we will add it at the end anyway</span>
+            <span class="c">#index.pop(self.index(self.stackAxis))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">index</span><span class="p">]</span> 
+        <span class="c">#create axisList</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">_List</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">orientation</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">orientation</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">orientation</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;stack&#39;</span><span class="p">:</span>
+                <span class="n">axisToCopy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackAxis</span>
+                <span class="n">newAxis</span> <span class="o">=</span> <span class="n">axisToCopy</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                <span class="n">newAxis</span><span class="o">.</span><span class="n">__class__</span> <span class="o">=</span> <span class="n">Axis</span>
+                <span class="n">newAxis</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="n">newAxis</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">axisToCopy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">newAxis</span> <span class="o">=</span> <span class="n">axisToCopy</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="n">newAxis</span><span class="o">.</span><span class="n">linkToAxis</span><span class="p">(</span><span class="n">axisToCopy</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newAxis</span><span class="p">)</span>
+        <span class="c">#add an extra stack axis:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">stackAxis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackAxis</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+    
+
+<div class="viewcode-block" id="Axis"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.Axis">[docs]</a><span class="k">class</span> <span class="nc">Axis</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">AxisItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A display axis</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">AxisItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orientation</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;str&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">value</span><span class="p">,</span>
+                <span class="s">&#39;expanded&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+                <span class="s">&#39;isGroup&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLinked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;axis linked&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLinked</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">linkToAxis</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">unlinkFromAxis</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;unit&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;str&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pPrefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prefix&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;str&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;range&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="s">&#39;linear&#39;</span><span class="p">,</span> <span class="s">&#39;percent&#39;</span><span class="p">]</span>
+                                 <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pRangeChanged</span><span class="p">)</span>
+        <span class="c">#scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;scale&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+        <span class="c">#offset</span>
+        <span class="c">#TODO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOffset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;offset&#39;</span><span class="p">,</span>
+                <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+                <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                <span class="c">#&#39;tip&#39;: &quot;Doesn&#39;t work at the moment&quot;,</span>
+                <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span>
+                <span class="p">})</span>
+            <span class="c">#TODO: need to know the orientation first</span>
+            <span class="c">#pOffset.sigValueChanged.connect(lambda x: dock.display.item.setPos ( qreal x, qreal y ))</span>
+        
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUnit</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">pPrefix</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">unitPrefix</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">setScale</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="c">#self.pOffset.sigValueChanged.connect(lambda param, x, self=self: self.setOffset(x))</span>
+
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+
+
+    <span class="k">def</span> <span class="nf">_pRangeChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">val</span><span class="o">!=</span><span class="s">&#39;percent&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">childs</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s">&#39;percent&#39;</span><span class="p">:</span>
+            <span class="c">#scale axis between 0 - 100</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linkedView</span><span class="p">()</span><span class="o">.</span><span class="n">childrenBoundingRect</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;right&#39;</span><span class="p">,</span> <span class="s">&#39;left&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">100</span><span class="o">/</span><span class="n">bounds</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">100</span><span class="o">/</span><span class="n">bounds</span><span class="o">.</span><span class="n">width</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+
+<div class="viewcode-block" id="Axis.linkToAxis"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.Axis.linkToAxis">[docs]</a>    <span class="k">def</span> <span class="nf">linkToAxis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        connect parameter changes to the given axis</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_linkedAxis</span> <span class="o">=</span> <span class="n">axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLinked</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">slave</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">childs</span><span class="p">,</span><span class="n">slave</span><span class="o">.</span><span class="n">childs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLinked</span><span class="p">:</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;readonly&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">:</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">setReadonly</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;readonly-backup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">linkedFn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">linkedFn</span><span class="p">)</span>
+                <span class="n">link</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_linkedAxis</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
+       
+        
+<div class="viewcode-block" id="Axis.unlinkFromAxis"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.Axis.unlinkFromAxis">[docs]</a>    <span class="k">def</span> <span class="nf">unlinkFromAxis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">unlink</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">slave</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">childs</span><span class="p">,</span><span class="n">slave</span><span class="o">.</span><span class="n">childs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLinked</span><span class="p">:</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;readonly-backup&#39;</span><span class="p">)</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">setReadonly</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">linkedFn</span><span class="p">)</span>
+                <span class="n">unlink</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_linkedAxis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Axis.duplicate"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.Axis.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        make a duplicate of this axiswith the same parameters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span>
+        <span class="n">a</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                            <span class="n">orientation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">saveState</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">a</span></div>
+
+
+<div class="viewcode-block" id="Axis.remove"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.Axis.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div></div>
+
+
+
+<div class="viewcode-block" id="StackAxis"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.StackAxis">[docs]</a><span class="k">class</span> <span class="nc">StackAxis</span><span class="p">(</span><span class="n">Axis</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Axis representing the dimension built by all input layers (stack)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">Axis</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        
+<div class="viewcode-block" id="StackAxis.registerStackParam"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.StackAxis.registerStackParam">[docs]</a>    <span class="k">def</span> <span class="nf">registerStackParam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pStack</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStack</span> <span class="o">=</span> <span class="n">pStack</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">limits</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">,</span> <span class="s">&#39;individual&#39;</span><span class="p">,</span> <span class="s">&#39;fromName&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> 
+                <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="n">val</span><span class="o">!=</span><span class="s">&#39;individual&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">pStack</span><span class="o">.</span><span class="n">childs</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> 
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">val</span><span class="o">==</span><span class="s">&#39;fromName&#39;</span><span class="p">)])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pOffset</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStack</span><span class="o">.</span><span class="n">sigChildAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pStack</span><span class="o">.</span><span class="n">sigChildRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;eval(name)&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;str&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;name[0:4]&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="s">&#39;eval(name)&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setPStackValues</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StackAxis.getNextStackValue"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.axis.StackAxis.getNextStackValue">[docs]</a>    <span class="k">def</span> <span class="nf">getNextStackValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pStack</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span>
+        <span class="c">#individual numbering</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;individual&#39;</span><span class="p">:</span>  
+            <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pStack</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#linear numbering</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOffset</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;linear&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">l</span><span class="o">*</span><span class="n">scale</span><span class="o">+</span><span class="n">offset</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#numbering from name</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                                     <span class="c">#GLOBALS:</span>
+                                     <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">name</span><span class="p">})</span>
+                                <span class="p">)</span><span class="o">*</span><span class="n">scale</span><span class="o">+</span><span class="n">offset</span>
+                    <span class="k">return</span> <span class="n">val</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">err</span></div>
+
+
+    <span class="c">#TODO: clean following messy defs  </span>
+    <span class="k">def</span> <span class="nf">_setNewStackValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">childs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;individual&#39;</span><span class="p">:</span>  
+            <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">child</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">childs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setChildValue</span><span class="p">(</span><span class="n">child</span><span class="p">,</span><span class="n">l</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_setChildValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span><span class="n">i</span><span class="p">):</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pScale</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pOffset</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;linear&#39;</span><span class="p">:</span>
+
+            <span class="n">ch</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">scale</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c">#evaluate value from expression:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFromName</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                                 <span class="c">#GLOBALS:</span>
+                                 <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">ch</span><span class="o">.</span><span class="n">name</span><span class="p">()})</span>
+                            <span class="p">)</span><span class="o">*</span><span class="n">scale</span><span class="o">+</span><span class="n">offset</span>
+                
+                <span class="n">ch</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">err</span>
+
+
+    <span class="k">def</span> <span class="nf">_setPStackValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pRange</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;individual&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pStack</span><span class="o">.</span><span class="n">childs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setChildValue</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span><span class="n">i</span><span class="p">)</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">_List</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="c">#only needed to attach attributes to a list</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

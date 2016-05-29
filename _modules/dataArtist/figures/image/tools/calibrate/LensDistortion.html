@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.figures.image.tools.calibrate.LensDistortion &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../../index.html"/> 
+
+  
+  <script src="../../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.figures.image.tools.calibrate.LensDistortion</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.figures.image.tools.calibrate.LensDistortion</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">imgProcessor.camera.LensDistortion</span> <span class="kn">import</span> <span class="n">LensDistortion</span> <span class="k">as</span> <span class="n">LD</span>
+<span class="kn">from</span> <span class="nn">imgProcessor.camera.LensDistortion</span> <span class="kn">import</span> <span class="n">EnoughImages</span><span class="p">,</span> <span class="n">NothingFound</span>
+
+<span class="c">#OWN</span>
+<span class="kn">from</span> <span class="nn">dataArtist.widgets.Tool</span> <span class="kn">import</span> <span class="n">Tool</span>
+<span class="kn">from</span> <span class="nn">dataArtist.figures.image.tools.globals.CalibrationFile</span> <span class="kn">import</span> <span class="n">CalibrationFile</span>
+<span class="kn">from</span> <span class="nn">dataArtist.items.UnregGridROI</span> <span class="kn">import</span> <span class="n">UnregGridROI</span>
+
+
+
+<div class="viewcode-block" id="LensDistortion"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.LensDistortion.LensDistortion">[docs]</a><span class="k">class</span> <span class="nc">LensDistortion</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calibrate the camera through interpreting chessboard images</span>
+<span class="sd">    [also works with un-loaded image stack]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;chessboard.svg&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">):</span>
+        <span class="n">Tool</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageDisplay</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">calFileTool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showGlobalTool</span><span class="p">(</span><span class="n">CalibrationFile</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cItem</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="bp">None</span>
+                
+        <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setParameterMenu</span><span class="p">()</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Live&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&quot;&quot;&quot;&#39;False&#39;: Images are taken from stack</span>
+<span class="s">True: Images are taken every time the first layer is updated </span>
+<span class="s">      choose this if you use a webcam&quot;&quot;&quot;</span><span class="p">})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLiveStopAfter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Stop after n images&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10000</span><span class="p">]})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLiveActivateTrigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Manual trigger&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLiveActivateTrigger</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&quot;Trigger or KEY [+]&quot;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="c">#show/hide children</span>
+            <span class="k">lambda</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">children</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">value</span><span class="p">())</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Method&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="s">&#39;Chessboard&#39;</span><span class="p">,</span> <span class="s">&#39;Symmetric circles&#39;</span><span class="p">,</span> <span class="s">&#39;Asymmetric circles&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Manual&#39;</span><span class="p">]})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pMethodChanged</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Fit to corners&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+            <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;Fit grid to given corner positions&#39;&#39;&#39;</span><span class="p">})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFit</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pChebXYChanged</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pChessbX</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;N corners X&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;Depending on used pattern, number of corners/circles in X&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">100</span><span class="p">]})</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pChessbX</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pChebXYChanged</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pChessbY</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;N corners Y&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;Depending on used pattern, number of corners/circles in Y&#39;&#39;&#39;</span><span class="p">,</span>
+            <span class="s">&#39;limits&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">100</span><span class="p">]})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pChessbY</span><span class="o">.</span><span class="n">sigValueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pChebXYChanged</span><span class="p">)</span>
+        
+        
+        <span class="n">pApSize</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Aperture Size [mm]&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;group&#39;</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Physical size of the sensor&#39;</span><span class="p">})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pApertureX</span> <span class="o">=</span> <span class="n">pApSize</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Size X&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Physical width of the sensor&#39;</span><span class="p">})</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pApertureY</span> <span class="o">=</span> <span class="n">pApSize</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Size Y&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+            <span class="s">&#39;tip&#39;</span><span class="p">:</span><span class="s">&#39;Physical height of the sensor&#39;</span><span class="p">})</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDrawChessboard</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Draw Chessboard&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pDisplacement</span>  <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Return spatial uncertainty&#39;</span><span class="p">,</span>
+            <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;bool&#39;</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Update calibration&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateCalibration</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pCorrect</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">addChild</span><span class="p">({</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Undistort&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;action&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;visible&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pCorrect</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">correct</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LensDistortion.correct"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.LensDistortion.LensDistortion.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getImageOrFilenmes</span><span class="p">():</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">keepSize</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+            <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> 
+            <span class="n">title</span><span class="o">=</span><span class="s">&#39;Corrected&#39;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_posSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#TODO: as general method in WidgetBase?</span>
+        <span class="n">vb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">vb</span><span class="o">.</span><span class="n">viewRange</span><span class="p">()</span>  
+        <span class="n">s</span> <span class="o">=</span> <span class="p">((</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">1.1</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">1.1</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="mf">0.1</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="mf">0.1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">p</span><span class="p">,</span><span class="n">s</span>
+
+
+    <span class="k">def</span> <span class="nf">_nCells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pChessbX</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pChessbY</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_removeROIs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">vb</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">:</span>
+            <span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_changeROI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+    <span class="k">def</span> <span class="nf">_createROIs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edgesList</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">vb</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+        <span class="n">p</span><span class="p">,</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posSize</span><span class="p">()</span> 
+        <span class="n">n</span> <span class="o">=</span>    <span class="bp">self</span><span class="o">.</span><span class="n">_nCells</span><span class="p">()</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">image</span><span class="p">)):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">UnregGridROI</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">w</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="n">r</span>
+                <span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">sigTimeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_changeROI</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_changeROI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="n">vb</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">vb</span>
+        <span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        
+    
+    <span class="k">def</span> <span class="nf">_pMethodChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_removeROIs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Manual&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_createROIs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pFit</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pFit</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_pChebXYChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#Show GridROI in case manual detectoin is chosen</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;Manual&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_removeROIs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_createROIs</span><span class="p">()</span>
+
+
+
+<div class="viewcode-block" id="LensDistortion.updateCalibration"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.LensDistortion.LensDistortion.updateCalibration">[docs]</a>    <span class="k">def</span> <span class="nf">updateCalibration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calFileTool</span><span class="o">.</span><span class="n">updateLens</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_chooseSavePath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span>
+                                    <span class="nb">filter</span><span class="o">=</span><span class="s">&#39;*.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">LensDistortion</span><span class="o">.</span><span class="n">ftype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pSavePath</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="LensDistortion.activate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.LensDistortion.LensDistortion.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="n">LD</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span>
+                   <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pMethod</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                   <span class="n">board_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pChessbX</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                               <span class="bp">self</span><span class="o">.</span><span class="n">pChessbY</span><span class="o">.</span><span class="n">value</span><span class="p">()),</span> 
+                   <span class="n">max_images</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pLiveStopAfter</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
+                   <span class="n">sensorSize_mm</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pApertureX</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> 
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">pApertureY</span><span class="o">.</span><span class="n">value</span><span class="p">()),</span>
+                   <span class="n">detect_sensible</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLive</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>  
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDrawChessboard</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cItem</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cItem</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Chessboard&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLiveActivateTrigger</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span><span class="o">.</span><span class="n">setOpts</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_addImgStream</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+                    <span class="c">#ACTIVATE ON KEY [+]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QShortcut</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Plus</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">setContext</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ApplicationShortcut</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span><span class="o">.</span><span class="n">activate</span><span class="p">)</span>     
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#ACTIVATE WHEN IMAGE CHANGES</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_addImgStream</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#READ IMAGE STACK</span>
+                <span class="c">#check conditions:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">filenames</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;having less than 10 images can result in erroneous results&#39;</span>
+
+            <span class="n">img</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">image</span>
+            <span class="n">img_loaded</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="c">#calibration images not loaded</span>
+                <span class="n">img_loaded</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">filenames</span>
+            
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDrawChessboard</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="n">found_indices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c">#MANUAL ADDING POINTS</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">addPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rois</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">setImgShape</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">addImg</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="c">#draw chessboard</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">drawChessboard</span><span class="p">(</span>
+                                <span class="bp">False</span> <span class="k">if</span> <span class="n">img_loaded</span> <span class="k">else</span> <span class="bp">None</span><span class="p">))</span>
+                        <span class="n">found_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">NothingFound</span><span class="p">,</span> <span class="n">errm</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Layer </span><span class="si">%s</span><span class="s">: &#39;</span> <span class="o">%</span><span class="n">n</span><span class="p">,</span> <span class="n">errm</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">img_loaded</span><span class="p">:</span>
+                    <span class="n">w</span><span class="o">.</span><span class="n">addColorLayer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;chessboard&#39;</span><span class="p">)</span><span class="c">#, indices=found_indices) </span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">addLayers</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Chessboard&#39;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>     
+        <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>    
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">findCount</span>
+        <span class="k">print</span> <span class="s">&#39;found chessboard of </span><span class="si">%s</span><span class="s"> images&#39;</span> <span class="o">%</span><span class="n">i</span>
+        <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+            <span class="c">#show calibration in window:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addTextDock</span><span class="p">(</span><span class="s">&#39;Camera calibration&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">showToolbar</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">getCoeffStr</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pUpdate</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pCorrect</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDisplacement</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addDisplay</span><span class="p">(</span>
+                        <span class="n">origin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">getDisplacementArray</span><span class="p">(),</span> 
+                        <span class="n">title</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_addImgStream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add a new image and draw chessboard on it till there are enough images</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pLiveActivateTrigger</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="k">print</span> <span class="s">&#39;click&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;activate first&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">image</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">addImgStream</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pDrawChessboard</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+                <span class="n">chessboard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">drawChessboard</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cItem</span><span class="o">.</span><span class="n">setLayer</span><span class="p">(</span><span class="n">chessboard</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;found </span><span class="si">%s</span><span class="s"> chessboards&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">findCount</span>  
+        <span class="k">except</span> <span class="n">EnoughImages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="LensDistortion.deactivate"><a class="viewcode-back" href="../../../../../../dataArtist.figures.image.tools.calibrate.html#dataArtist.figures.image.tools.calibrate.LensDistortion.LensDistortion.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_addImgStream</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span><span class="o">.</span><span class="n">sigActivated</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_addImgStream</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pLiveTrigger</span><span class="o">.</span><span class="n">activate</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>   </div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

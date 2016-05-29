@@ -1,0 +1,720 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items.GridROI &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.items.GridROI</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.items.GridROI</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">pi</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">PseudoSquareROI</span> <span class="kn">import</span> <span class="n">PseudoSquareROI</span>
+<span class="kn">from</span> <span class="nn">dataArtist.items.QPainterPath</span> <span class="kn">import</span> <span class="n">QPainterPath</span>
+
+
+
+<div class="viewcode-block" id="GridROI"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI">[docs]</a><span class="k">class</span> <span class="nc">GridROI</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    An ROI displaying mini ROIs of different shapes as a grid</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">grid</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> 
+                 <span class="n">shape</span><span class="o">=</span><span class="s">&#39;Rect&#39;</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">subgrid</span><span class="o">=</span><span class="p">([],[]),</span>
+                 <span class="n">subgrid_width</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        shape = [&#39;Rect&#39;, &#39;Square&#39;, &#39;Circular&#39;, &#39;Pseudosquare&#39;]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;shape&#39;</span><span class="p">:</span><span class="n">shape</span><span class="p">,</span>
+                     <span class="s">&#39;grid&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span>
+                     <span class="s">&#39;gap&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">asfarray</span><span class="p">(</span><span class="n">gap</span><span class="p">),</span>
+                     <span class="s">&#39;subgrid&#39;</span><span class="p">:</span><span class="n">subgrid</span><span class="p">,</span>
+                     <span class="s">&#39;subgrid_width&#39;</span><span class="p">:</span><span class="n">subgrid_width</span>
+                    <span class="p">}</span>
+        <span class="c">#TODO: limit max cell size while rescale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxCellSize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createCells</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createSubgrid</span><span class="p">()</span>
+
+        <span class="c">#cannot set brush at the moment, so:</span>
+        <span class="k">if</span> <span class="s">&#39;brush&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;brush&#39;</span><span class="p">)</span>
+        
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span><span class="n">size</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">pen</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">translatable</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseHovering</span> <span class="o">=</span> <span class="bp">False</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellSize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span>  <span class="o">=</span> <span class="bp">False</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">addRotateHandle</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="GridROI.saveState"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span>
+        <span class="n">s</span><span class="p">[</span><span class="s">&#39;gap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">&#39;gap&#39;</span><span class="p">])</span>
+        <span class="n">s</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">])</span>
+        <span class="n">s</span><span class="p">[</span><span class="s">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s">&#39;shape&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+    
+
+<div class="viewcode-block" id="GridROI.painterPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.painterPath">[docs]</a>    <span class="k">def</span> <span class="nf">painterPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a qpainterpath including all cells</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">painterPath</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">addPath</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">painterPath</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">p</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_createCells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span>
+        
+        <span class="n">cellClass</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Rect&#39;</span><span class="p">:</span><span class="n">RectROI</span><span class="p">,</span> 
+                     <span class="s">&#39;Circle&#39;</span><span class="p">:</span><span class="n">CircleROI</span><span class="p">,</span>
+                     <span class="s">&#39;Pseudosquare&#39;</span><span class="p">:</span><span class="n">CellPseudoSquareROI</span><span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;shape&#39;</span><span class="p">]]</span>     
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span>  <span class="o">=</span> <span class="bp">True</span>
+        
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">cellClass</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        
+        <span class="n">i_scaleCell</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scaleCell</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i_scaleCell</span><span class="p">]</span>
+        
+        <span class="n">c</span><span class="o">.</span><span class="n">setScaleCell</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cellResized</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_createSubgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+   
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;subgrid&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;subgrid_width&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubLine</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> 
+                                         <span class="n">thickness</span><span class="o">=</span><span class="n">w</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubLine</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> 
+                                         <span class="n">thickness</span><span class="o">=</span><span class="n">w</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scaleCell</span><span class="o">.</span><span class="n">subgrid</span><span class="p">):</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">setScaleLine</span><span class="p">()</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_lineResized</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+ 
+
+<div class="viewcode-block" id="GridROI.setPen"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setPen">[docs]</a>    <span class="k">def</span> <span class="nf">setPen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setBrush"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setBrush">[docs]</a>    <span class="k">def</span> <span class="nf">setBrush</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+        <span class="c">#TODO</span>
+        <span class="c">#pg.ROI.setB(pen)</span>
+<span class="c">#         for c in self.cells:</span>
+<span class="c">#             c.setBrush(pen)</span>
+<span class="c">#             #raises: AttributeError: &#39;RectROI&#39; object has no attribute &#39;setBrush&#39;</span>
+
+
+<div class="viewcode-block" id="GridROI.getMask"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.getMask">[docs]</a>    <span class="k">def</span> <span class="nf">getMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMask</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">m</span> <span class="o">+=</span>  <span class="n">c</span><span class="o">.</span><span class="n">getMask</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span></div>
+        
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_lineResized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span><span class="p">:</span>
+            <span class="c">#size = line.state[&#39;size&#39;]</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span>
+            
+            <span class="n">thick</span><span class="p">,</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">fromState</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+                <span class="n">ln</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ln</span> <span class="o">!=</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">ln</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thick</span>
+                    <span class="n">ln</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span>
+                    <span class="n">ln</span><span class="o">.</span><span class="n">updatePos</span><span class="p">()</span>
+                    <span class="n">ln</span><span class="o">.</span><span class="n">updateSize</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_cellResized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+         
+            <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;gap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span>
+                                <span class="n">size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">])</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">cell</span><span class="p">:</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">],</span> <span class="bp">True</span><span class="p">)</span>
+           
+
+<div class="viewcode-block" id="GridROI.setAngle"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setAngle">[docs]</a>    <span class="k">def</span> <span class="nf">setAngle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">finish</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setAngle</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">finish</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">setAngle</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">finish</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setAngle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">finish</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setPos"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setPos">[docs]</a>    <span class="k">def</span> <span class="nf">setPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">finish</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">finish</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setSubGrid"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setSubGrid">[docs]</a>    <span class="k">def</span> <span class="nf">setSubGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;subgrid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setGrid"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setGrid">[docs]</a>    <span class="k">def</span> <span class="nf">setGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">x</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">y</span>            
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setCellShape"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setCellShape">[docs]</a>    <span class="k">def</span> <span class="nf">setCellShape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span></div>
+        
+        
+<div class="viewcode-block" id="GridROI.refresh"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.refresh">[docs]</a>    <span class="k">def</span> <span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createCells</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellSize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createSubgrid</span><span class="p">()</span>
+        <span class="p">[</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="GridROI.setSize"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setSize">[docs]</a>    <span class="k">def</span> <span class="nf">setSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">finish</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">finish</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span> <span class="o">=</span><span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellSize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setCellPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_rescaling</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxCellSize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_setCellSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">size_cell</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;gap&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">]</span> 
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">size_cell</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">updateSize</span><span class="p">()</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_rotatePoint</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">center</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">angle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">point</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">cx</span><span class="p">)</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">cy</span><span class="p">)</span> <span class="o">+</span> <span class="n">cx</span>
+        <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">cx</span><span class="p">)</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">cy</span><span class="p">)</span> <span class="o">+</span> <span class="n">cy</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_setCellPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ignoreScaleCell</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">size_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleCell</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+
+        <span class="n">rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+        <span class="c">#center of rotation:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">:</span>
+            <span class="c">#centre defined by both edges:</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;grid&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">ignoreScaleCell</span> <span class="ow">and</span> <span class="n">cell</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleCell</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                        <span class="n">line</span><span class="o">.</span><span class="n">updatePos</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span>  <span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">size_cell</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;gap&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rotatePoint</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="n">cell</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">subgrid</span><span class="p">:</span>
+                    <span class="n">line</span><span class="o">.</span><span class="n">updatePos</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="GridROI.setViewBox"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.setViewBox">[docs]</a>    <span class="k">def</span> <span class="nf">setViewBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add grid and its cells to the ViewBox</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>    
+        <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="p">[</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="GridROI.show"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="p">[</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridROI.hide"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.hide">[docs]</a>    <span class="k">def</span> <span class="nf">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="p">[</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subgrid</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridROI.close"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.GridROI.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+       
+        
+        
+<span class="k">class</span> <span class="nc">_CellBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>     
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Base class for all cells in a grid</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subgrid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translatable</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseHovering</span> <span class="o">=</span> <span class="bp">False</span>
+
+
+
+<div class="viewcode-block" id="SubLine"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.SubLine">[docs]</a><span class="k">class</span> <span class="nc">SubLine</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    one line for the subgrid</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">thickness</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">translatable</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseHovering</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span>
+        
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>           
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell</span> <span class="o">=</span> <span class="n">cell</span>
+
+
+<div class="viewcode-block" id="SubLine.fromState"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.SubLine.fromState">[docs]</a>    <span class="k">def</span> <span class="nf">fromState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        update thickness and position from current state</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">j</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">j</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">state</span>
+        <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="n">cs</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">])</span><span class="o">/</span><span class="n">cs</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">cs</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span><span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="SubLine.setScaleLine"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.SubLine.setScaleLine">[docs]</a>    <span class="k">def</span> <span class="nf">setScaleLine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="SubLine.updateSize"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.SubLine.updateSize">[docs]</a>    <span class="k">def</span> <span class="nf">updateSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">thickness</span><span class="o">*</span><span class="n">s</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="SubLine.updatePos"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.SubLine.updatePos">[docs]</a>    <span class="k">def</span> <span class="nf">updatePos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+        
+        <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">j</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">+=</span><span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span>
+
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div></div>
+
+
+
+<div class="viewcode-block" id="RectROI"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.RectROI">[docs]</a><span class="k">class</span> <span class="nc">RectROI</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="p">,</span> <span class="n">_CellBase</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_CellBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RectROI.setScaleCell"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.RectROI.setScaleCell">[docs]</a>    <span class="k">def</span> <span class="nf">setScaleCell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RectROI.painterPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.RectROI.painterPath">[docs]</a>    <span class="k">def</span> <span class="nf">painterPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">QPainterPath</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">addRect</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="RectROI.getMask"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.RectROI.getMask">[docs]</a>    <span class="k">def</span> <span class="nf">getMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">s</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span>
+        <span class="c">#opencv convention:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>        
+        <span class="c">#draw rotated rectangle:</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int0</span><span class="p">(</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">BoxPoints</span><span class="p">((</span><span class="n">center</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">[</span><span class="n">vertices</span><span class="p">],</span> 
+                         <span class="mi">0</span><span class="p">,</span> 
+                         <span class="n">color</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                         <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div></div>
+
+ 
+
+<div class="viewcode-block" id="CircleROI"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CircleROI">[docs]</a><span class="k">class</span> <span class="nc">CircleROI</span><span class="p">(</span><span class="n">_CellBase</span><span class="p">,</span> <span class="n">pg</span><span class="o">.</span><span class="n">EllipseROI</span><span class="p">):</span>
+   
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_CellBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>        
+
+
+<div class="viewcode-block" id="CircleROI.setScaleCell"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CircleROI.setScaleCell">[docs]</a>    <span class="k">def</span> <span class="nf">setScaleCell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="n">cos</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="mi">0</span><span class="p">)],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CircleROI.painterPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CircleROI.painterPath">[docs]</a>    <span class="k">def</span> <span class="nf">painterPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">QPainterPath</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">addEllipse</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span></div>
+    
+    
+<div class="viewcode-block" id="CircleROI.getMask"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CircleROI.getMask">[docs]</a>    <span class="k">def</span> <span class="nf">getMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns bool array</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;size&#39;</span><span class="p">]</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">s</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span>
+        <span class="c">#opencv convention:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="c">#draw ellipse:</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> 
+                    <span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">),</span> 
+                    <span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">),</span>
+                      <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ratioEllispeRectangle</span><span class="p">)</span> <span class="p">),</span> 
+                    <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span>
+                    <span class="n">startAngle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+                    <span class="n">endAngle</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div></div>
+
+
+
+
+<div class="viewcode-block" id="CellPseudoSquareROI"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CellPseudoSquareROI">[docs]</a><span class="k">class</span> <span class="nc">CellPseudoSquareROI</span><span class="p">(</span><span class="n">_CellBase</span><span class="p">,</span> <span class="n">PseudoSquareROI</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">PseudoSquareROI</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_CellBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CellPseudoSquareROI.setScaleCell"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CellPseudoSquareROI.setScaleCell">[docs]</a>    <span class="k">def</span> <span class="nf">setScaleCell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CellPseudoSquareROI.painterPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.GridROI.CellPseudoSquareROI.painterPath">[docs]</a>    <span class="k">def</span> <span class="nf">painterPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">QPainterPath</span><span class="p">()</span>
+        <span class="n">roundness</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">99</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alen</span><span class="p">)</span><span class="o">/</span><span class="mi">16</span><span class="o">/</span><span class="mi">90</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rect</span><span class="p">)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">addRoundRect</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">roundness</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span></div></div>
+
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pyqtgraph.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="p">([])</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">GraphicsWindow</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">800</span><span class="p">),</span> <span class="n">border</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s">&#39;pyqtgraph example: ROI Examples&#39;</span><span class="p">)</span>
+    
+    <span class="n">w1</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c">#label1 = w1.addLabel(&#39;test&#39;, row=1, col=0)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">w1</span><span class="o">.</span><span class="n">addViewBox</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lockAspect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">w1</span><span class="o">.</span><span class="n">addViewBox</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lockAspect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">img1b</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">()</span>
+    <span class="n">v2</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">img1b</span><span class="p">)</span>
+
+
+    <span class="n">v3</span> <span class="o">=</span> <span class="n">w1</span><span class="o">.</span><span class="n">addViewBox</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lockAspect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">img1c</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">()</span>
+    <span class="n">v3</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">img1c</span><span class="p">)</span>
+
+    <span class="c">## Create image to display</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">arr</span><span class="p">[</span><span class="mi">45</span><span class="p">:</span><span class="mi">55</span><span class="p">,</span> <span class="mi">45</span><span class="p">:</span><span class="mi">55</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">arr</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">arr</span><span class="p">[:,</span> <span class="mi">25</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">arr</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">arr</span><span class="p">[:,</span> <span class="mi">75</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">arr</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">arr</span><span class="p">[:,</span> <span class="mi">50</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">arr</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+
+
+    <span class="n">img1a</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">v</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">img1a</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">GridROI</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">pen</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> 
+                <span class="n">subgrid</span><span class="o">=</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">],[]),</span> <span class="n">shape</span><span class="o">=</span><span class="s">&#39;Pseudosquare&#39;</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">setViewBox</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="n">cell</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v</span><span class="o">.</span><span class="n">autoRange</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">roi</span><span class="p">):</span>
+        <span class="n">img1b</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">getArrayRegion</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">img1a</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+        <span class="n">img1c</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int0</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getMask</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+
+    <span class="c">#cell.sigRegionChanged.connect(update)</span>
+    <span class="c">#update(cell)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.widgets.UndoRedo &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.widgets.UndoRedo</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.widgets.UndoRedo</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.Qt</span> <span class="kn">import</span> <span class="n">QtGui</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+
+       
+        
+<div class="viewcode-block" id="UndoRedo"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo">[docs]</a><span class="k">class</span> <span class="nc">UndoRedo</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Widget containing an undo and redo button + </span>
+<span class="sd">    tool-button menu to choose the current step in history</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_hist_len</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c</span> <span class="o">=</span> <span class="mi">0</span><span class="c">#count all added backups</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setContentsMargins</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c">#HISTORY MENU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_showMenu</span><span class="p">)</span>
+
+        <span class="n">hl</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">setContentsMargins</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">hl</span><span class="p">)</span>
+        
+        <span class="n">DA_FOLDER</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(</span><span class="s">&#39;dataArtist&#39;</span><span class="p">)</span>
+        <span class="n">icon_path</span> <span class="o">=</span> <span class="n">DA_FOLDER</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;media&quot;</span><span class="p">,</span><span class="s">&quot;icons&quot;</span><span class="p">)</span>
+        
+        <span class="c">#UNDO BUTTON</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setAutoRaise</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s">&#39;Undo&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">icon_path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;undo.svg&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setShortcut</span> <span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Undo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">undo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        
+        <span class="c">#MENU BUTTON</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="o">.</span><span class="n">setAutoRaise</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s">&#39;Undo/Redo options&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="o">.</span><span class="n">setPopupMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="o">.</span><span class="n">InstantPopup</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span> <span class="o">=</span> <span class="n">_MenuOptions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">stateChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setActive</span><span class="p">)</span>
+        
+        <span class="n">action</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidgetAction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">action</span><span class="o">.</span><span class="n">setDefaultWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>      
+
+        <span class="c">#REDO BUTTON</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QToolButton</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setAutoRaise</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s">&#39;Redo&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">icon_path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;redo.svg&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setShortcut</span> <span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Redo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="p">)</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_menu</span><span class="p">)</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="UndoRedo.setActive"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.setActive">[docs]</a>    <span class="k">def</span> <span class="nf">setActive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanMenu</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UndoRedo.reset"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#step within undo/redo:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">#_list = list of (display, name, method)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#arguments to be captured before redo:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_args</span> <span class="o">=</span> <span class="p">[]</span>   </div>
+
+
+<div class="viewcode-block" id="UndoRedo.displayClosed"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.displayClosed">[docs]</a>    <span class="k">def</span> <span class="nf">displayClosed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        remove all undos/redos from the closed display</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">display</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
+            
+
+<div class="viewcode-block" id="UndoRedo.saveState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;activate&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+                <span class="s">&#39;lenHistory&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">value</span><span class="p">()}</span></div>
+<span class="c">#         session.addContentToSave(l, &#39;undoRedo.txt&#39;)</span>
+
+
+
+<div class="viewcode-block" id="UndoRedo.restoreState"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="c">#         l = eval(session.getSavedContent(&#39;undoRedo.txt&#39;))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;activate&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;lenHistory&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="UndoRedo.cleanMenu"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.cleanMenu">[docs]</a>    <span class="k">def</span> <span class="nf">cleanMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">actions</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">removeAction</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+         
+            
+    <span class="k">def</span> <span class="nf">_showMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="c">#, point):</span>
+        <span class="c">#### current state &lt;bold&gt; and without connected action</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanMenu</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="c">#build menu</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">:</span>
+                    <span class="c">#UNDO</span>
+                    <span class="n">dn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">n</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="c">#execute undo n times:</span>
+                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">dn</span><span class="o">=</span><span class="n">dn</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">undo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dn</span><span class="p">)])</span>
+                <span class="k">elif</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">:</span>
+                    <span class="c">#REDO</span>
+                    <span class="n">dn</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="c">#execute redo n times:</span>
+                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">dn</span><span class="o">=</span><span class="n">dn</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">redo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dn</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c">#CURRENT position</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">setBold</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Current&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">setBold</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dn</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                        <span class="c">#execute redo n times:</span>
+                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">dn</span><span class="o">=</span><span class="n">dn</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">redo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dn</span><span class="p">)])</span>
+                
+    
+<div class="viewcode-block" id="UndoRedo.isActive"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.isActive">[docs]</a>    <span class="k">def</span> <span class="nf">isActive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span></div>
+     
+     
+<div class="viewcode-block" id="UndoRedo.add"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">undoFn</span><span class="p">,</span> <span class="n">redoFn</span><span class="p">,</span> <span class="n">dataFn</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c">#remove all old redos:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>                
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_options</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">value</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">display</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> | </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="p">,</span><span class="n">name</span><span class="p">),</span> <span class="n">undoFn</span><span class="p">,</span> <span class="n">redoFn</span><span class="p">,</span> <span class="n">dataFn</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UndoRedo.undo"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.undo">[docs]</a>    <span class="k">def</span> <span class="nf">undo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#capture arg for redo</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="c">#no undos done so far</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">current</span><span class="o">=</span><span class="bp">True</span>   
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_args</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+        <span class="c">#create redo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c">#DO UNDO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">][</span><span class="mi">2</span><span class="p">]()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">current</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">-=</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="UndoRedo.redo"><a class="viewcode-back" href="../../../dataArtist.widgets.html#dataArtist.widgets.UndoRedo.UndoRedo.redo">[docs]</a>    <span class="k">def</span> <span class="nf">redo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c">#DO REDO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fn</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fn</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_undo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_redo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
+
+
+     
+<span class="k">class</span> <span class="nc">_MenuOptions</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span> 
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Display last history steps and activate button</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  
+        
+        <span class="n">l</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        
+        <span class="n">title</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;&lt;b&gt;Undo / Redo&lt;/b&gt;&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">activate</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;Activate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="o">.</span><span class="n">stateChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_enableLenHistory</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_lenHist</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;History Length&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lenHistory</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        
+        <span class="n">l_history</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">l_history</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_lenHist</span><span class="p">)</span>
+        <span class="n">l_history</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lenHistory</span><span class="p">)</span>
+        
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activate</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">l_history</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_enableLenHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_lenHist</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lenHistory</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

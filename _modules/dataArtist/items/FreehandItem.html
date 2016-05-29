@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dataArtist.items.FreehandItem &mdash; dataArtist  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dataArtist  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dataArtist
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArtist.html">dataArtist package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dataArtist</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dataArtist.items.FreehandItem</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dataArtist.items.FreehandItem</h1><div class="highlight"><pre>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl.graphicsItems.GraphicsObject</span> <span class="kn">import</span> <span class="n">GraphicsObject</span>
+<span class="kn">import</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">from</span> <span class="nn">pyqtgraph_karl</span> <span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">fn</span>
+
+<span class="kn">from</span> <span class="nn">dataArtist.items.QPainterPath</span> <span class="kn">import</span> <span class="n">QPainterPath</span>
+
+
+<span class="c">#The following class is basically a copy from pyqtgraph</span>
+<span class="c">#but using dataArtists modified QPainterPath</span>
+<span class="c">#TODO: implement without complete code copy</span>
+
+
+<div class="viewcode-block" id="FreehandItem"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem">[docs]</a><span class="k">class</span> <span class="nc">FreehandItem</span><span class="p">(</span><span class="n">GraphicsObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    **Bases:** :class:`GraphicsObject &lt;pyqtgraph.GraphicsObject&gt;`</span>
+<span class="sd">    </span>
+<span class="sd">    #TODO text</span>
+<span class="sd">    Item displaying an isocurve of a 2D array.To align this item correctly with an </span>
+<span class="sd">    ImageItem,call isocurve.setParentItem(image)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parentItem</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="n">brush</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">is_area</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new isocurve item. </span>
+<span class="sd">        </span>
+<span class="sd">        ==============  ===============================================================</span>
+<span class="sd">        **Arguments:**</span>
+<span class="sd">        elements</span>
+<span class="sd">        is_area         Whether the drawn path is closed and can be filled</span>
+<span class="sd">        ==============  ===============================================================</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">GraphicsObject</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setElements</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">isEmpty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isEmpty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_area</span> <span class="o">=</span> <span class="n">is_area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isModify</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">brush</span> <span class="o">=</span> <span class="n">brush</span>
+        <span class="k">if</span> <span class="n">brush</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">brush</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">parentItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setParentItem</span><span class="p">(</span><span class="n">parentItem</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FreehandItem.saveState"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.saveState">[docs]</a>    <span class="k">def</span> <span class="nf">saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;elements&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">(),</span> <span class="s">&#39;is_area&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">is_area</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="FreehandItem.setElements"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.setElements">[docs]</a>    <span class="k">def</span> <span class="nf">setElements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">QPainterPath</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">elem</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="o">*</span><span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lineTo</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FreehandItem.painterPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.painterPath">[docs]</a>    <span class="k">def</span> <span class="nf">painterPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span></div>
+
+    
+<div class="viewcode-block" id="FreehandItem.startPath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.startPath">[docs]</a>    <span class="k">def</span> <span class="nf">startPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">moveTo</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+<span class="c">#        self.prepareGeometryChange()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>   </div>
+
+
+<div class="viewcode-block" id="FreehandItem.continuePath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.continuePath">[docs]</a>    <span class="k">def</span> <span class="nf">continuePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lineTo</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>   </div>
+
+
+<div class="viewcode-block" id="FreehandItem.closePath"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.closePath">[docs]</a>    <span class="k">def</span> <span class="nf">closePath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_area</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">closeSubpath</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>   </div>
+        
+
+<div class="viewcode-block" id="FreehandItem.setPen"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.setPen">[docs]</a>    <span class="k">def</span> <span class="nf">setPen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the pen used to draw the isocurve. Arguments can be any that are valid </span>
+<span class="sd">        for :func:`mkPen &lt;pyqtgraph.mkPen&gt;`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pen</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">mkPen</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FreehandItem.setBrush"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.setBrush">[docs]</a>    <span class="k">def</span> <span class="nf">setBrush</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the brush used to draw the isocurve. Arguments can be any that are valid </span>
+<span class="sd">        for :func:`mkBrush &lt;pyqtgraph.mkBrush&gt;`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brush</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">mkBrush</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FreehandItem.elements"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.elements">[docs]</a>    <span class="k">def</span> <span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">elementCount</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="p">)</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">elementAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">elem</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">e</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">return</span> <span class="n">elem</span></div>
+
+
+<div class="viewcode-block" id="FreehandItem.setModify"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.setModify">[docs]</a>    <span class="k">def</span> <span class="nf">setModify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modify</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isModify</span> <span class="o">=</span> <span class="n">modify</span>
+
+        <span class="k">if</span> <span class="n">modify</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">PolyLineROI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">(),</span> 
+                                <span class="n">closed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pen</span><span class="p">,</span> <span class="n">movable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getViewBox</span><span class="p">()</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#x0,y0 = self.pathEdit.pos()</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">elementCount</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span><span class="o">.</span><span class="n">getHandles</span><span class="p">()):</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">elementAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">setElementPositionAt</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+            <span class="c">#last element = first element:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">setElementPositionAt</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span><span class="o">.</span><span class="n">getHandles</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getViewBox</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pathEdit</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FreehandItem.boundingRect"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.boundingRect">[docs]</a>    <span class="k">def</span> <span class="nf">boundingRect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span></div>
+    
+
+    
+<div class="viewcode-block" id="FreehandItem.paint"><a class="viewcode-back" href="../../../dataArtist.items.html#dataArtist.items.FreehandItem.FreehandItem.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">brush</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_area</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brush</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">drawPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div></div>
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
