@@ -19,15 +19,14 @@ git push origin master # Sends your commits in the "master" branch to GitHub
 
 #API on GitHub pages
 ####################
-
-#only for initial setup:
-#sphinx-apidoc -A "Karl Bedrich" -f -M -o doc dataArtist
+#add -F (full) at first time, then modify config.py
+sphinx-apidoc -A "Karl Bedrich" -f -M -o doc/api dataArtist
 
 cd doc/api/_build
 
 git clone https://github.com/radjkarl/dataArtist.git gh-pages
 
-rm -r -f html
+rm -r -force html
 mv gh-pages html
 cd html
 
@@ -39,6 +38,7 @@ cd ../../
 
 make html
 cd _build/html
+mv -f dataArtist.html index.html
 
 #add an empty file called .nojekyll in the docs repo. This tells github’s default parsing software to ignore the sphinx-generated pages that are in the gh-pages branch
 touch .nojekyll

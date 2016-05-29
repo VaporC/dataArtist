@@ -3,7 +3,8 @@
 
 # backups
 *~
-doc/
+
+
 DUMP/
 DUMP/*
 
@@ -30,6 +31,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.tmp
 
 # Installer logs
 pip-log.txt
@@ -60,7 +62,6 @@ coverage.xml
 
 # Sphinx documentation
 doc/api/_build/
-<<<<<<< HEAD
-=======
+doc/api/_static
+doc/api/_templates
 
->>>>>>> 0d344b93150324aea6ff39458a2233c074876d72
