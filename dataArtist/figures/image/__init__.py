@@ -1,2 +1,0 @@
-import ImageWidget
-import tools
