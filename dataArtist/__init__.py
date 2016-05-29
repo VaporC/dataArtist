@@ -3,9 +3,8 @@
 Interactive scientific data and image processing
 '''
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 __author__ = 'Karl Bedrich'
 __email__ = 'karl@bedrich.de'
 __url__ = 'https://github.com/radjkarl/dataArtist'
 __license__ = 'GPLv3'
-__description__ = __doc__

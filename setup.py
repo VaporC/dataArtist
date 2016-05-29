@@ -73,7 +73,7 @@ setup(
         'Topic :: Scientific/Engineering :: Visualization',
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],
-    description=package.__description__,
+    description=package.__doc__,
     packages=find_packages(exclude=['tests*']),
 #     package_dir=pkg_dir,
 #     py_modules = ['dataArtist', 'pyqtgraph'],
@@ -81,7 +81,7 @@ setup(
     scripts = [] if not os.path.exists('bin') 
                  else [os.path.join('bin',x) for x in os.listdir('bin')],
     long_description=(
-        read('README.md') + '\n\n' +
+        read('README.rst') + '\n\n' +
         read('CHANGES.rst') + '\n\n' +
         read('AUTHORS.rst'))
     )
