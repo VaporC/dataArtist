@@ -1,23 +1,23 @@
 **dataArtist** - *…scientific data processing made easy.*
 
-[Download for Windows 7-10]
-(https://github.com/radjkarl/dataArtist/releases/tag/v0.1-alpha)
+`Download for Windows 7-10`_
 
 [screenshot]
 
 About
 -----
 
-*dataArtist* is a graphical program for interactive data analysis and
-processing. It is currently specialized image processing tasks in
-combination with electroluminescence imaging of photovoltaic devices. It
-is written in Python (2.7) and is released under open source.
-*dataArtist* is written to be platform independent. It is known to run
-under Windows 7-10 and Ubuntu Linux 14.10 (soon).
+| *dataArtist* is a graphical program for interactive data analysis and
+  processing. It is currently specialized image processing tasks in
+  combination with electroluminescence imaging of photovoltaic devices.
+| It is written in Python (2.7) and is released under open source.
+| *dataArtist* is written to be platform independent. It is known to run
+  under Windows 7-10 and Ubuntu Linux 14.10 (soon).
 
-**Please cite *dataArtist* as follows:** > K.G. Bedrich et al.,
-“Electroluminescence Imaging of PV Devices: Camera Calibration and Image
-Correction” in IEEE PVSC, 2016.
+**Please cite *dataArtist* as follows:**
+
+    K.G. Bedrich et al., “Electroluminescence Imaging of PV Devices:
+    Camera Calibration and Image Correction” in IEEE PVSC, 2016.
 
 Manuals
 -------
@@ -29,21 +29,22 @@ Manuals
 Online Tutorials
 ----------------
 
-General usage, camera calibration and image correction are explained in
-youtube screencast sessions, see |IMAGE ALT TEXT HERE|
+| General usage, camera calibration and image correction are explained
+  in youtube screencast sessions, see
+| |IMAGE ALT TEXT HERE|
 
 Supported file types
 --------------------
 
 Data is imported through drag n’drop.
 
-1. Images
+#. Images
 
 -  Common used (TIF, BMP, PNG, JPG, CSV, TXT, MAT)
 -  RAW, if data type and image shape are known
 -  Numpy arrays
 
-2. Plots
+#. Plots
 
 -  CSV, TXT, numpy arrays
 
@@ -68,11 +69,12 @@ Installation into existing Python installation using pip
 Scripting, Automation, Modding
 ------------------------------
 
-*dataArtist* comes with a built-in python shell. Data can be examplary
-accessed though ``d1.l3`` (display 1, data layer 3) and tools
-e.g. through ``d.tools['Axes'].click()`` (in current display execute
-tool ‘Axes’). *dataArtist* allows adding own tools, displays and
-importers, for examples, see dataArtist/modding.
+| *dataArtist* comes with a built-in python shell. Data can be examplary
+  accessed though ``d1.l3`` (display 1, data layer 3) and tools
+  e.g. through ``d.tools['Axes'].click()`` (in current display execute
+  tool ‘Axes’).
+| *dataArtist* allows adding own tools, displays and importers, for
+  examples, see dataArtist/modding.
 
 Main dependencies
 -----------------
@@ -97,9 +99,34 @@ Example: Electroluminescence imaging
 Camera calibration
 ~~~~~~~~~~~~~~~~~~
 
-For camera calibration all needed images are dropped into *dataArtist*
-and the matching tool
+| For camera calibration all needed images are dropped into *dataArtist*
+  and the matching tool is executed. The calibration results are
+  hereinafter saved to a calibration file. The determination of the
+  point spread function is exemplary shown in the following figure:
+| |screenshot\_psf|
 
+    dataArtist screenshot - toolbar ‘calibration’. **a**: Best focus
+    determination; **b**: noise-level-function measurement; **c**: Dark
+    current mapping; **d**: Flat field mapping; **e**: PSF estimation
+    (selected): **f**: lens distortion measurement
+
+Image correction
+~~~~~~~~~~~~~~~~
+
+| The correction of EL image is shown in the following figure. 15.
+  Perspective correction (red box) can be done either using the outline
+  of the PV device (automatically detected or manually defined) or using
+  a reference image.
+| |screenshot\_correction|
+
+    | dataArtist screenshot - **a**: tool ‘CalibrationFile’; **b**: tool
+      ‘CorrectCamera’; **c**: tool ‘PerspectiveCorrection’
+    | **green line**: Camera correction; **red line**: Perspective
+      correction
+
+.. |screenshot\_psf| image:: https://cloud.githubusercontent.com/assets/350050/15404653/bd2e51b6-1dbb-11e6-8282-2ea539f0286d.png
+.. |screenshot\_correction| image:: https://cloud.githubusercontent.com/assets/350050/15404785/53d4c992-1dbc-11e6-93b7-c6108ab9a2b0.png
+.. _Download for Windows 7-10: https://github.com/radjkarl/dataArtist/releases/tag/v0.1-alpha
 .. _USER manual: https://github.com/radjkarl/dataArtist/raw/master/dataArtist/media/USER_MANUAL.pdf
 .. _DEVELOPERS manual: http://radjkarl.github.io/dataArtist/
 .. _Releases: https://github.com/radjkarl/dataArtist/releases
