@@ -12,13 +12,14 @@ It is written in Python (2.7) and is released under open source.
 *dataArtist* is written to be platform independent. It is known to run under Windows 7-10 and Ubuntu Linux 14.10 (soon).
 
 __Please cite *dataArtist* as follows:__
-> K.G. Bedrich et al., “Electroluminescence Imaging of PV Devices: Camera Calibration and Image Correction” in IEEE PVSC, 2016.
+> K.G. Bedrich et al., "Electroluminescence Imaging of PV Devices: Camera Calibration and Image Correction" in IEEE PVSC, 2016.
 
 ## Manuals
-[USER manual](../blob/master/LICENSE)
-[DEVELOPERS manual](../blob/master/LICENSE)
+[USER manual](https://github.com/radjkarl/dataArtist/raw/master/dataArtist/media/USER_MANUAL.pdf)
 
-## Tutorials
+[DEVELOPERS manual](http://radjkarl.github.io/dataArtist/)
+
+## Online Tutorials
 General usage, camera calibration and image correction are explained in youtube screencast sessions, see
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ)
 
@@ -68,13 +69,13 @@ Package | Description
 ### Camera calibration
 For camera calibration all needed images are dropped into *dataArtist* and the matching tool is executed. The calibration results are hereinafter saved to a calibration file. The determination of the point spread function is exemplary shown in the following figure:
 ![screenshot_psf]
-> dataArtist screenshot – toolbar 'calibration'. **a**: Best focus determination; **b**: noise-level-function measurement; **c**: Dark current mapping; **d**: Flat field mapping; **e**: PSF estimation (selected): **f**: lens distortion measurement 
+> dataArtist screenshot - toolbar 'calibration'. **a**: Best focus determination; **b**: noise-level-function measurement; **c**: Dark current mapping; **d**: Flat field mapping; **e**: PSF estimation (selected): **f**: lens distortion measurement 
 
 
 ### Image correction
 The correction of EL image is shown in the following figure. 15. Perspective correction (red box) can be done either using the outline of the PV device (automatically detected or manually defined) or using a reference image. 
 ![screenshot_correction]
-> dataArtist screenshot – **a**: tool 'CalibrationFile'; **b**: tool 'CorrectCamera'; **c**: tool 'PerspectiveCorrection'
+> dataArtist screenshot - **a**: tool 'CalibrationFile'; **b**: tool 'CorrectCamera'; **c**: tool 'PerspectiveCorrection'
 > **green line**: Camera correction; **red line**: Perspective correction
 
 [logo]: https://cloud.githubusercontent.com/assets/350050/15405164/00b08326-1dbe-11e6-959d-c7745de7d167.png "dataArtist logo"
