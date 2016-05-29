@@ -90,7 +90,7 @@ Main dependencies
 +----------------------+----------------------------------------------------------+
 | `fancyWidgets`_      | A collection of fancy widgets, based on Qt               |
 +----------------------+----------------------------------------------------------+
-| `fanctTools`_        | A collection of useful not-GUI tools                     |
+| `fancyTools`_        | A collection of useful not-GUI tools                     |
 +----------------------+----------------------------------------------------------+
 
 Example: Electroluminescence imaging
@@ -125,6 +125,10 @@ a reference image.
       ‘CorrectCamera’; **c**: tool ‘PerspectiveCorrection’
     | **green line**: Camera correction; **red line**: Perspective
       correction
+
+
+
+
 
 .. |screenshot| image:: https://cloud.githubusercontent.com/assets/350050/15406631/806a7a8a-1dc4-11e6-9e76-709cd482857f.png
 .. |screenshotpsf| image:: https://cloud.githubusercontent.com/assets/350050/15404653/bd2e51b6-1dbb-11e6-8282-2ea539f0286d.png
