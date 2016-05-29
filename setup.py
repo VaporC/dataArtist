@@ -81,16 +81,15 @@ setup(
     scripts = [] if not os.path.exists('bin') 
                  else [os.path.join('bin',x) for x in os.listdir('bin')],
     long_description=(
-        read('README.rst') + '\n\n' +
-        read('CHANGES.rst') + '\n\n' +
-        read('AUTHORS.rst'))
+        read('README.rst') #+ '\n\n' +
+        #read('CHANGES.rst') + '\n\n' +
+        #read('AUTHORS.rst')
+        )
     )
 
 # remove the build
 # else old and non-existent files could come again in the installed pkg
 
-bPath = os.path.join(mainPath,'build')
-if os.path.exists(bPath):
-    shutil.rmtree(bPath)
-
-
+# bPath = os.path.join(mainPath,'build')
+# if os.path.exists(bPath):
+#     shutil.rmtree(bPath)

@@ -141,7 +141,7 @@ a reference image.
 .. _imgProcessor: https://github.com/radjkarl/imgProcessor
 .. _appBase: https://github.com/radjkarl/appBase
 .. _fancyWidgets: https://github.com/radjkarl/fancyWidgets
-.. _fanctTools: https://github.com/radjkarl/fancyTools
+.. _fancyTools: https://github.com/radjkarl/fancyTools
 
 .. |IMAGE ALT TEXT HERE| image:: http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg
    :target: https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ
