@@ -5,6 +5,7 @@
 *~
 doc/
 DUMP/
+DUMP/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
