@@ -103,7 +103,8 @@ For camera calibration all needed images are dropped into *dataArtist*
 and the matching tool is executed. The calibration results are
 hereinafter saved to a calibration file. The determination of the
 point spread function is exemplary shown in the following figure:
-|screenshot\_psf|
+
+|screenshotpsf|
 
     dataArtist screenshot - toolbar ‘calibration’. **a**: Best focus
     determination; **b**: noise-level-function measurement; **c**: Dark
@@ -117,7 +118,8 @@ The correction of EL image is shown in the following figure.
 Perspective correction (red box) can be done either using the outline
 of the PV device (automatically detected or manually defined) or using
 a reference image.
-|screenshot\_correction|
+
+|screenshotcorrection|
 
     | dataArtist screenshot - **a**: tool ‘CalibrationFile’; **b**: tool
       ‘CorrectCamera’; **c**: tool ‘PerspectiveCorrection’
@@ -125,8 +127,8 @@ a reference image.
       correction
 
 .. |screenshot| image:: https://cloud.githubusercontent.com/assets/350050/15406631/806a7a8a-1dc4-11e6-9e76-709cd482857f.png
-.. |screenshot\_psf| image:: https://cloud.githubusercontent.com/assets/350050/15404653/bd2e51b6-1dbb-11e6-8282-2ea539f0286d.png
-.. |screenshot\_correction| image:: https://cloud.githubusercontent.com/assets/350050/15404785/53d4c992-1dbc-11e6-93b7-c6108ab9a2b0.png
+.. |screenshotpsf| image:: https://cloud.githubusercontent.com/assets/350050/15404653/bd2e51b6-1dbb-11e6-8282-2ea539f0286d.png
+.. |screenshotcorrection| image:: https://cloud.githubusercontent.com/assets/350050/15404785/53d4c992-1dbc-11e6-93b7-c6108ab9a2b0.png
 .. _Download for Windows 7-10: https://github.com/radjkarl/dataArtist/releases/tag/v0.1-alpha
 .. _USER manual: https://github.com/radjkarl/dataArtist/raw/master/dataArtist/media/USER_MANUAL.pdf
 .. _DEVELOPERS manual: http://radjkarl.github.io/dataArtist/
