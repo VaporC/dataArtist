@@ -34,7 +34,7 @@ Online Tutorials
 
 | General usage, camera calibration and image correction are explained
   in youtube screencast sessions, see
-| |IMAGE ALT TEXT HERE|
+| |youtube|
 
 Supported file types
 --------------------
@@ -60,6 +60,7 @@ Portable version
 -  *dataArtist* runs out of the box. No installation needed (currently
    Windows only). See section `Releases`_.
 
+
 Installation into existing Python installation using pip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -68,6 +69,12 @@ Installation into existing Python installation using pip
 -  Once these packages are installed, open a command shell and type:
 
 ``pip install dataArtist``
+
+- Now start dataArtist either from the command shell:
+
+``python dataArtist/gui.pyw``
+
+- ... or through double clicking on dataArtist/gui.pyw
 
 Scripting, Automation, Modding
 ------------------------------
@@ -146,5 +153,5 @@ a reference image.
 .. _fancyWidgets: https://github.com/radjkarl/fancyWidgets
 .. _fancyTools: https://github.com/radjkarl/fancyTools
 
-.. |IMAGE ALT TEXT HERE| image:: http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg
+.. |youtube| image:: http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg
    :target: https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ
