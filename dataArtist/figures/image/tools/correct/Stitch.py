@@ -13,7 +13,7 @@ class Stitch(ImageTool):
     
     ...works on unloaded images too
     
-    IMPORTANT: not correction for rotational or perspective errors at the moment
+    IMPORTANT: not correction for perspective errors at the moment
     '''
     icon = 'imgStitching.svg'
     

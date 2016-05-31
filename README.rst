@@ -1,5 +1,8 @@
 **dataArtist** - *…scientific data processing made easy.*
 
+.. image:: https://img.shields.io/badge/License-GPLv3-red.svg
+.. image:: https://img.shields.io/badge/python-2.6%7C2.7-yellow.svg
+
 `Download for Windows 7-10`_
 
 |screenshot|
