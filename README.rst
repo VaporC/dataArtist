@@ -167,5 +167,5 @@ a reference image.
 .. _fancyWidgets: https://github.com/radjkarl/fancyWidgets
 .. _fancyTools: https://github.com/radjkarl/fancyTools
 
-.. |youtube| image:: https://i.ytimg.com/vi/vAcpuLvEwTA/hqdefault.jpg
-   :target: https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ
+.. |youtube| image:: https://cloud.githubusercontent.com/assets/350050/15802145/a8eaac4c-2a66-11e6-865d-4c77c306acc9.png
+   :target: https://www.youtube.com/playlist?list=PLKyzYL-Q8Rcl6tHN1PjB3FiIfI24pdLLb
