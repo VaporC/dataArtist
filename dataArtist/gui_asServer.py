@@ -4,7 +4,7 @@ run dataArist from taskbar
 """
 
 import sys
-import gui
+from dataArtist import gui
 
 sys.argv.append('-s')
 

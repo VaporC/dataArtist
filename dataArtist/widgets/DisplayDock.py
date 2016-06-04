@@ -224,9 +224,12 @@ class DisplayDock(Dock):
         self.widget.setTitle(title)
 
 
-    def _setTitleFromCurrentLayer(self, index):  
-        self.widget.setTitle(
-            self.stack.childs[index].name())
+    def _setTitleFromCurrentLayer(self, index):
+        try:
+            self.widget.setTitle(
+                self.stack.childs[index].name())
+        except IndexError:
+            pass #there are no layers
 
 
     @staticmethod

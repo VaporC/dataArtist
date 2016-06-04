@@ -42,9 +42,9 @@ new(axes=['x','y'])
 # or
 new(names=['LIST OF FILENAMES TO LOAD FROM'])
 # or
-new(data=np.ones(shape=100,100), axes=3) # to create on image layer
+new(data=np.ones(shape=(100,100), axes=3)) # to create on image layer
 # or
-new(data=np.ones(shape=10,10), axes=2) # to create 10 layers of 2d plots 
+new(data=np.ones(shape=(10,10), axes=2)) # to create 10 layers of 2d plots 
 
 t = timed() #creates, registers and return a QtCore.QTimer instance
 # or

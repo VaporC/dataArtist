@@ -63,10 +63,11 @@ class DeconvolutionBalance(Tool):
             'type':'int',
             'value':10,
             'limits':[3,1000]})        
-        pUpdate = pa.addChild({
+        self.pUpdate = pa.addChild({
             'name':'Update Calibration',
-            'type':'action'}) 
-        pUpdate.sigActivated.connect(self.updateCalibration)   
+            'type':'action',
+            'visible':False}) 
+        self.pUpdate.sigActivated.connect(self.updateCalibration)   
 
 
     def _bRange(self):
@@ -85,17 +86,16 @@ class DeconvolutionBalance(Tool):
         img = w.image
 
         img = img[w.currentIndex].copy()
-        #Wiener method neds image scalled (-1,1):
+        #Wiener method needs image scaled (-1,1):
         mn, mx = img.min(), img.max()
         img-=mn
         img/=(mx-mn)
          
-        
         vals = self._bRange()
         out = []        
         for balance in vals:
             o = wiener(img, psf, balance)
-            #Scale back
+            #Scale back:
             o[o<0]=0
             o*=(mx-mn)
             o+=mn
@@ -105,6 +105,7 @@ class DeconvolutionBalance(Tool):
 
     def _done(self, (out, names)):
         d = self._outDisplay = self.handleOutput(out, names=names)
+        self.pUpdate.show()
         d.pTitleFromLayer.setValue(True)
         print 'Now find the best balance value and click on update calibration'
         

@@ -4,7 +4,7 @@ import numpy as np
 from fancywidgets.pyqtgraphBased.parametertree.parameterTypes import GroupParameter
 from imgProcessor.transformations import transpose
 #OWN
-from _ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase
 
 
    

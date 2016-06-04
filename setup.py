@@ -9,8 +9,8 @@ usage:
 '''
 
 import os
-import sys
-import shutil
+# import sys
+# import shutil
 from setuptools import find_packages
 from setuptools import setup
 
@@ -33,36 +33,41 @@ def read(*paths):
 
 
 setup(
-    name              = package.__name__,
-    version           = package.__version__,
-    author            = package.__author__,
-    author_email      = package.__email__,
-    url               = package.__url__,
-    license           = 'GPLv3',
-    install_requires= [
-        #OWN
+    name=package.__name__,
+    version=package.__version__,
+    author=package.__author__,
+    author_email=package.__email__,
+    url=package.__url__,
+    license=package.__license__,
+    install_requires=[
+        # OWN
         "fancytools",
         "fancywidgets",
         "appbase",
-        #"interactiveTutorial"
-        "pyqtgraph_karl",#a fork of the original pyqtgraph
-        #FOREIGN
-        "puka",#a RabbitMQ client
+        "imgProcessor",
+        # "interactiveTutorial"
+        "pyqtgraph_karl",  # a fork of the original pyqtgraph
+        # FOREIGN
+        "puka",  # a RabbitMQ client
         "numpy",
         "scipy",
+        "scikit-image",
         "lxml",
         "transforms3d",
         "cssselect",
-        "hachoir-core", 
-        "hachoir-metadata", 
+        "hachoir-core",
+        "hachoir-metadata",
         "hachoir-parser",
         "exifread",
-        #"pypiwin32", # pip integration for pywin32, which is not in pip http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/
+        # "pypiwin32", # pip integration for pywin32, which is not in pip http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/
         "pygments",
-        #TO BE INSTALLED MANUALLY:
-        #opencv
+        "tifffile",# for tiffFileReader
+        "enum34", #neede by numba(llvmlite) ... and for some reason not installed 
+        # TO BE INSTALLED MANUALLY:
+        # opencv
+        # PyQt4
     ],
-    classifiers        = [
+    classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Intended Audience :: Other Audience',
@@ -75,15 +80,17 @@ setup(
         ],
     description=package.__doc__,
     packages=find_packages(exclude=['tests*']),
-#     package_dir=pkg_dir,
-#     py_modules = ['dataArtist', 'pyqtgraph'],
     include_package_data=True,
-    scripts = [] if not os.path.exists('bin') 
-                 else [os.path.join('bin',x) for x in os.listdir('bin')],
+
+    entry_points={
+        'gui_scripts': [
+            'dataArtist = dataArtist.gui:main',
+                        ]
+                  },    
     long_description=(
-        read('README.rst') #+ '\n\n' +
-        #read('CHANGES.rst') + '\n\n' +
-        #read('AUTHORS.rst')
+        read('README.rst')  # + '\n\n' +
+        # read('CHANGES.rst') + '\n\n' +
+        # read('AUTHORS.rst')
         )
     )
 

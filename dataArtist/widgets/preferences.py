@@ -155,6 +155,7 @@ class PreferencesCommunication(QtGui.QWidget):
                 #maybe rabbitMQ is not installed
                 self._errm = QtGui.QErrorMessage() #needs to assign to self, otherwise garbage collected
                 self._errm.showMessage(str(err))
+                self.cb_allowRabbit.setChecked(False)
                 self.cb_allowRabbit.setEnabled(False)
                 return     
         else:
@@ -264,7 +265,7 @@ class PreferencesView(QtGui.QWidget):
 
 
     def _setAntialiasting(self, val):
-        pyqtgraph.setConfigOption('antialias', bool(val))
+        pyqtgraph_karl.setConfigOption('antialias', bool(val))
         for ws in self.gui.workspaces():
             ws.reload()
 
@@ -280,12 +281,12 @@ class PreferencesView(QtGui.QWidget):
 
     def setColorTheme(self, theme):
         if theme == 'dark':
-            pyqtgraph.setConfigOption('foreground', 'w')
-            pyqtgraph.setConfigOption('background', 'k')
+            pyqtgraph_karl.setConfigOption('foreground', 'w')
+            pyqtgraph_karl.setConfigOption('background', 'k')
             
         elif theme == "bright":
-            pyqtgraph.setConfigOption('foreground', 'k')
-            pyqtgraph.setConfigOption('background', 'w')
+            pyqtgraph_karl.setConfigOption('foreground', 'k')
+            pyqtgraph_karl.setConfigOption('background', 'w')
         else:
             raise AttributeError('theme %s unknown' %theme)
         

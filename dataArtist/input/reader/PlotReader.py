@@ -8,12 +8,12 @@ import fancywidgets.pyqtgraphBased.parametertree.parameterTypes as pTypes
 from fancytools.os.countLines import countLines
 
 #OWN
-from _ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase
 
 
 
         
-class CsvPlotReader(ReaderBase):
+class PlotReader(ReaderBase):
     '''
     Readout values from a plain-text saved in file. The format has to be similar to the following example::
         
@@ -43,7 +43,7 @@ class CsvPlotReader(ReaderBase):
 
     @staticmethod 
     def check(ftype, fname):  
-        return ftype in CsvPlotReader.ftypes
+        return ftype in PlotReader.ftypes
     
 
     def open(self, filename):
@@ -100,8 +100,10 @@ class CsvPlotReader(ReaderBase):
                         c.insert(0,x_col)
                 n_col = len(c)
                 col_filter = itemgetter(*c)
-            else:
+            elif n_col >1:
                 col_filter = lambda l: l[:n_col]
+            else:
+                col_filter = lambda l:l[0]
             
             #GET FIRST LINE NAMES:
             fline = prefs.pFirstLine.value()
@@ -145,7 +147,7 @@ class CsvPlotReader(ReaderBase):
             elif n_col > 1:
                 shape = (shape,n_col)
             data = np.empty(shape=shape, dtype=prefs.dtypes[prefs.pDType.value()])
-    
+                
             #MAIN LOOP:
             while not self.canceled:
                 #READ PART OF THE FILE:
@@ -190,8 +192,7 @@ class CsvPlotReader(ReaderBase):
                         y = np.c_[x,y]
                     l.append(y)
                 return tuple(l), labels
-            
-            return data, labels
+            return [data], labels
 
     
     def _findSeparator(self, f):

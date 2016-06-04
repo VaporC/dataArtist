@@ -4,7 +4,7 @@ from collections import OrderedDict
 from fancywidgets.pyqtgraphBased.parametertree.parameterTypes import GroupParameter
 
 #OWN
-from _ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase
 
 
 STR_TO_DTYPE = OrderedDict(( ('8-bit','u1'),

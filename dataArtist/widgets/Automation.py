@@ -8,7 +8,7 @@ from fancywidgets.pyqtgraphBased.parametertree import Parameter
 from fancywidgets.pyQtBased.FwTabWidget import FwTabWidget
 from fancywidgets.pyQtBased.CodeEditor import CodeEditor
 
-
+import dataArtist
 from dataArtist.widgets.ParameterMenu import ParameterMenu
 from dataArtist.widgets.Tool import Tool
 
@@ -22,7 +22,9 @@ for b in dir(__builtin__):
     BUILTINS_DICT[b] = getattr(__builtin__, b)
 del __builtin__
 
-SPRIPT_PATH = PathStr.getcwd('dataArtist').join("scripts")
+#SPRIPT_PATH = PathStr.getcwd('dataArtist').join("scripts")
+SPRIPT_PATH = PathStr(dataArtist.__file__).dirname().join('scripts')
+
 #------------------------------------------
 
 

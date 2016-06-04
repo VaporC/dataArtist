@@ -7,8 +7,11 @@ from fancytools.os.PathStr import PathStr
 
 from dataArtist.widgets.ParameterMenu import ParameterMenu
 
-ICONFOLDER = PathStr.getcwd('dataArtist').join("media","icons")
 
+# ICONFOLDER = PathStr.getcwd('dataArtist').join("media","icons")
+import dataArtist
+ICONFOLDER = PathStr(dataArtist.__file__).dirname().join('media', 'icons')
+del dataArtist
 
 
 class _ProcessThread(QtCore.QThread):

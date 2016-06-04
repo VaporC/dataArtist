@@ -61,7 +61,7 @@ class Drill(Tool):
                          )
                
         self.n_slices += 1
-        self.slave.addLayer(name, info='Drill')
+        self.slave.addLayer(label=name, info='Drill')
 
 
 

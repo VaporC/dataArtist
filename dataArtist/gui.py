@@ -3,12 +3,13 @@
 import sys 
 import os
 
+
+from pyqtgraph_karl.Qt import QtGui, QtCore
+
 #FIXME: many array indices in pyqtgraph are not int
 #therefore numpy 1.11 shows many VisibleDeprecationWarning...
 import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
-
-from pyqtgraph_karl.Qt import QtGui, QtCore
 
 from appbase.MultiWorkspaceWindow import MultiWorkspaceWindow
 from appbase.Application import Application
@@ -38,7 +39,6 @@ if '-exec' in sys.argv:
         raw_input('-exec failed! --> %s' %err)
     sys.exit()
 ##########
-
 
 
 MEDIA_FOLDER = PathStr(dataArtist.__file__).dirname().join('media')
@@ -227,7 +227,7 @@ class Gui(MultiWorkspaceWindow):
         #hide the menu so toolbars can only be show/hidden via gui->view->toolbars:
         m.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
 
-        self.undoRedo = UndoRedo()
+        self.undoRedo = UndoRedo(MEDIA_FOLDER)
 
         self.gTools = GlobalTools()
         self.gTools.addWidget(self.undoRedo)
@@ -320,7 +320,11 @@ class Gui(MultiWorkspaceWindow):
         m.menu_help.addAction('Online tutorials').triggered.connect(
             lambda checked: os.startfile(
             'http://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ'))
-
+        m.menu_help.addAction('Support').triggered.connect(
+            lambda checked: os.startfile(
+            'https://github.com/radjkarl/dataArtist/issues'))        
+        
+        
     def _duplicateCurrentDiplay(self):
         d = self.currentWorkspace().getCurrentDisplay()
         if not d:
@@ -454,7 +458,7 @@ def main(name='dataArtist',
     Create a QApplication and Gui instance
     '''
     if icon is None:
-        icon = PathStr.getcwd('dataArtist').join('media','logo.svg')
+        icon = MEDIA_FOLDER.join('logo.svg')
     
     app = Application(sys.argv, 
                       name=name, 

@@ -36,6 +36,16 @@ class FlatField(ImageTool):
 'from normal images'
 %s''' %(flatFieldFromCalibration.__doc__, FlatFieldFromImgFit.__doc__) })
 
+        self.pFitMethod = pa.addChild({
+                    'name':'Fit method',
+                    'type':'list',
+                    'value':'fit vignetting function',
+                    'limits':['fit vignetting function','fit polynomial'],
+                    'visible':False})
+        
+        self.pMethod.sigValueChanged.connect(lambda p,v:
+                self.pFitMethod.show(p.value()=='from normal images'))
+
         self.pBg = pa.addChild({
                     'name':'Background image(s)',
                     'value':'-',
@@ -73,9 +83,12 @@ class FlatField(ImageTool):
         self.calFileTool.udpateFlatField(self.outDisplay.widget.image[0])
      
         
-    @staticmethod
-    def _fnImgAvg(imgs):
-        out, bglevel = FlatFieldFromImgFit(imgs).flatField()[:2]
+    def _fnImgAvg(self, imgs):
+        ff = FlatFieldFromImgFit(imgs)
+        if self.pFitMethod.value() == 'fit vignetting function':
+            out, bglevel = ff.flatFieldFromFunction()[:2]
+        else:
+            out, bglevel = ff.flatFieldFromFit()[:2]
         print 'background level = %s' %bglevel
         return out
     
@@ -89,7 +102,9 @@ class FlatField(ImageTool):
                 print 'assume images are already background corrected'
                 bgimg = 0
             else:
-                bgimg = self._bg.getImageOrFilenames()
+                bgimg = self._bg.widget.image
+                if img is None:
+                    img = self._bg.filenames
 
             self.startThread(lambda b=bgimg, i=img:
                             flatFieldFromCalibration(b,i), self._done)

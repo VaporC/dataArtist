@@ -1,16 +1,14 @@
 from pyqtgraph_karl.Qt import QtGui
 
-from fancytools.os.PathStr import PathStr
 
-       
-        
+     
 class UndoRedo(QtGui.QWidget):
     '''
     Widget containing an undo and redo button + 
     tool-button menu to choose the current step in history
     '''
     
-    def __init__(self):
+    def __init__(self, MEDIA_FOLDER):
         QtGui.QWidget.__init__(self)
         
         self.is_active = True
@@ -28,9 +26,8 @@ class UndoRedo(QtGui.QWidget):
         hl.setContentsMargins (0, 0, 0, 0)
 
         self.setLayout(hl)
-        
-        DA_FOLDER = PathStr.getcwd('dataArtist')
-        icon_path = DA_FOLDER.join("media","icons")
+
+        icon_path = MEDIA_FOLDER.join("icons")
         
         #UNDO BUTTON
         self.btn_undo = QtGui.QToolButton()

@@ -1,7 +1,7 @@
 import numpy as np
 
 #OWN
-from _ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase
 
 
 

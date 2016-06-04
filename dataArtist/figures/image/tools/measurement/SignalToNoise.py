@@ -136,8 +136,11 @@ class SignalToNoise(Tool):
                 ibg = 0
             
             #ref. image must be different than image:
-            if (self._refBg == self.display and self._refBg_i == n 
-                or self._ref2 == self.display and self._ref2_i == n) :
+            if ( (self._refBg and self._refBg.number == self.display.number 
+                    and self._refBg_i == n ) 
+                or 
+                 (self._ref2 and self._ref2.number == self.display.number 
+                    and self._ref2_i == n) ) :
                 continue 
             
             if self.pMethod.value() != 'Bedrich2016':

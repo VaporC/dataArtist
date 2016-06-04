@@ -124,7 +124,10 @@ class ROIArea(pg.ROI):
         '''
         roi still exists but doesnt listen to changes in the master display
         '''
-        self.master.item.sigImageChanged.disconnect(self.updateView) 
+        try:
+            self.master.item.sigImageChanged.disconnect(self.updateView) 
+        except TypeError:
+            pass #'instancemethod' object is not connected
         self.sigRegionChanged.disconnect(self.updateView)
         self.tool.display.stack.sigValuesChanged.disconnect(self.updateView)
 

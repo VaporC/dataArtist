@@ -4,10 +4,18 @@ from pyqtgraph_karl.Qt import QtGui, QtCore
 from imgProcessor.camera.LensDistortion import LensDistortion as LD
 from imgProcessor.camera.LensDistortion import EnoughImages, NothingFound
 
+from fancytools.os.PathStr import PathStr
+
+import os
+
 #OWN
 from dataArtist.widgets.Tool import Tool
 from dataArtist.figures.image.tools.globals.CalibrationFile import CalibrationFile
 from dataArtist.items.UnregGridROI import UnregGridROI
+
+import dataArtist
+PATTERN_FILE = PathStr(dataArtist.__file__).dirname().join('media', 'camera_calibration_patterns.pdf')
+del dataArtist
 
 
 
@@ -31,6 +39,11 @@ class LensDistortion(Tool):
         self._roi = None
                 
         pa = self.setParameterMenu() 
+        
+        btn = QtGui.QPushButton('Show Patterns')
+        btn.clicked.connect(lambda: os.startfile(PATTERN_FILE) )
+        btn.setFlat(True)
+        self._menu.content.header.insertWidget(2, btn)
 
         self.pLive = pa.addChild({
             'name':'Live',

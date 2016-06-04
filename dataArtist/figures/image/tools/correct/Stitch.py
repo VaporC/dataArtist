@@ -118,8 +118,8 @@ class Stitch(ImageTool):
         
         st = StitchImages(self._refImg)
         
-        im = self.getImageOrFilenmes()
-        if self._refDisplay == self.display:
+        im = self.getImageOrFilenames()
+        if self._refDisplay.number == self.display.number:
             im = im[1:]
  
         bgcol = {'0'     : 0,

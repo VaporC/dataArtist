@@ -98,14 +98,20 @@ class ColorLayerItem(pg.ImageItem):
 
     def _mkQImg(self):
         '''create a QImage from self.image_full'''
-        if self.image.dtype == bool:
+        im = self.image
+        a = self.alpha
+        if im.dtype == bool:
             mn = False
-            mx=True/ self.alpha
+            mx = True/ a
         else:
-            mn,mx = np.min(self.image), np.max(self.image) / self.alpha
+            mn = np.min(im) 
+            mx = np.max(im)
+            if a > 0:
+                mx /= a
+
         if np.isnan(mn):
-            mn,mx = np.nanmin(self.image), np.nanmax(self.image) / self.alpha
-        argb, alpha = pg.functions.makeARGB(self.image, levels=[mn,mx])
+            mn,mx = np.nanmin(im), np.nanmax(im) / a
+        argb, alpha = pg.functions.makeARGB(im, levels=[mn,mx])
         qalpha = pg.functions.makeQImage(argb, alpha, transpose=True)
         qalpha.convertToFormat(QtGui.QImage.Format_Indexed8)
         return qalpha

@@ -1,4 +1,4 @@
-**dataArtist** - *…scientific data processing made easy.*
+﻿**dataArtist** - *…scientific data processing made easy.*
 
 .. image:: https://img.shields.io/badge/License-GPLv3-red.svg
 .. image:: https://img.shields.io/badge/python-2.6%7C2.7-yellow.svg
@@ -20,7 +20,8 @@ About
 **Please cite *dataArtist* as follows:**
 
     K.G. Bedrich et al., “Electroluminescence Imaging of PV Devices:
-    Camera Calibration and Image Correction” in IEEE PVSC, 2016.
+    Camera Calibration and Image Correction”, Proc. 43rd IEEE Photovoltaic Specialists Conference, Portland, 2016.
+
 
 Manuals
 -------
@@ -54,27 +55,38 @@ Data is imported through drag n’drop.
 Installation
 ------------
 
-Portable version
-~~~~~~~~~~~~~~~~
+a) Portable version
+~~~~~~~~~~~~~~~~~~~
 
 -  *dataArtist* runs out of the box. No installation needed (currently
    Windows only). See section `Releases`_.
 
 
-Installation into existing Python installation using pip
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+b) Installation into existing Python installation using pip
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  A few packages used by dataArtist are not available via pip. Please
-   refer to the `USER manual`_ for more information.
+- After installing Python2.7 and ensuring that 'pip' is a recognised command in the command shell (Windows: CMD.exe).
+  you need to install the following packages BEFORE installing dataArtist:
+    - PyQt4 
+    - OpenCV2.4
+    - OPTIONAL: RabbitMQ (for inter-program communication)
+   Please refer to the `USER manual`_ for more information.
 -  Once these packages are installed, open a command shell and type:
 
 ``pip install dataArtist``
 
-- Now start dataArtist either from the command shell:
+- Now start dataArtist from the command shell:
 
-``python dataArtist/gui.pyw``
+``dataArtist``
 
-- ... or through double clicking on dataArtist/gui.pyw
+- To launch dataArtist into the system tray type:
+
+``dataArtist -s``
+
+- To open a dataArtist session directly type:
+
+``dataArtist -o /path/to/my/session.da``
+
 
 Scripting, Automation, Modding
 ------------------------------

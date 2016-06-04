@@ -4,12 +4,12 @@ import numpy as np
 from imgProcessor.camera.DarkCurrentMap \
     import getDarkCurrentFunction, getDarkCurrentAverages
 
-from dataArtist.widgets.Tool import Tool
+from dataArtist.widgets.ImageTool import ImageTool
 from dataArtist.figures.image.tools.globals.CalibrationFile import CalibrationFile
 
 
 
-class DarkCurrent(Tool):
+class DarkCurrent(ImageTool):
     '''
     Averages multiple dark current images (including STE removal)
     or calculate a dark current function as f(t) = a + b*t
@@ -21,7 +21,7 @@ class DarkCurrent(Tool):
     icon = 'darkCurrent.svg'
 
     def __init__(self, imageDisplay):
-        Tool.__init__(self, imageDisplay)
+        ImageTool.__init__(self, imageDisplay)
         
         self.calFileTool = self.showGlobalTool(CalibrationFile)
         self.pa = self.setParameterMenu() 
@@ -33,13 +33,19 @@ class DarkCurrent(Tool):
         self.pMethod = self.pa.addChild({
             'name':'Method',
             'type':'list',
-            'value':'average',
+            'value':'as function',
             'limits':['average', 'as function']})
 
+        self.pa.addChild({
+            'name':'Exposure times [s]',
+            'type':'str',
+            'value':'... are taken from layer value',
+            'readonly':True})
+
         self.pUpdate = self.pa.addChild({
-                    'name':'Update calibration',
-                    'type':'action',
-                    'visible':False})
+            'name':'Update calibration',
+            'type':'action',
+            'visible':False})
         self.pUpdate.sigActivated.connect(self.updateCalibration)
 
 
@@ -64,11 +70,11 @@ class DarkCurrent(Tool):
 
 
     def _startAsFunction(self):
-        x = self.display.stack.values, 
-        imgs = self.getImageorFilenames()
+        x = self.display.stack.values 
+        imgs = self.getImageOrFilenames()
+        mx = self.calFileTool.curCal.coeffs['max value']
         #TODO: include rmse,maxExpTime
-        inter, slope, rmse = getDarkCurrentFunction(x,imgs, 
-                                    self.calFileTool.curCal.coeffs['max value'])
+        inter, slope, rmse = getDarkCurrentFunction(x,imgs,mxIntensity=mx)
         return inter, slope
 
 

@@ -9,7 +9,7 @@ from dataArtist.figures.image.tools.globals.CalibrationFile import CalibrationFi
 
 
 class NoiseLevelFunction(Tool):
-    ''''
+    '''
     Calculate the noise level function from one or more input images
     ...Works on unloaded images as well
     '''

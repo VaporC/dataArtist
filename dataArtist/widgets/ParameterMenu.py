@@ -15,6 +15,7 @@ class ParameterMenu(QtGui.QMenu):
         
         self.content = _MenuContent(tool)
         self.pTree = self.content.pTree
+#         self.header = self.content.header
 
         a.setDefaultWidget(self.content)
         self.addAction(a)
@@ -74,7 +75,7 @@ class _MenuContent(QtGui.QWidget):
 
         self.setLayout(l)
         
-        header = QtGui.QHBoxLayout()
+        self.header = header = QtGui.QHBoxLayout()
         header.setContentsMargins(5, 0, 5, 0)
 
         label = QtGui.QLabel('<b> %s</b>' %tool.__class__.__name__)

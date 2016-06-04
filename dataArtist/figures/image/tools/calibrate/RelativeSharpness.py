@@ -7,7 +7,7 @@ from dataArtist.widgets.Tool import Tool
 
 
 class RelativeSharpness(Tool):
-    ''''
+    '''
     Calculate the sharpness of one or more input images.
     This method is suitable to best the best camera focus.
     '''

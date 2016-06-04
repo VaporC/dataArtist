@@ -16,8 +16,8 @@ def addDataFiles():
    		('appbase', os.path.join(pkg_dir,'appBase', 'appbase', 'media')),
    		('dataArtist', os.path.join(pkg_dir,'dataartist', 'dataArtist', 'media')),
    		('dataArtist', os.path.join(pkg_dir,'dataartist', 'dataArtist','scripts')),
-   		('dataArtist', os.path.join(pkg_dir,'dataartist', 'dataArtist','tutorials')),
-   		('bat', os.path.join(pkg_dir,'dataartist', 'dataArtist','bat')),
+   	#	('dataArtist', os.path.join(pkg_dir,'dataartist', 'dataArtist','tutorials')),
+   	#	('bat', os.path.join(pkg_dir,'dataartist', 'dataArtist','bat')),
    		('fancywidgets', os.path.join(pkg_dir,'fancyWidgets', 'fancywidgets', 'media'))
     		]
     for loc, d in dirs:
@@ -29,7 +29,7 @@ def addDataFiles():
     return extraDatas
 
 
-a = Analysis(['dataArtist\\gui.pyw'],
+a = Analysis(['dataArtist\\gui.py'],
              pathex=[
              	os.path.join(pkg_dir,'pyqtgraph_karl'), 
              	os.path.join(pkg_dir,'fancyTools'), 
@@ -89,7 +89,7 @@ exe = EXE(pyz,
       name='dataArtist.exe',
       debug=False,
       strip=None,
-      upx=True,
+      upx=True,#should be disabled for PtQt4 according to https://groups.google.com/forum/#!topic/pyinstaller/GEL1QQfpHLI
       console=False, 
       icon=os.path.join(pkg_dir,'dataartist','dataArtist','media','logo.ico'))
 

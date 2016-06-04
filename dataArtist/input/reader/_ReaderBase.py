@@ -139,7 +139,6 @@ class ReaderBase(QtCore.QThread):
                     
                 if self.canceled:
                     break
-
         self.done.emit(data_list, fname_list, label_list)
 
             

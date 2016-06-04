@@ -2,16 +2,16 @@ import numpy as np
 import fancywidgets.pyqtgraphBased.parametertree.parameterTypes as pTypes
 
 #OWN
-from _ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase
 
 
 
-class NpyTxtReader(ReaderBase):
+class Array2DReader(ReaderBase):
     '''
     Read CSV/text files using numpy.loadtxt
     '''
     ftypes = ('txt', 'csv')
-    axes = ['x', 'y', 'intensity']   
+    axes = ['x', 'y', '']   
     preferred = True
 
     def __init__(self, *args, **kwargs):
@@ -21,14 +21,14 @@ class NpyTxtReader(ReaderBase):
 
     @staticmethod 
     def check(ftype, fname):
-        return ftype in NpyTxtReader.ftypes
+        return ftype in Array2DReader.ftypes
 
     
     def open(self, filename):
         p = self.preferences
         f = p.pFindDelimiter.value()
         if f:
-            delimiters = [',',', ', ' ', ';', '; ', '\t']#
+            delimiters = [',',', ','\t', ' ', ';', '; ']
         else:
             delimiters = [p.pDelimiter.value()]
         arr = None

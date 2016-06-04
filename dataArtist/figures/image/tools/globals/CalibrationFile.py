@@ -140,8 +140,11 @@ class CalibrationFile(GlobalTool):
 
     def getCurrentCoeff(self, name):
         c = self._checkCal()
-        return c.getCoeff(name, self.pLight.value(), 
+        try:
+            return c.getCoeff(name, self.pLight.value(), 
                           self.pCal.param(name).value())[2]
+        except TypeError:
+            raise KeyError("current calibration doesn't have [%s]" %name)
 
 
     def currentCameraMatrix(self):

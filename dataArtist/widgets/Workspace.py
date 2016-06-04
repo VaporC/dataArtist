@@ -105,7 +105,10 @@ class Workspace(QtGui.QWidget):
             d[number] = (display.name(), len(display.axes))
             l['display_%i' %number] = display.saveState()
         l['displays'] = d # ={name:(name,nDim)}
-        l['currentDisplay'] = self.getCurrentDisplay().number if d else None
+        if self.getCurrentDisplay():
+            l['currentDisplay'] = self.getCurrentDisplay().number 
+        else:
+            l['currentDisplay'] = None
         l['nDisplays'] = self._n_displays
         l['displayLayout'] = self.area_middle.saveState() if d else None
 #         dis = self.displays()

@@ -39,13 +39,13 @@ class MedianFilterThreshold(Tool):
     def activate(self):  
         img = self.display.widget.image
         #PROCESS:
-        (out, indices) = medianThreshold(img,
-                                         self.pThreshold.value(), 
-                                         self.pSize.value(), 
-                                         self.pCondition.value(),
-                                         copy=self.pOutDisplay.value()!='[REPLACE]')
-        
-        self.handleOutput(out, title='MedianThreshold', changes='median threshold')#, names=names)
+        (out, indices) = medianThreshold(
+                            img, self.pThreshold.value(), 
+                            self.pSize.value(), 
+                            self.pCondition.value(),
+                            copy=self.pOutDisplay.value()!='[REPLACE]' )
+        #DISPLAY:
+        self.handleOutput(out, title='MedianThreshold', changes='median threshold')
         #CHANGES:
         if self.pAddChangesLayer.value() and indices.any():
             self.display.widget.addColorLayer(indices, 'medianThreshold', tip='blablabla')
