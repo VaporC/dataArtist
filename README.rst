@@ -1,4 +1,4 @@
-﻿**dataArtist** - *…scientific data processing made easy.*
+**dataArtist** - *…scientific data processing made easy.*
 
 .. image:: https://img.shields.io/badge/License-GPLv3-red.svg
 .. image:: https://img.shields.io/badge/python-2.6%7C2.7-yellow.svg
@@ -67,9 +67,11 @@ b) Installation into existing Python installation using pip
 
 - After installing Python2.7 and ensuring that 'pip' is a recognised command in the command shell (Windows: CMD.exe).
   you need to install the following packages BEFORE installing dataArtist:
+  
     - PyQt4 
     - OpenCV2.4
     - OPTIONAL: RabbitMQ (for inter-program communication)
+  
    Please refer to the `USER manual`_ for more information.
 -  Once these packages are installed, open a command shell and type:
 
@@ -165,5 +167,5 @@ a reference image.
 .. _fancyWidgets: https://github.com/radjkarl/fancyWidgets
 .. _fancyTools: https://github.com/radjkarl/fancyTools
 
-.. |youtube| image:: http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg
+.. |youtube| image:: https://i.ytimg.com/vi/vAcpuLvEwTA/hqdefault.jpg
    :target: https://www.youtube.com/channel/UCjjngrC3jPdx1HL8zJ8yqLQ
