@@ -304,6 +304,7 @@ class PreferencesImport(QtGui.QWidget):
     together = 1
     inCurrentDisplay = 2
     inImportDisplay = 3
+    
     importFilesPolicy = together
     showImportDialog = True
     loadImportedFiles = True
@@ -321,14 +322,21 @@ class PreferencesImport(QtGui.QWidget):
 
         hlayout = QtGui.QHBoxLayout()
         layout.addLayout(hlayout)
-        self.label_multifiles = QtGui.QLabel('Import multiple files') 
+        self.label_multifiles = QtGui.QLabel('Import files') 
         hlayout.addWidget(self.label_multifiles)
         
         self.combo_import = QtGui.QComboBox()
         hlayout.addWidget(self.combo_import)
-        self.combo_import.addItems(( 'separated', 'together',
-                                     'in current display',
-                                     'in import display'))
+        
+#         self.combo_import.addItems(( 'separated', 
+#                                      'together',
+#                                      'in current display',
+#                                      'in import display'))
+        self.combo_import.addItems(( 'SPLIT into MULTIPLE displays', 
+                                     'ALL in NEW display',
+                                     'ALL in CURRENT display',
+                                     'ALL in IMPORT display'))
+
         self.combo_import.setCurrentIndex(self.importFilesPolicy)
         self.combo_import.currentIndexChanged.connect(self._importChanged)
 
@@ -358,11 +366,9 @@ class PreferencesImport(QtGui.QWidget):
 
     def _save(self, state):
         state['pimport'] = {
-#         session.addContentToSave({
             'importOption':self.combo_import.currentIndex(),
             'loadFiles':self.btn_loadFiles.isChecked(),
             'showDialog':self.btn_ask.isChecked()}
-#         , 'preferences','import.txt')
 
             
     def _restore(self, state):
@@ -378,7 +384,5 @@ class PreferencesImport(QtGui.QWidget):
         '''
         pref.combo_import.setCurrentIndex(
                     self.combo_import.currentIndex() )
-        #pref.showImportDialog = self.related.btn_ask.isChecked()
         pref.btn_ask.setChecked(self.showImportDialog)
-        #self.loadImportedFiles = self.related.btn_loadFiles.isChecked()
         pref.btn_loadFiles.setChecked(self.loadImportedFiles)

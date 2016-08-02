@@ -155,6 +155,7 @@ class PlotWidget(DisplayWidget, pgPlotWidget, PyqtgraphgDisplayBase):
             #this should word, but doesn't 
 #             if isinstance(data,_PlotData):
             #working but uncool workaround:
+            print data,999
             if data.__class__.__name__.endswith('_PlotData'):
             
                 p = data
@@ -187,8 +188,10 @@ class PlotWidget(DisplayWidget, pgPlotWidget, PyqtgraphgDisplayBase):
         del self._movedCurve 
 
 
-    def addLayer(self, name='unnamed', data=None, **kwargs):
-        return self.insertLayer(len(self.curves), name, data, **kwargs)
+    def addLayer(self, name='unnamed', data=None, index=None, **kwargs):
+        if index is None:
+            index = len(self.curves)
+        return self.insertLayer(index, name, data, **kwargs)
 
 
     def update(self, data=None, index=None, label=None, **kwargs):

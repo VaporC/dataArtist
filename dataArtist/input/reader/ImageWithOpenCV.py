@@ -1,10 +1,9 @@
 import cv2
 import numpy as np
 
-from fancywidgets.pyqtgraphBased.parametertree.parameterTypes import GroupParameter
 from imgProcessor.transformations import transpose
 #OWN
-from dataArtist.input.reader._ReaderBase import ReaderBase
+from dataArtist.input.reader._ReaderBase import ReaderBase, ReaderPreferences
 
 
    
@@ -77,29 +76,29 @@ class ImageWithOpenCV(ReaderBase):
                 img = cv2.cvtColor(img, cv2.cv.CV_BGR2RGB)
 
         #change data type to float
-        img = self.toFloat(img, p.pToFloat.value(), p.pForceFloat64.value()) 
+        img = self.toFloat(img) 
         return img, labels
 
     
 
 
 
-class _ImagePreferences(GroupParameter):
+class _ImagePreferences(ReaderPreferences):
     
     def __init__(self, name=' Image import'):
         
-        GroupParameter.__init__(self, name=name)
-        
-        self.pToFloat = self.addChild({
-                'name':'transform to float',
-                'type':'bool',
-                'value':True})
-        self.pForceFloat64 = self.pToFloat.addChild({
-                'name':'Force double precision (64bit)',
-                'type':'bool',
-                'value':False})
-        self.pToFloat.sigValueChanged.connect(lambda p,v:
-                      self.pForceFloat64.show(v))
+        ReaderPreferences.__init__(self, name=name)
+#         
+#         self.pToFloat = self.addChild({
+#                 'name':'transform to float',
+#                 'type':'bool',
+#                 'value':True})
+#         self.pForceFloat64 = self.pToFloat.addChild({
+#                 'name':'Force double precision (64bit)',
+#                 'type':'bool',
+#                 'value':False})
+#         self.pToFloat.sigValueChanged.connect(lambda p,v:
+#                       self.pForceFloat64.show(v))
         self.pGrey = self.addChild({
                 'name':'Force grayscale',
                 'type':'bool',

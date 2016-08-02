@@ -40,7 +40,7 @@ class Text(Tool):
         pColor = pa.addChild({
             'name': 'Color',
             'type': 'empty',
-            'isgroup':True})         
+            'highlight':True})         
 
         self.pCFont = pColor.addChild({
             'name': 'Font',

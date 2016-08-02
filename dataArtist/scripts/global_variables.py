@@ -19,6 +19,18 @@ d.l[1]
 # access all tools of a display:
 d.tools['NAME OF THE TOOL']
 
+#add new file to display:
+d.addFiles(['1.tiff','2.tiff' ,... ])
+
+#remove layers:
+d.removeLayer(1)
+d.removeLayers()
+
+#access other areas:
+d.workspace
+d.workspace.gui
+
+
 #===================
 #BUILTINS
 #===================

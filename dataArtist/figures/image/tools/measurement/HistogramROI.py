@@ -1,7 +1,7 @@
 import numpy as np
 
 #OWN
-from _ROI import ROIArea, ROITool
+from dataArtist.widgets._ROI import ROITool, ROIArea
 
 
 

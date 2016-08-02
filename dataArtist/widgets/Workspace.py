@@ -264,9 +264,12 @@ class Workspace(QtGui.QWidget):
 
 
     def _removeCurrentToolBars(self):
-        if self._last_active_display:
-            for bar in self._last_active_display.widget.toolbars:
-                self.gui.removeToolBar(bar) 
+        toolbars = self.gui.findChildren(QtGui.QToolBar)
+        for bar in toolbars:
+                self.gui.removeToolBar(bar)      
+#         if self._last_active_display:
+#             for bar in self._last_active_display.widget.toolbars:
+#                 self.gui.removeToolBar(bar) 
 
 
     def close(self):
@@ -374,7 +377,6 @@ class Workspace(QtGui.QWidget):
         
         #add new toolbars:
         for bar in display.widget.toolbars:
-
             p = bar.position
             if p == 0:
                 p = 4

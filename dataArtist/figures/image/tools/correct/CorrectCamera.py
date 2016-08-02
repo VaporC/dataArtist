@@ -53,6 +53,12 @@ class CorrectCamera(Tool):
             'value':False,
             'tip':'Whether to deconvolve the image - this might take some minutes'})
 
+        self.pDenoise  = pa.addChild({
+            'name':'Denoise',
+            'type':'bool',
+            'value':False,
+            'tip':'Remove noise using Non-Local Means Denoising - this takes some time'})
+
         self.pKeepSize  = pa.addChild({
             'name':'Keep size',
             'type':'bool',
@@ -175,7 +181,8 @@ class CorrectCamera(Tool):
                                 bgImages=bgImages, 
                                 threshold=self.pThreshold.value(),
                                 keep_size=self.pKeepSize.value(),
-                                deblur=self.pDeblur.value())
+                                deblur=self.pDeblur.value(),
+                                denoise=self.pDenoise.value())
                        )
         return out
     

@@ -1,3 +1,5 @@
+from pyqtgraph.Qt import QtGui
+
 from dataArtist.widgets.Tool import Tool
 
 from imgProcessor.signal import signalRange
@@ -14,23 +16,37 @@ class Colorbar(Tool):
     def __init__(self, display):
         Tool.__init__(self, display)
         self.setChecked(True)
-        
+
+        self._linked_displays = []
+        self._actions = []
+
+        w = self.display.widget
+
         pa = self.setParameterMenu() 
+
+        pSync = pa.addChild({
+            'name':'Synchronize',
+            'value':'Display',
+            'type':'menu',
+            'highlight':True
+            })
+        pSync.aboutToShow.connect(self._buildLinkColorbar)
 
         pFit = pa.addChild({
             'name': 'Fit',
             'type': 'action'})
         pFit.sigActivated.connect(self._fit)
-        
+
+
         pLevels = pa.addChild({
             'name': 'autoLevels',
             'type': 'bool',
-            'value':True})
+            'value':w.opts['autoLevels']})
         
         pRange = pa.addChild({
             'name': 'autoHistogramRange',
             'type': 'bool',
-            'value':True})
+            'value':w.opts['autoHistogramRange']})
         
         self.pPrintView = pa.addChild({
             'name': 'print view',
@@ -50,6 +66,51 @@ class Colorbar(Tool):
                 self.display.widget.setHistogramPrintView(
                                         value, pShowHist.value()))        
         pShowHist.sigValueChanged.connect(self._pShowHistChanged)        
+
+
+
+    def _buildLinkColorbar(self, menu):
+        menu.clear()
+        self._actions = []
+        
+        for d in self.display.otherDisplaysOfSameType():
+            a = QtGui.QAction(d.name(),menu, checkable=True)
+            menu.addAction(a)
+            self._actions.append(a)
+
+            if d in self._linked_displays:
+                a.setChecked(True)
+            a.triggered.connect(lambda checked, d=d, self=self: 
+                                self._linkColorbar(d, checked))
+
+
+
+    def _linkColorbar(self, display, dolink=True):
+        '''
+        Link gradient and range from this display to the given slave display
+        '''
+        master = self.display.widget.ui.histogram
+        slave = display.widget.ui.histogram
+        
+        if dolink:
+            self.setChecked(True)
+            self._linked_displays.append(display)
+            master.linkHistogram(slave, connect=True)
+            master.gradient.linkGradient(slave.gradient, connect=True)
+        else:
+            self._linked_displays.remove(display)
+            #undo linking:
+            master.linkHistogram(slave, connect=False)
+            master.gradient.linkGradient(slave.gradient, connect=False)
+            #check whether at least on of the other links is still active, 
+            #      else: uncheck
+            inactive = True
+            for a in self._actions:
+                if a.isChecked():
+                    inactive = False
+                    break
+            if inactive:
+                self.setChecked(False)
 
 
     def _fit(self):

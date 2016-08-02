@@ -49,26 +49,27 @@ class RelativeSharpness(Tool):
         im = self.display.widget.image
         if im is None:
             raise Exception('no images loaded')
-
+        
+        xvals = self.display.stack.values
         if self.pLayer.value() == 'last layer':
             im = [im[-1]]
+            xvals = [xvals[-1]]
+            
         fn = self._method[self.pMethod.value()]
+        yvals = np.array([fn(i) for i in im])     
         
-        d = [np.array([fn(i) for i in im])]     
-
         if ( not self.pNewDisplay.value() 
              and self.outDisplay 
              and not self.outDisplay.isClosed() ):
             #append new points
-            for curve,newY in zip(self.outDisplay.widget.curves, d):
-                x,y = curve.xData, curve.yData
-                newX = len(x)  
-                x = np.append(x,newX)
-                y = np.append(y,newY)
-                curve.setData(x,y) 
+            c = self.outDisplay.widget.curves[-1]
+            x,y = c.xData, c.yData
+            x = np.append(x,xvals)
+            y = np.append(y,yvals)
+            c.setData(x,y)                       
         else:
             self.outDisplay = self.display.workspace.addDisplay( 
                             origin=self.display,
                             axes=self.display.axes.copy(('stack',0)), 
-                            data=d, 
+                            data=[[xvals,yvals]], 
                             title='sharpness')

@@ -34,7 +34,7 @@ class StackedTifImages(ImageWithOpenCV):
                 #try to extract labels names set by imageJ:
                 tif.pages[0].imagej_tags['labels']
                 return True
-            except AttributeError:
+            except (AttributeError, KeyError):
                 #not an imageJ stack
                 return False
     

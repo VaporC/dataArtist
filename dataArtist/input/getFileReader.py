@@ -1,10 +1,13 @@
 import inspect
 
 from dataArtist.widgets.dialogs.ChooseFileReaderDialog import ChooseFileReaderDialog
-from . import reader
+from dataArtist.input import reader
 
 
 READERS = inspect.getmembers(reader, inspect.isclass)
+
+SUPPORTED_FTYPES = set()
+[[SUPPORTED_FTYPES.add(f) for f in cls.ftypes] for _,cls in READERS]
 
 
 def getFileReader(filenames=[]):

@@ -99,7 +99,7 @@ class Axis(pg.AxisItem):
                 'type':'str',
                 'value':value,
                 'expanded':False,
-                'isGroup':True})
+                'highlight':True})
         self.setLabel(value)
         
         self.pLinked = self.p.addChild({

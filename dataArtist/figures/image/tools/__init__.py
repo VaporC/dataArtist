@@ -9,6 +9,8 @@ import measurement
 import stack
 import view
 
+# sequence = (general,view, measurement, correct
+
 #SETUP
 import imgProcessor
 #DUE TO DIFFERENT BETWEEN OPENCV AND PYQTGRAPH:

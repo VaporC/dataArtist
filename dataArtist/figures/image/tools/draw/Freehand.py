@@ -41,7 +41,7 @@ class Freehand(Tool):
         p = self.pa.addChild({
             'name': str(len(self.paths)+1),
             'type': 'empty',
-            'isGroup':True,
+            'highlight':True,
             'removable':True,
             'renamable':True,
             'autoIncrementName':True

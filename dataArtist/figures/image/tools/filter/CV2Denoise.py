@@ -36,7 +36,7 @@ class CV2Denoise(Tool):
             'name':'Optional (expand to setup)',
             'type':'empty',
             'expanded':False,
-            'isgroup':True})
+            'highlight':True})
 
         self.pTemplateWindowSize = self.pOptional.addChild({
             'name':'templateWindowSize ',

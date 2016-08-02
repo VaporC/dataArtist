@@ -111,7 +111,7 @@ class DisplayDock(Dock):
         elif type(axes) == int:
             axes = ['x', 'y', '', 'i','j'][:axes]
 
-        self.stack = _StackParameter(weakref.proxy(self))
+        self.stack = _StackParameter(self)
 
         #PARAMETERS:
         self.p = Parameter.create(
@@ -119,7 +119,7 @@ class DisplayDock(Dock):
                     type='empty')
 
         #TAB DISPLAYING PREFERENCES AND INPUT INFORMATION:
-        self.tab = _DisplayTab(weakref.proxy(self))
+        self.tab = _DisplayTab(self)
         #FILL PARAMETERS:
         self.pTitle = self.p.addChild({
                     'name':'Title',
@@ -166,14 +166,14 @@ class DisplayDock(Dock):
         #UPDATE DATA FROM FILE USING SPECIFIED PREFERENCES: 
         #TODO: 'update' should only update file based data and no processed data
         if self.reader:
-            pUpdate = Parameter.create(**{
-                        'type':'action',
-                        'name':'Update',
-                        })
+#             pUpdate = Parameter.create(**{
+#                         'type':'action',
+#                         'name':'Update',
+#                         })
             if self.reader.preferences:
-                pUpdate.addChild(self.reader.preferences)
-            pUpdate.sigActivated.connect(self.updateInput)
-            self.p.addChild(pUpdate)
+#                 pUpdate.addChild(self.reader.preferences)
+#             pUpdate.sigActivated.connect(self.updateInput)
+                self.p.addChild(self.reader.preferences)
 
         self.p.addChild(widgetList)
       
@@ -189,6 +189,13 @@ class DisplayDock(Dock):
                     self.addLayer(data, names[0], origin=origin)
                 else:
                     self.addLayers(data, names, origin=origin)
+
+
+    def otherDisplaysOfSameType(self, includeThisDisplay=False):
+        for d in self.workspace.displays():
+            if (isinstance(d.widget,self.widget.__class__) 
+                    and ( includeThisDisplay or d.name() != self.name()) ):
+                yield d
 
 
     def _limitLayers(self, param, val):
@@ -272,7 +279,7 @@ class DisplayDock(Dock):
                     data = origin.widget.getData()
             else:
                 if data is None:
-                    data = [origin.widget.getData(index)]
+                    data = origin.widget.getData(index)
 
                 ch = [ch[index]]
 
@@ -970,7 +977,7 @@ class _StackParameter(GroupParameter):
         #CREATE AND ADD COPY-LAYER-TO OPTION TO PARAMETER:
         pLayer = self.addChild({
                 'type':'float',
-                'isGroup':True,
+                'highlight':True,
                 'name':name,
                 'value':self.display.axes.stackAxis.getNextStackValue(
                                             PathStr(fname).basename()),

@@ -25,28 +25,64 @@ class DarkCurrent(ImageTool):
         
         self.calFileTool = self.showGlobalTool(CalibrationFile)
         self.pa = self.setParameterMenu() 
-        self.createResultInDisplayParam(self.pa)
 
         self._bg = None
         self._method = None
+        self._inter, self._slope = None, None
 
-        self.pMethod = self.pa.addChild({
+        pMeasure = self.pa.addChild({
+            'name':'Calculate calibration array ...',
+            'type':'empty'})
+
+        self.createResultInDisplayParam(pMeasure)
+
+        self.pMethod = pMeasure.addChild({
             'name':'Method',
             'type':'list',
             'value':'as function',
             'limits':['average', 'as function']})
 
-        self.pa.addChild({
+        pMeasure.addChild({
             'name':'Exposure times [s]',
             'type':'str',
             'value':'... are taken from layer value',
             'readonly':True})
+
+
+        pFromDisplay = self.pa.addChild({
+            'name':'Load calibration array ...',
+            'type':'empty'})
+
+        pFromDisplay.addChild({
+            'name':'Intercept',
+            'type':'menu',
+            'value':'from display'}).aboutToShow.connect(
+                lambda m, fn=self._interceptfromDisplay:
+                            self.buildOtherDisplayLayersMenu(m,fn, includeThisDisplay=True))
+
+        pFromDisplay.addChild({
+            'name':'Slope',
+            'type':'menu',
+            'value':'from display'}).aboutToShow.connect(
+                lambda m, fn=self._slopefromDisplay:
+                            self.buildOtherDisplayLayersMenu(m,fn, includeThisDisplay=True))
 
         self.pUpdate = self.pa.addChild({
             'name':'Update calibration',
             'type':'action',
             'visible':False})
         self.pUpdate.sigActivated.connect(self.updateCalibration)
+
+
+    def _interceptfromDisplay(self, disp,n,layername):
+        self._inter = self.display.widget.image[n]
+        if self._slope is not None:
+            self.pUpdate.show()
+
+    def _slopefromDisplay(self, disp,n,layername):
+        self._slope = self.display.widget.image[n]
+        if self._inter is not None:
+            self.pUpdate.show()
 
 
     def updateCalibration(self):

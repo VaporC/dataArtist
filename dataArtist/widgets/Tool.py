@@ -218,33 +218,40 @@ class Tool(QtGui.QToolButton):
                     d.changeLayer(data=out, index=l,**kwargs)
         return d
                     
-
-    def buildOtherDisplayLayersMenu(self, menu, triggerFn):
+    def buildOtherDisplayLayersMenu(self, menu, triggerFn, includeThisDisplay=False, updateMenuValue=True):
         '''
         fill the menu with all available layers within other displays
         this function of often connected with the menu.aboutToShow signal
         '''
         menu.clear()
         #SUBMENU FOR ALL DISPLAYS
-        for d in self.display.workspace.displays():
-            if isinstance(d.widget,self.display.widget.__class__):
+#         for d in self.display.workspace.displays():
+#             if (isinstance(d.widget,self.display.widget.__class__)
+#                 and d.name() != self.display.name() ):
+        for d in self.display.otherDisplaysOfSameType(includeThisDisplay):
                 m = menu.addMenu(d.name())
                 #ACTION FOR ALL LAYERS
                 for n,l in enumerate(d.layerNames()):
-                    m.addAction('%s - %s' %(n,l)).triggered.connect(
+                    name = '%s - %s' %(n,l)
+                    a = m.addAction(name)
+                    a.triggered.connect(
                         lambda checked, d=d, n=n,l=l: 
                             triggerFn(d, n, l) )
+                    if updateMenuValue:
+                        a.triggered.connect(lambda checked, name=name: menu.setTitle(name))
 
 
-    def buildOtherDisplaysMenu(self, menu, triggerFn):
+    def  buildOtherDisplaysMenu(self, menu, triggerFn):
         '''
         fill the menu with all available displays
         this function of often connected with the menu.aboutToShow signal
         '''
         menu.clear()
         #SUBMENU FOR ALL DISPLAYS
-        for d in self.display.workspace.displays():
-            if isinstance(d.widget,self.display.widget.__class__):
+#         for d in self.display.workspace.displays():
+#             if (isinstance(d.widget,self.display.widget.__class__) 
+#                     and d.name() != self.display.name() ):
+        for d in self.display.otherDisplaysOfSameType():
                 menu.addAction(d.name()).triggered.connect(
                         lambda checked, d=d: 
                             triggerFn(d) )

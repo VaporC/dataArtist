@@ -279,9 +279,10 @@ class PerspectiveCorrection(Tool):
                     h['item'].setPos(pos[0], pos[1])
             ref = vertices
             self.quadROI.show()
-            
-        c = self.calFileTool.currentCameraMatrix()
-        
+        try:    
+            c = self.calFileTool.currentCameraMatrix()
+        except TypeError:
+            c = None
         #height/width:
         if self.pCalcAR.value():
             w,h = None,None

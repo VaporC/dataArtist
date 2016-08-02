@@ -10,7 +10,7 @@ class GreatEyesImageFormat(ReaderBase):
     Read EL images (*.txt) created by the LumiSolarCell Software
     from GreatEyes 
     '''
-    ftypes = ('txt')
+    ftypes = ('txt',)
     axes = ['x', 'y', '']   
     preferred = False
 

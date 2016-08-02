@@ -84,7 +84,7 @@ class Selection(Tool):
         p = self.pa.addChild({
             'name': '[%i] %s' %(len(self.paths)+1,name),
             'type': 'empty',
-            'isGroup':True,
+            'highlight':True,
             'removable':True,
             'renamable':True,
             'autoIncrementName':True}) 
@@ -438,7 +438,7 @@ Click on 'Done Add' to stop drawing
         pCells = param.addChild({
             'name':'Cells',
             'type':'empty',
-            'isGroup':True})
+            'highlight':True})
          
         pX = pCells.addChild({
             'name':'x',

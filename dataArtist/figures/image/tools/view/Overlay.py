@@ -98,7 +98,7 @@ class Overlay(Tool):
         
         p = self._menu.p.addChild({
                     'name':name,
-                    'isGroup':True,
+                    'highlight':True,
                     'type':'color',
                     'tip':tip,
                     'removable':True,

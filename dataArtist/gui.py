@@ -54,7 +54,7 @@ class Gui(MultiWorkspaceWindow):
         MultiWorkspaceWindow.__init__(self, Workspace, title)
 
         s = self.app.session
-        self.resize(600,550)
+        self.resize(605,550)
         #ALLOW DRAGnDROP        
         self.setAcceptDrops(True)
         #INIT CHILD PARTS:
@@ -410,18 +410,21 @@ class Gui(MultiWorkspaceWindow):
     def dropEvent(self, event):
         '''what to do is sth. if dropped'''
         m = event.mimeData()
+        
+        #HTML CONTENT        
         if m.hasHtml():
-            #HTML CONTENT
             (paths, data) = html2data(unicode(m.html()))
             self.currentWorkspace().addFiles(paths)
             #raise NotImplementedError('direct import of data (like tables) from a browser is not implemented at the moment')
+        
+        #FILES
         elif m.hasUrls():
-            
             paths =  self._getFilePathsFromUrls(m.urls())
             #filter from session files and open those:
             i  = 0
             while i < len(paths):
                 p = paths[i]
+                #DATAARTIST SESSION
                 if p.endswith(self.app.session.FTYPE):
                     if self.isEmpty():
                         self.app.session.replace(p)
@@ -432,6 +435,8 @@ class Gui(MultiWorkspaceWindow):
                     i += 1
             
             self.currentWorkspace().addFiles(paths)
+        
+        #TEXT/TABLES
         if m.hasText():
             txt = unicode(m.text())
             if self.txtIsTable(txt):

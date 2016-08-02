@@ -3,6 +3,9 @@ import numpy as np
 from pyqtgraph_karl.Qt import QtCore, QtGui
 
 from fancywidgets.pyqtgraphBased.parametertree import ParameterTree
+from fancywidgets.pyqtgraphBased.parametertree.parameterTypes import GroupParameter
+
+
 
 class ReaderBase(QtCore.QThread):
     '''
@@ -33,9 +36,15 @@ class ReaderBase(QtCore.QThread):
  
  
  
-    def toFloat(self, arr, toFloat, forceFloat64):
+    def toFloat(self, arr, toFloat=True, forceFloat64=False):
+        if hasattr(self, 'preferences'):
+            p = self.preferences
+            toFloat = p.pToFloat.value() 
+            forceFloat64 = p.pForceFloat64.value()
+            
         if not  toFloat:
             return arr
+        arr = np.asanyarray(arr)
         try:
             if forceFloat64:
                 dtype = np.float64
@@ -145,3 +154,22 @@ class ReaderBase(QtCore.QThread):
     def cleanUp(self):
         self._status_timer.stop()
         self.progressBar.hide() 
+
+
+
+class ReaderPreferences(GroupParameter):
+    
+    def __init__(self, **kwargs):
+        
+        GroupParameter.__init__(self, **kwargs)
+        
+        self.pToFloat = self.addChild({
+                'name':'transform to float',
+                'type':'bool',
+                'value':True})
+        self.pForceFloat64 = self.pToFloat.addChild({
+                'name':'Force double precision (64bit)',
+                'type':'bool',
+                'value':False})
+        self.pToFloat.sigValueChanged.connect(lambda p,v:
+                      self.pForceFloat64.show(v))

@@ -23,31 +23,36 @@ class PointSpreadFunction(Tool):
         self.calFileTool = self.showGlobalTool(CalibrationFile)
 
         pa = self.setParameterMenu() 
-        self.createResultInDisplayParam(pa)
+        
+        pMeasure = pa.addChild({
+            'name':'Calculate calibration array ...',
+            'type':'empty'})
+        
+        self.createResultInDisplayParam(pMeasure)
 
-        self.pMethod = pa.addChild({
+        self.pMethod = pMeasure.addChild({
             'name':'Method',
             'type':'list',
             'value':'multiple pin holes',
             'limits':['multiple pin holes']})
 
-        pSetBoundaries = pa.addChild({
+        pSetBoundaries = pMeasure.addChild({
             'name':'Set boundaries',
             'type':'action'})
         pSetBoundaries.sigActivated.connect(self._setBoundaries)
 
-        self.pKSize = pa.addChild({
+        self.pKSize = pMeasure.addChild({
             'name':'Maximum kernel size (mxm)',
             'type':'int',
             'value':51,
             'limits':[7,101]})
 
-        self.pDrawPoints = pa.addChild({
+        self.pDrawPoints = pMeasure.addChild({
             'name':'Draw found points',
             'type':'bool',
             'value':False})
 
-        self.pFilterLow = pa.addChild({
+        self.pFilterLow = pMeasure.addChild({
             'name':'Filter low values',
             'type':'slider',
             'value':0.0,
@@ -55,11 +60,23 @@ class PointSpreadFunction(Tool):
             'visible':False})
         self.pFilterLow.sigValueChanged.connect(self._updatePSF)
 
-        self.pUpdate = pa.addChild({
+        self.pUpdate = pMeasure.addChild({
                     'name':'Update calibration',
                     'type':'action',
                     'visible':False})
         self.pUpdate.sigActivated.connect(self.updateCalibration)
+
+
+        pa.addChild({
+            'name':'Load calibration array ...',
+            'type':'menu',
+            'value':'from display'}).aboutToShow.connect(
+                lambda m, fn=self._fromDisplay:
+                            self.buildOtherDisplayLayersMenu(m,fn, includeThisDisplay=True))
+
+    def _fromDisplay(self, display,n,layername):
+        im = display.widget.image[n]
+        self.calFileTool.updatePSF(im)
 
 
     def _updatePSF(self, p,v):
@@ -100,6 +117,12 @@ class PointSpreadFunction(Tool):
             w.view.vb.addItem(self.quadROI)    
 
 
+    def deactivate(self):
+        #show tool activated to highlight this one against PSF tools
+        #in other displays
+        pass
+
+
     def activate(self):
         if self.quadROI is None:
             print 'need to set boundaries first'
@@ -129,7 +152,10 @@ class PointSpreadFunction(Tool):
                             title='Point spread function')
             
         out = self.sharp.psf(filter_below=self.pFilterLow.value())    
-        self.outDisplay.addLayer(data=out, label='PSF')
+        self.outDisplay.addLayer(data=[out], label='PSF')
+        #make filtering low values less painfull:
+        self.outDisplay.widget.setOpts(autoLevels=False,
+                                 autoHistogramRange=False)
         
         self.pFilterLow.show()
         self.pUpdate.show()
@@ -137,7 +163,7 @@ class PointSpreadFunction(Tool):
 
     def updateCalibration(self):
         w = self.outDisplay.widget
-        im = w.image[w.currentIndex]
-#         if im.ndim == 3:
-#             im = im[w.currentIndex]
+        im = w.image
+        if im.ndim == 3:
+            im = im[w.currentIndex]
         self.calFileTool.updatePSF(im)

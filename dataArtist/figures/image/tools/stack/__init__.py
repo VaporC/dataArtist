@@ -7,4 +7,4 @@ from PlotTrend import PlotTrend
 from Slice import Slice
 from Squeeze import Squeeze
 
-show={'simple':False, 'electroluminescence':False}
+show=False#{'simple':False, 'electroluminescence':False}

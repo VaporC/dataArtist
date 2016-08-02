@@ -269,12 +269,13 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
         self.insertLayer(index, data=self._moved_layer)
 
 
-    def addLayer(self, name=None, data=None):
+    def addLayer(self, name=None, data=None, index=None):
         '''
         add a new image as layer the the and of the image stack
         '''
         if self.image is not None:
-            index = len(self.image)
+            if index is None:
+                index = len(self.image)
             self.insertLayer(index, data=data)
         else:
             self.update(data)
@@ -293,7 +294,7 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
             self.image = np.delete(self.image, index, axis=0)
             s = self.image.shape[0]
             if s==0:
-                self.setImage( np.zeros((2,2)))
+                self.setImage( np.zeros((1,3,3)))
                 self.image = None
             else:  
                 #TODO: has last index, if addWidget was called before
@@ -308,7 +309,7 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
     
 
     def clear(self):
-        self.setImage( np.zeros((1,2,2)))
+        self.setImage( np.zeros((1,3,3)))
         self.image = None    
         for name in self.cItems:
             self.removeColorLayer(name) 
@@ -354,10 +355,12 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
         update the visual representation
         '''
         if self.image is not None and (force or self._changed):
+            
             if self._image_redefined or self._set_kwargs or self._firstTime:
                 self.setImage(self.image, **self._set_kwargs)
                 self._firstTime = False
                 self._image_redefined = False
+                
             elif force or self._set_index == None or self._set_index == self.currentIndex:
                 self.imageDisp = None # needed by ImageView to set histogram levels
                 self.updateImage(**self._set_kwargs)
@@ -381,9 +384,15 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
         image = self.getProcessedImage()
         if autoHistogramRange:
             self.ui.histogram.setHistogramRange(self.levelMin, self.levelMax)
-        if self.axes['t'] is None:
-            self.imageItem.updateImage(image)
-        else:
+        if self.axes['t'] is not None:
+            #show/hide timeline:
             self.ui.roiPlot.setVisible(
                         self.image.shape[0]>1 and self._timeline_visible)
-            self.imageItem.updateImage(image[self.currentIndex])
+            image = image[self.currentIndex]
+            
+        # ensure initial right scaling (not done when image is [0...1]
+        # TODO: fix the origin bug
+        if image.dtype == bool:
+            return self.imageItem.updateImage(image,levels=(0.,1.)) 
+        else:
+            self.imageItem.updateImage(image)            

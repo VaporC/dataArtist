@@ -48,7 +48,7 @@ class RAWimage(ReaderBase):
             s1 = arr.shape[0]/s0
             arr = arr.reshape(s0,s1)
             
-        arr = self.toFloat(arr, p.pToFloat.value(), p.pForceFloat64.value()) 
+        arr = self.toFloat(arr) 
 
         labels = None
         return arr, labels
