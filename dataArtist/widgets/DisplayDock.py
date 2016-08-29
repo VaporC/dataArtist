@@ -299,32 +299,32 @@ class DisplayDock(Dock):
         return '[%s]' %self.number
 
 
-    def _getNDataLayers(self, axes, data):
-        '''
-        define number of data layers interpreting [data] and it's [axes]
-        '''
-        l = len(axes)
-        #get number of dimensions (nDim) and shape without the need of an ndarray:
-        try:
-            x = data
-            shape = []
-            while True:
-                shape.append(len(x))
-                x = x[0]
-        except TypeError:
-            ndim = len(shape)
-        except IndexError:
-            #has no layers jet
-            return 0
-        if l == ndim + 1:
-            #stack with one layer or no stack:
-            nlayers = 1
-        elif l == ndim or l == ndim-1:
-            #multiple layers:
-            nlayers = shape[0]
-        else:
-            raise Exception("number of axes doesn't fit to data shape")
-        return nlayers
+#     def _getNDataLayers(self, axes, data):
+#         '''
+#         define number of data layers interpreting [data] and it's [axes]
+#         '''
+#         l = len(axes)
+#         #get number of dimensions (nDim) and shape without the need of an ndarray:
+#         try:
+#             x = data
+#             shape = []
+#             while True:
+#                 shape.append(len(x))
+#                 x = x[0]
+#         except TypeError:
+#             ndim = len(shape)
+#         except IndexError:
+#             #has no layers jet
+#             return 0
+#         if l == ndim + 1:
+#             #stack with one layer or no stack:
+#             nlayers = 1
+#         elif l == ndim or l == ndim-1:
+#             #multiple layers:
+#             nlayers = shape[0]
+#         else:
+#             raise Exception("number of axes doesn't fit to data shape")
+#         return nlayers
 
 
     def mousePressEvent(self, event):
@@ -388,7 +388,12 @@ class DisplayDock(Dock):
                 
                 nLayers = len(self.stack.childs)
                 # CASE 'l'
-                n = self._getNDataLayers(self.axes, value)
+                n = self.widget.getNLayers(value)
+#                 n = self._getNDataLayers(self.axes, value)
+#                 print nLayers, n,55555555555
+#                 if not n:
+#                     raise Exception("number of axes doesn't fit to data shape")
+
                 if nLayers == n:
                     #print value
                     return self.widget.update(value)

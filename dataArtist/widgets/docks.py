@@ -17,10 +17,12 @@ class DockBase(Dock):
     
 class DockTable(DockBase):
     '''create dock from table'''
-    def __init__(self, name='unnamed table', text=None, *args, **kwargs):
+    def __init__(self, name='unnamed table', text=None, 
+                 array=None, *args, **kwargs):
         Dock.__init__(self, name, *args, **kwargs) 
-        
-        if text is not None:
+        if array is not None:
+            t = Table.fromArray(array)
+        elif text is not None:
             t = Table.fromText(text)
         else: 
             t = Table()

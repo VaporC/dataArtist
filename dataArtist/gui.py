@@ -45,6 +45,17 @@ MEDIA_FOLDER = PathStr(dataArtist.__file__).dirname().join('media')
 HELP_FILE = MEDIA_FOLDER.join('USER_MANUAL.pdf')
 
 
+def _showActionToolTipInMenu(menu, action):
+    #show tooltip on the right side of [menu]
+    ###QMenu normaly doesnt allow QActions to show tooltips...
+    tip = action.toolTip()
+#             QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+    p = menu.pos()
+    p.setX(p.x()+105)
+    p.setY(p.y()-21)
+    if tip != action.text():
+        QtGui.QToolTip.showText(p, tip)
+
 
 class Gui(MultiWorkspaceWindow):
     '''
@@ -68,16 +79,16 @@ class Gui(MultiWorkspaceWindow):
         st = StatusBar()
         self.setStatusBar(st)
     
-        def showOut(msg):
-            if msg != '\n':
-                # after every message this new line character is emitted 
-                # showing this hides the real message
-                st.showMessage(msg,3000)
-        def showErr(msg):
-            if msg != '\n':
-                st.showError(msg, 3000)
-        s.streamOut.message.connect(showOut)
-        s.streamErr.message.connect(showErr)
+#         def showOut(msg):
+#             if msg != '\n':
+#                 # after every message this new line character is emitted 
+#                 # showing this hides the real message
+#                 st.showMessage(msg,9000)
+#         def showErr(msg):
+#             if msg != '\n':
+#                 st.showError(msg, 9000)
+        s.streamOut.message.connect(st.showMessage)#showOut)
+        s.streamErr.message.connect(st.showError)#showErr)
 
         self.framelessDisplays = {} # contain all displays that are unbounded 
                                     # from the main window and showed frameless
@@ -219,7 +230,8 @@ class Gui(MultiWorkspaceWindow):
     
     def _appendMenubarAndPreferences(self):
         m = self.menuBar()
-        m.setMaximumHeight(25)
+        m.setFixedHeight(25)
+#         m.setMaximumHeight(25)
 
         m.aboutWidget.setModule(dataArtist)
         m.aboutWidget.setInstitutionLogo(MEDIA_FOLDER.join('institution_logo.svg'))
@@ -245,23 +257,69 @@ class Gui(MultiWorkspaceWindow):
         p = f.action_preferences 
         action_file = QtGui.QAction('&Import', f)
         action_file.triggered.connect(self.openFile)
-        action_file.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_I))
+        action_file.setShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_I))
         f.insertAction(p,action_file)
         f.insertSeparator(p)
             #MENU VIEW
         v = m.menu_view
-            #ACTION PRINT VIEW
+                #ACTION PRINT VIEW
         aPrintView = QtGui.QAction('Print view', v)
         aPrintView.setCheckable(True)
         aPrintView.triggered.connect(
                 lambda checked: self.currentWorkspace().setPrintView(checked) ) 
         v.addAction(aPrintView)
-            #ACTION VIEW2CLIPBOARD
+                
+                #SHOW/HIDE history
+        aHistory = QtGui.QAction('Program history', v)
+        aHistory.setShortcut(QtCore.Qt.Key_F4)
+
+        aHistory.setCheckable(True)     
+        
+        def showhideHistory(checked):
+            s = self.currentWorkspace().middle_splitter
+            r = s.getRange(1)[1]
+            if checked:
+                r/= 1.5
+            return s.moveSplitter(r,1)
+        
+        def isHistoryVisible():
+            s = self.currentWorkspace().middle_splitter
+            aHistory.setChecked(s.sizes()[1] != 0)
+                
+        aHistory.triggered.connect(showhideHistory) 
+        v.aboutToShow.connect(isHistoryVisible)
+        v.addAction(aHistory)     
+               
+                #SHOW/HIDE preferences
+        aPref= QtGui.QAction('Dock preferences', v)
+        aPref.setShortcut(QtCore.Qt.Key_F3)
+        aPref.setCheckable(True)     
+        
+        def showhidePref(checked):
+            s = self.currentWorkspace().vert_splitter
+            r = s.getRange(1)[1]
+            if checked:
+                r/= 3
+            else:
+                r = 0
+            return s.moveSplitter(r,1)
+        
+        def isPrefVisible():
+            w = self.currentWorkspace()
+            s = w.vert_splitter
+            aPref.setChecked(s.sizes()[0]!=0)
+            aPref.setEnabled(w.displayPrefTabs.isVisible())
+                
+        aPref.triggered.connect(showhidePref) 
+        v.aboutToShow.connect(isPrefVisible)
+        v.addAction(aPref)  
+
+                #ACTION VIEW2CLIPBOARD
         aClipboard = QtGui.QAction('Copy view to clipboard', v)
         aClipboard.triggered.connect(
                 lambda checked: self.currentWorkspace().copyViewToClipboard() ) 
         v.addAction(aClipboard)
-            #ACTION Display2CLIPBOARD
+                #ACTION Display2CLIPBOARD
         aClipboard = QtGui.QAction('Copy active display to clipboard', v)
         aClipboard.triggered.connect(
                 lambda checked: self.currentWorkspace().copyCurrentDisplayToClipboard() ) 
@@ -295,6 +353,10 @@ class Gui(MultiWorkspaceWindow):
         self._m_duplDisp.aboutToShow.connect(self._fillMenuDuplicateToOtherWS ) 
             #MENU - TOOLBARS                
         self.menu_toolbars = QtGui.QMenu('Toolbars', m)
+        self.connect(self.menu_toolbars, QtCore.SIGNAL("hovered(QAction *)"),
+                     lambda action, m=self.menu_toolbars: 
+                        _showActionToolTipInMenu(m, action))
+        
             #SHOW ALL TOOLBARS - ACTION
         a = self.menu_toolbars.a_show = QtGui.QAction('show', m)
         f = a.font()
@@ -360,7 +422,9 @@ class Gui(MultiWorkspaceWindow):
         #REMOVE OLD:
         m.clear()
         m.addAction(m.a_show)
-        self.currentWorkspace().addShowToolBarAction(m)
+        if m.a_show.isChecked():
+            self.currentWorkspace().addShowToolBarAction(m)
+            
 
         
     def _toggleShowSelectedToolbars(self, checked):

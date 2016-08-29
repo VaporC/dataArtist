@@ -58,6 +58,7 @@ setup(
         "hachoir-core",
         "hachoir-metadata",
         "hachoir-parser",
+        "pyfits",
         "exifread",
         # "pypiwin32", # pip integration for pywin32, which is not in pip http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/
         "pygments",

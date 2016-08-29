@@ -23,12 +23,49 @@ class SwitchBetweenGridAndStackedView(Tool):
             'type': 'int',
             'value':2,
             'limits':[1,100]})
+        self.pRNRows.sigValueChanged.connect(self._gridParamChanged)
 
         self.pSpace = pa.addChild({
             'name': 'Space inbetween',
             'type': 'int',
             'value':30,
             'limits':[0,1e5]})        
+        self.pSpace.sigValueChanged.connect(self._gridParamChanged)
+
+
+    def _gridParamChanged(self):
+        if self.isChecked():
+            for item, (dx,dy) in zip(self._items, 
+                                     self._positions()):
+                x,y = item.pos()
+                item.moveBy(dx-x, dy-y)
+            
+
+    def _positions(self):
+        w = self.display.widget
+        nr = self.pRNRows.value()
+        s = self.pSpace.value()
+        
+        s0,s1 = w.image.shape[1:3]
+
+        dx,dy = 0,0
+        ir = 1 #row index
+        
+        while True:
+            if ir < nr:
+                dx +=s0+s
+            yield dx,dy
+            
+            #update grid position coords:
+            ir += 1
+#             dx += s0+s
+            if ir >= nr:
+                ir = 0
+                dx = -s0-s
+                dy += s1+s     
+
+
+
 
 
     def activate(self):
@@ -36,8 +73,7 @@ class SwitchBetweenGridAndStackedView(Tool):
         self._items = []
         self._fns = []
         
-        nr = self.pRNRows.value()
-        s = self.pSpace.value()
+
         w = self.display.widget
         vb = w.view.vb
         
@@ -49,10 +85,8 @@ class SwitchBetweenGridAndStackedView(Tool):
         w.display.widget.showTimeline(False)
         
         hist = w.ui.histogram
-        s0,s1 = w.image.shape[1:3]
-        px,py = s0+s,0
-        ir = 1
-        for img in w.image[1:]:
+
+        for img, (px,py) in zip(w.image[1:], self._positions()):
 
             if isColor(img):
                 #TODO: I dont know why it returns an error on color ...find out
@@ -67,16 +101,10 @@ class SwitchBetweenGridAndStackedView(Tool):
             hist.sigLookupTableChanged.connect(fn1)
             hist.sigLevelsChanged.connect(fn2)
 
-            s0,s1 = img.shape[:2]
+#             s0,s1 = img.shape[:2]
             item.moveBy(px,py)
             vb.addItem(item)
-            #update grid position coords:
-            ir += 1
-            px += s0+s
-            if ir == nr:
-                ir = 0
-                px = 0
-                py += s1+s        
+   
         
             self._items.append(item)
             self._fns.append((fn1,fn2))

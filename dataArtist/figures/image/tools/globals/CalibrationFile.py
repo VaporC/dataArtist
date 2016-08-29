@@ -26,6 +26,7 @@ class CalibrationFile(GlobalTool):
         self._last_dir  = None
         self._cal_file_path = None
         self._curIndex = 0
+        self._genericCal = CameraCalibration()
 
         pa = self.setParameterMenu() 
 
@@ -225,7 +226,7 @@ class CalibrationFile(GlobalTool):
         try:
             return self.calibrations[self._curIndex]
         except IndexError:
-            return None
+            return self._genericCal
 
 
     def udpateFlatField(self, arr, error=None):

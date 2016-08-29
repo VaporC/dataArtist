@@ -241,7 +241,7 @@ class Tool(QtGui.QToolButton):
                         a.triggered.connect(lambda checked, name=name: menu.setTitle(name))
 
 
-    def  buildOtherDisplaysMenu(self, menu, triggerFn):
+    def  buildOtherDisplaysMenu(self, menu, triggerFn, lenMenuName=25):
         '''
         fill the menu with all available displays
         this function of often connected with the menu.aboutToShow signal
@@ -252,9 +252,12 @@ class Tool(QtGui.QToolButton):
 #             if (isinstance(d.widget,self.display.widget.__class__) 
 #                     and d.name() != self.display.name() ):
         for d in self.display.otherDisplaysOfSameType():
-                menu.addAction(d.name()).triggered.connect(
-                        lambda checked, d=d: 
+            a = menu.addAction(d.name())
+            a.triggered.connect( lambda checked, d=d: 
                             triggerFn(d) )
+            a.triggered.connect(lambda checked, d=d:     
+                menu.setTitle(d.name()[:lenMenuName]) )
+            
 
 
     def _checkShowBtnMenu(self):

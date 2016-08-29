@@ -24,11 +24,28 @@ class ExtractBackground(Tool):
             'value':30,
             'limits':[5, 1000]})
 
+        self.pSetEvery = pa.addChild({
+            'name':'Set every',
+            'type':'bool',
+            'value':False,
+            'tip':'Otherwise value calculated as size/3.5'})
+        self.pEvery = self.pSetEvery.addChild({
+            'name':'value',
+            'type':'int',
+            'value':10,
+            'limits':[5, 1000],
+            'visible':False})
+        self.pSetEvery.sigValueChanged.connect(
+                            lambda p,v: self.pEvery.show(v))
+
 
     def activate(self):  
         out = []
         size = self.pSize.value()
-        every = int(size/3.5)
+        if self.pSetEvery.value():
+            every = self.pEvery.value()
+        else:
+            every = int(size/3.5)
         for img in self.display.widget.image:
             out.append(fastNaNmedianFilter(img, ksize=size,every=every))
 

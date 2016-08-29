@@ -9,8 +9,8 @@ from DeconvolutionBalance import DeconvolutionBalance
 tools = ( RelativeSharpness, NoiseLevelFunction, 
           DarkCurrent, FlatField, PointSpreadFunction, 
           DeconvolutionBalance, LensDistortion )
-position='top'
+# position='top'
 secondRow=True
 color='pink'
-show = {'simple':False, 'electroluminescence':True}
+show = {'simple':False, 'advanced':True}
 

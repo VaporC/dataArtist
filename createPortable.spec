@@ -81,7 +81,6 @@ a.datas += [ ('msvcp140.dll', 'C:\\Python27\\Lib\\site-packages\\llvmlite\\bindi
 
 pyz = PYZ(a.pure)
 
-
 #make exe file:
 exe = EXE(pyz,
       a.scripts,
@@ -91,7 +90,8 @@ exe = EXE(pyz,
       strip=None,
       upx=True,#should be disabled for PtQt4 according to https://groups.google.com/forum/#!topic/pyinstaller/GEL1QQfpHLI
       console=False, 
-      icon=os.path.join(pkg_dir,'dataartist','dataArtist','media','logo.ico'))
+      icon=os.path.join(pkg_dir,'dataartist','dataArtist','media','logo.ico')
+      )
 
 #make dist folder:
 dist = COLLECT(exe, 

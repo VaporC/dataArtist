@@ -8,4 +8,4 @@ from ZDenoise import ZDenoise
 from ExtractBackground import ExtractBackground
 
 color='yellow'
-show = {'simple':False, 'electroluminescence':False}
+show = {'simple':False, 'advanced':False}

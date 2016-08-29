@@ -3,4 +3,4 @@ from Selection import Selection
 from SignalToNoise import SignalToNoise
 
 color = 'green'
-show={'simple':False, 'electroluminescence':True}
+show={'simple':False, 'advanced':True}

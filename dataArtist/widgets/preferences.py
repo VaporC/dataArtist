@@ -208,7 +208,7 @@ Changes are only effective after restarting the program.'''
         
         cb = QtGui.QComboBox()
         cb.setToolTip(tt)
-        items = ( 'simple', 'electroluminescence')
+        items = ( 'simple', 'advanced')
         cb.addItems(items)
         try:
             cb.setCurrentIndex(items.index(session.app_opts['profile']))

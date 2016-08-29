@@ -292,6 +292,9 @@ class Workspace(QtGui.QWidget):
         '''
         show tab, symbolActive and the toolbars of the changed display
         '''
+        if (self._last_active_display 
+            and self._last_active_display.name == display.name):
+            return
         if self._last_active_display != display:
             if self._last_active_display:
                 self._last_active_display.label.setSelected(False)
@@ -345,19 +348,80 @@ class Workspace(QtGui.QWidget):
         if d:
             self.changeDisplay(d)
       
-      
+
+
+    def _2dToolbars(self):
+        '''return list of lists of all toolbars in the current workspace
+        e.g. [ [bar1, bar2], #row1
+               [bar3] ]      #row2
+        '''
+        toolbars = sorted(self.gui.findChildren(QtGui.QToolBar), 
+                          key=lambda bar: (bar.pos().y(), bar.pos().x()))  
+        rows = [[]]
+        for bar in  toolbars:
+                if self.gui.toolBarBreak(bar):
+                    rows.append([])
+                if bar.isVisible():
+                    rows[-1].append(bar)
+        rows = [r for r in rows if len(r)] #remove empty rows
+        return rows
+
+ 
+
+    #TODO: only works for TopToolBarArea - make work for others as well
+    #ignore all other positions - only positioning in top bar
+    
+    def addNewToolbar(self, newbar):
+        #find position [right end one toolbar row]
+        #for new toolbars depending on where 
+        #space is available
+        w = self.gui.size().width()
+        needed_space = newbar.width
+        p = QtCore.Qt.TopToolBarArea
+
+        toolbars = self._2dToolbars()
+
+        #there are now toolbars at the moment        
+        if not len(toolbars):
+            return self.gui.addToolBar(p, newbar)
+        
+        avail_space = []
+        for row in toolbars:
+            avail_space.append(w - sum( [ bar.width for bar in row]) )
+
+        #assign position for new toolbar:
+        for row, space in enumerate(avail_space):
+            if space>=needed_space:
+                try:
+                    #add at end of current row
+                    before = toolbars[row+1][0]
+                    self.gui.insertToolBar(before, newbar)
+                    self.gui.removeToolBarBreak(newbar)
+                    self.gui.insertToolBarBreak(before)
+                except IndexError:
+                    #there is no following row
+                    self.gui.addToolBar(p, newbar)
+                return
+        #need to create new row to add toolbar 
+        self.gui.addToolBarBreak(p)
+        self.gui.addToolBar(p, newbar)
+
+ 
     def changeToolBars(self, display):
         '''
         remove old and show new toolbars - if there are selected
         apply position of last display.widget.toolbars
         '''
+        #only show/change toolbars is that button is checked:
+        if not self.gui.menu_toolbars.a_show.isChecked():
+            return 
 
         d = self._last_active_display
-        if d:# and display !=d:
+        if d:
             #save old layout
             for bar in d.widget.toolbars: 
                 if bar.isSelected():  
-                    bar.position = self.gui.toolBarArea(bar)
+#                     bar.position = self.gui.toolBarArea(bar)
                     bar.hasBreak = self.gui.toolBarBreak(bar)
             #save order:
             d.widget.toolbars = sorted(d.widget.toolbars, key=lambda bar:
@@ -377,15 +441,15 @@ class Workspace(QtGui.QWidget):
         
         #add new toolbars:
         for bar in display.widget.toolbars:
-            p = bar.position
-            if p == 0:
-                p = 4
-            self.gui.addToolBar(p, bar)
-            if bar.hasBreak:
-                self.gui.insertToolBarBreak(bar)
-            if not self.gui.menu_toolbars.a_show.isChecked() or not bar.isSelected():
-                bar.hide()
-            else:
+            if bar.isSelected():
+#                 p = bar.position
+                self.gui.addToolBar(QtCore.Qt.TopToolBarArea, bar)
+                if bar.hasBreak:
+                    self.gui.insertToolBarBreak(bar)
+#             if (# not self.gui.menu_toolbars.a_show.isChecked() 
+#                 not bar.isSelected() ):
+#                 bar.hide()
+#             else:
                 bar.show()
 
 
@@ -397,21 +461,24 @@ class Workspace(QtGui.QWidget):
 
 
     def toggleShowSelectedToolbars(self, show):
-        if self._last_active_display is not None:
-            for t in self._last_active_display.widget.toolbars:
-                if show and t.isSelected():
-                    t.show()
-                else:
+        if show:
+            self.changeToolBars(self.getCurrentDisplay())
+        else:
+            if self._last_active_display is not None:
+                for t in self._last_active_display.widget.toolbars:
+#                 if show and t.isSelected():
+#                     t.show()
+#                 else:
                     t.hide()
 
 
-    def addTableDock(self, name=None, text=None):
+    def addTableDock(self, name=None, text=None, array=None):
         '''
         add a new table to the dock area
         '''
         if name is None:
             name = 'table %s' %(len(self.tables())+1)
-        d = DockTable(name=name, text=text)
+        d = DockTable(name=name, text=text, array=array)
         self.area_middle.addDock(d)
         return d
     

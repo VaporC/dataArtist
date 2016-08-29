@@ -9,16 +9,16 @@ import inspect
 #from ToolMod2 import ToolCls2 
 #
 #position='top',
-#show=True, # OR {"simple":True,"electroluminescence":False}
+#show=True, # OR {"simple":True,"advanced":False}
 #secondRow=False,#show tools normally in first toolbar row
 #tools=set(ToolCls1, Toolcls2 ...) #to define tool position in toolbar
 #color=None OR 'red' ...
 ############################
 
-TO_QT_POSITION = {'top':QtCore.Qt.TopToolBarArea,
-                  'left':QtCore.Qt.LeftToolBarArea,
-                  'right':QtCore.Qt.RightToolBarArea,
-                  'bottom':QtCore.Qt.BottomToolBarArea}
+# TO_QT_POSITION = {'top':QtCore.Qt.TopToolBarArea,
+#                   'left':QtCore.Qt.LeftToolBarArea,
+#                   'right':QtCore.Qt.RightToolBarArea,
+#                   'bottom':QtCore.Qt.BottomToolBarArea}
 
 
 def build(widget):
@@ -70,13 +70,24 @@ class _ToolBar(QtGui.QToolBar):
 
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._openContextMenu)
-    
+        #make ToolBar smaller:
+        self.setIconSize(QtCore.QSize(16,16))
+        self.layout().setContentsMargins(0,0,0,0)
+        self.setAllowedAreas(QtCore.Qt.TopToolBarArea)
+        
+        #measure toolbar width in order to find best place when added
+        self.width = 9 #9=handle width
+        
+        # whether position of toolbar should be 
+        #found depending on available space:
+#         self.needPositioning = False 
+
         name[0].islower()
         f = name[0]
         if f.islower():
             name = f.upper() + name[1:]
-        
         self.name = name
+        
         self.widget = widget
         self.toolClasses = toolClasses
         self._toolsCreated = False
@@ -90,9 +101,9 @@ class _ToolBar(QtGui.QToolBar):
             profile = session.app_opts.get('profile',None)
             show = show.get(profile, False)
         if self.widget.__class__.selectedToolbars.get(name, None) is None:
-            self.widget.__class__.selectedToolbars[name] = [
-                            show,
-                            TO_QT_POSITION[getattr(pkg, 'position','top')], 
+            self.widget.__class__.selectedToolbars[name] = [show,
+#                             QtCore.Qt.TopToolBarArea, 
+#                             TO_QT_POSITION[getattr(pkg, 'position','top')], 
                             False]#->hasBreak
 
 #         #add logo to toolbar:
@@ -130,34 +141,45 @@ class _ToolBar(QtGui.QToolBar):
             self.setPalette(p)
             self.setAutoFillBackground(True)
 
-        self.actionSelect = QtGui.QAction(name, self)
-        self.actionSelect.setCheckable(True)
-        self.actionSelect.setChecked(show)
-        self.actionSelect.triggered.connect(self.setSelected)
+        self.actionSelect = a = QtGui.QAction(name, self)
+        s = 'contains...'
+        for cls in self.toolClasses:
+            s += '\n     %s' %cls.__name__
+        a.setToolTip(s)
+        a.setCheckable(True)
+        a.setChecked(show)
+        a.triggered.connect(self.setSelected)
+
+#         if self.isSelected:
+#             self.addTools()
 
 
-    @property
-    def position(self):
-        return self.widget.__class__.selectedToolbars[self.name][1]
-    @position.setter
-    def position(self, val):
-        if val == QtCore.Qt.NoToolBarArea:
-            val = QtCore.Qt.TopToolBarArea
-        self.widget.__class__.selectedToolbars[self.name][1] = val  
+#     @property
+#     def position(self):
+#         p = self.widget.__class__.selectedToolbars[self.name][1]
+#         if p == QtCore.Qt.NoToolBarArea:
+#             return QtCore.Qt.LeftToolBarArea
+#         return p
+#     @position.setter
+#     def position(self, val):
+#         if val == QtCore.Qt.NoToolBarArea:
+#             val = QtCore.Qt.TopToolBarArea
+#         self.widget.__class__.selectedToolbars[self.name][1] = val  
 
 
     @property
     def hasBreak(self):
-        return self.widget.__class__.selectedToolbars[self.name][2]
+        return self.widget.__class__.selectedToolbars[self.name][1]
     @hasBreak.setter
     def hasBreak(self, val):
-        self.widget.__class__.selectedToolbars[self.name][2] = val  
+        self.widget.__class__.selectedToolbars[self.name][1] = val  
 
 
     def _openContextMenu(self, pos):
+        #show toolbar name and action[remove] on right click
         m = QtGui.QMenu()
         #title:
-        a = QtGui.QAction(self.name, self)
+        a = QtGui.QAction('Toolbar:   %s' %self.name, self)
         a.setSoftKeyRole(QtGui.QAction.NoSoftKey)
         f = a.font()
         f.setBold(True)
@@ -179,10 +201,21 @@ class _ToolBar(QtGui.QToolBar):
                     self.widget.tools[cls.__name__] = tool
                     #ADD TOOL
                     self.addWidget(tool)
+                    if tool.popupMode() == QtGui.QToolButton.MenuButtonPopup:
+                        self.width += 39 #[px] - tool is wider if drop down button is shown
+                    else:
+                        self.width += 27 #px
                 except Exception:
                     print "ERROR loading toolbutton: ", traceback.print_exc()
             self._toolsCreated = True
    
+    
+#     def width(self):
+#         h = 4 #width of a toolbar handle
+#         t = 35 #tool width - assume every 2nd has drop down menu
+#         w = 0
+#         for 
+#         h+len(bar.toolClasses)*t
     
     def removeTools(self):
         #REMOVE TOOL TO FREE SOME MEMORY
@@ -202,12 +235,13 @@ class _ToolBar(QtGui.QToolBar):
             del toolAction
 
         self._toolsCreated = False
+        self.width = 9
                   
   
     def show(self):
         #ensure that all tools are loaded:
-        QtGui.QToolBar.show(self)
         self.addTools()
+        QtGui.QToolBar.show(self)
 
  
 #     def hide(self):
@@ -236,9 +270,15 @@ class _ToolBar(QtGui.QToolBar):
         if select:
             #self.addTools()
 #             if not self._toolsCreated:
+#             self.needPositioning = True
+            self.addTools()
+            self.widget.display.workspace.addNewToolbar(self)
             self.show()
+
         else:
-            self.hide()
+#             self.hide()
+
+            self.widget.display.workspace.gui.removeToolBar(self)
             self.removeTools()
 
 

@@ -37,15 +37,33 @@ class CorrectCamera(Tool):
         self.createResultInDisplayParam(pa)
 
         self.pAllLayers  = pa.addChild({
-            'name':'Execute on all layers',
-            'type':'bool',
-            'value':True})
+            'name':'Execute on',
+            'type':'list',
+            'value':'all layers average',
+            'tip': '''
+all layers: 
+        average: all images are averaged and single time effects (STE) are removed
+        indiviual: all images are corrected, no averaging, no ste removal
+pair of two layers: every next 2 image are averaged and STE removed
+current layer: only the current image is taken - no average, no STE removal
+                    ''',
+            'limits':['current layer', 
+                      'all layers average',
+                      'all layers individual',
+                       'pair of two layers']})
 
-        self.pSTEremoval  = pa.addChild({
-            'name':'Single-time-effect removal',
-            'type':'bool',
-            'value':False,
-            'tip':'Averages every two images in a row in this display'})
+#         ps = self.pSTEremoval  = pa.addChild({
+#             'name':'Single-time-effect removal',
+#             'type':'bool',
+#             'value':False,
+#             'tip':'Averages every two images in a row in this display'})
+#         
+#         self.pAllLayers.sigValueChanged.connect(lambda p,v:
+#             ps.setOpts(value=True, readonly=True) 
+#             if v == 'all layers' 
+#             else ps.setOpts(readonly=False))
+#         self.pAllLayers.setValue(True)
+        
 
         self.pDeblur  = pa.addChild({
             'name':'Deblur',
@@ -67,7 +85,7 @@ class CorrectCamera(Tool):
         self.pBgMethod  = pa.addChild({
             'name':'Background',
             'type':'list',
-            'value':'calculate',
+            'value':'from display',
             'limits': ['calculate', 'from display']})
         self.pBgMethod.sigValueChanged.connect(self._pBgMethodChanged) 
 
@@ -77,20 +95,28 @@ class CorrectCamera(Tool):
             'value':10,
             'suffix': 's', 
             'siPrefix':True,
+            'visible':False,
              'limits':[0,1e6]})
 
         self.pBgFromDisplay  = self.pBgMethod.addChild({
             'name':'From display',
             'type':'menu',
-            'value':'[Choose]',
-            'visible':False})
-        self.pBgFromDisplay.aboutToShow.connect(self._buildBgFromDisplayMenu)
+            'value':'-'})
+        self.pBgFromDisplay.aboutToShow.connect(
+#                                 self._buildBgFromDisplayMenu)
+
+                lambda m, fn=self._setBGDisplay:
+                            self.buildOtherDisplaysMenu(
+                                    m,fn))
+
+
 
         self.pThreshold  = pa.addChild({
             'name':'Artifact removal threshold',
             'type':'float',
-            'value':0.2,
-            'tip':'Set to 0 to disable artifact removal'})
+            'value':0.0,
+            'limits':[0.,1.],
+            'tip':'Increase value to increase filter effect'})
 
 #         self.pUncertainty  = pa.addChild({
 #             'name':'Return correction uncertainty',
@@ -99,7 +125,16 @@ class CorrectCamera(Tool):
 
 
     def _updatepCal(self):
-        self.pCalName.setValue( self.calFileTool.pCal.value() )
+        v = self.calFileTool.pCal.value()
+        self.pCalName.setValue( v )
+        hasCal =  v != '-'
+        self.pDeblur.show(hasCal)
+        self.pDenoise.show(hasCal)
+        self.pKeepSize.show(hasCal)
+        if hasCal:
+            self.pBgMethod.setOpts(readonly=False)
+        else:
+            self.pBgMethod.setOpts(value= 'from display',readonly=True)
 
 
     def _pBgMethodChanged(self, param, value):
@@ -112,21 +147,25 @@ class CorrectCamera(Tool):
         else:
             self.pBgFromDisplay.show()
             self.pBgExpTime.hide()
- 
+     
+     
+    def _setBGDisplay(self, display):
+        self._bgDisplay = display
 
-    def _buildBgFromDisplayMenu(self, menu):
-        '''
-        add an action for all layers of other ImageDisplays
-        '''
-        menu.clear()
-        for d in self.display.workspace.displays():
-            if (d.widget.__class__ == self.display.widget.__class__ 
-                and d != self.display):
-                a = menu.addAction(d.name())
-                a.triggered.connect(
-                    lambda checked, d=d: 
-                        [menu.setTitle(d.name()[:20]),
-                        self.__setattr__('_bgDisplay', d)] )
+
+#     def _buildBgFromDisplayMenu(self, menu):
+#         '''
+#         add an action for all layers of other ImageDisplays
+#         '''
+#         menu.clear()
+#         for d in self.display.workspace.displays():
+#             if (d.widget.__class__ == self.display.widget.__class__ 
+#                 and d.name() != self.display.name()):
+#                 a = menu.addAction(d.name())
+#                 a.triggered.connect(
+#                     lambda checked, d=d: 
+#                         [menu.setTitle(d.name()[:20]),
+#                         self.__setattr__('_bgDisplay', d)] )
 
 
     def activate(self):        
@@ -140,43 +179,58 @@ class CorrectCamera(Tool):
         w = self.display.widget
         im = w.image
         
-        if not self.pAllLayers.value():
-            im = [im[w.currentIndex]]
-        
         out = []
         
         #CHECK SETUP:
-        if self.pCalName.value() =='-':# is None:
-            raise Exception('no calibration file given')
+#         if self.pCalName.value() =='-':# is None:
+#             raise Exception('no calibration file given')
         #GET VARIABLES:
+        bgImages = None
+        exposureTime = None
         if self.pBgMethod.value() == 'calculate':
             exposureTime = self.pBgExpTime.value()
-            bgImages = None
-        else:
-            exposureTime = None
+        elif self.pBgFromDisplay.value() != '-': 
             bgImages  = self._bgDisplay.widget.image
-            if len(bgImages)==1:
-                bgImages = bgImages[0]
+#             if len(bgImages)==1:
+#                 bgImages = bgImages[0]
 
-        ste = self.pSTEremoval.value()
-        if ste:
-            if len(im) %2 != 0:
-                raise Exception('need an even number of images (min 2) for STE removal')        
-            c = 2
-        else:
-            c = 1
+#         if not self.pAllLayers.value():
+#             im = [im[w.currentIndex]]
 
-        for i in range(0,len(im),c):
-            if ste:
-                im1 = im[i]
-                im2 = im[i+1]
-            else:
-                im1 = im[i]
-                im2 = None
+        l = len(im)
+        wc = w.currentIndex
+                                    #start, stop,step
+        c = {'current layer':       (wc, wc+1, 1),
+             'all layers average':  (0,  l+1,  l),
+             'all layers individual':(0, l,    1),
+             'pair of two layers':   (0, l,    2)}[
+                                    self.pAllLayers.value()]
+
+
+#         ste = self.pSTEremoval.value()
+#         if ste:
+#             if len(im) %2 != 0:
+#                 raise Exception('need an even number of images (min 2) for STE removal')        
+#             c = 2
+#         else:
+#             c = 1
+
+
+        r = range(*c)
+
+#         for i in range(0,len(im),c):
+#             if ste:
+#                 im1 = im[i]
+#                 im2 = im[i+1]
+#             else:
+#                 im1 = im[i]
+#                 im2 = None
+
+        for i in range(len(r)-1):
+            
 
             out.append( self.calFileTool.correct(
-                                image1=im1, 
-                                image2=im2,
+                                images=im[r[i]:r[i+1]], 
                                 exposure_time=exposureTime, 
                                 bgImages=bgImages, 
                                 threshold=self.pThreshold.value(),

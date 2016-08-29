@@ -85,6 +85,20 @@ class ImageWidget(DisplayWidget, ImageView, PyqtgraphgDisplayBase):
             self.updateView()
 
 
+    @staticmethod
+    def getNLayers(data):
+        s = data.shape
+        l = data.ndim
+        if l == 2:
+            return 1
+        if l == 3:
+            if s[-1] in (3,4):
+                return 1
+        if l == 4:
+            if s[-1] in (3,4):
+                return s[0]
+        return 0
+
     def close(self):
         self.clear()#free memory
         try:

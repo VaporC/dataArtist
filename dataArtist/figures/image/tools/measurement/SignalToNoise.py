@@ -166,6 +166,7 @@ class SignalToNoise(Tool):
                         self.outDisplay =  self.display.workspace.addDisplay(
                                 origin=self.display,
                                 data=[snr], 
-                                title='Signal-to-Noise ratio')
+                                title='Signal-to-Noise ratio (avg=%s[%s])' %(
+                                                                avg,unit))
                     else:
                         self.outDisplay.addLayer(data=snr, origin=self.display, index=n)

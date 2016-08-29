@@ -11,4 +11,4 @@ tools = ( CorrectCamera, PerspectiveCorrection,
 # position='right'
 secondRow=True
 color='red'
-show = {'simple':False, 'electroluminescence':True}
+show = {'simple':False, 'advanced':True}

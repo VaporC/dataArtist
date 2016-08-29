@@ -1,7 +1,6 @@
+import numpy as np
 from pyqtgraph.Qt import QtGui
-
 from dataArtist.widgets.Tool import Tool
-
 from imgProcessor.signal import signalRange
 
 
@@ -37,36 +36,51 @@ class Colorbar(Tool):
             'type': 'action'})
         pFit.sigActivated.connect(self._fit)
 
-
         pLevels = pa.addChild({
             'name': 'autoLevels',
             'type': 'bool',
             'value':w.opts['autoLevels']})
-        
+        pLevels.sigValueChanged.connect(lambda param, value: 
+                w.setOpts(autoLevels=value))
+         
         pRange = pa.addChild({
             'name': 'autoHistogramRange',
             'type': 'bool',
             'value':w.opts['autoHistogramRange']})
+        pRange.sigValueChanged.connect(lambda param, value: 
+                w.setOpts(autoHistogramRange=value))  
         
         self.pPrintView = pa.addChild({
             'name': 'print view',
             'type': 'bool',
             'value':False})
-        
+        self.pPrintView.sigValueChanged.connect(lambda param, value: 
+               w.setHistogramPrintView(value, pShowHist.value()))  
+                
         pShowHist = self.pPrintView.addChild({
             'name': 'show histogram',
             'type': 'bool',
             'value':False})        
-   
-        pLevels.sigValueChanged.connect(lambda param, value: 
-                self.display.widget.setOpts(autoLevels=value))
-        pRange.sigValueChanged.connect(lambda param, value: 
-                self.display.widget.setOpts(autoHistogramRange=value))                
-        self.pPrintView.sigValueChanged.connect(lambda param, value: 
-                self.display.widget.setHistogramPrintView(
-                                        value, pShowHist.value()))        
-        pShowHist.sigValueChanged.connect(self._pShowHistChanged)        
+        pShowHist.sigValueChanged.connect(self._pShowHistChanged)  
+        
+        pLog = pa.addChild({
+            'name': 'Transform to base 10 logarithm',
+            'tip':'The absolute is taken to include negative values as well',
+            'type': 'action'})
+        pLog.sigActivated.connect(self._log10)
 
+   
+    def _log10(self):
+        d = self.display
+        w = d.widget
+        img = np.abs(w.image)
+        img = np.log10(img)
+#         img[np.logical_or(np.isnan(img), np.isinf(img))]=0
+        img[np.isinf(img)]=0 # no NaN any more because no negate values in img
+        
+        d.backupChangedLayer(changes='Transform to  base 10 logarithm')
+        w.update(img)
+        w.updateView()
 
 
     def _buildLinkColorbar(self, menu):

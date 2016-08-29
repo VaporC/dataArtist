@@ -10,9 +10,6 @@ from IsColor import IsColor
 from SwitchBetweenGridAndStackedView import SwitchBetweenGridAndStackedView
 
 color = 'blue'
-#position = 'right'
 show = True
-
-
 tools = ( LockView, Colorbar, Axes, TimeLine,
           Transform, IsColor, Overlay,SwitchBetweenGridAndStackedView)

@@ -12,11 +12,11 @@ class Legend(Tool):
         Tool.__init__(self, plotDisplay)
 
         pa = self.setParameterMenu() 
-
+        l = self.display.widget.view.legend 
         pFrame = pa.addChild({
             'name':'Show frame',
             'type':'bool',
-            'value':True})
+            'value':l.drawFrame})
         pFrame.sigValueChanged.connect(self._drawFrame) 
         
         pOrientation = pa.addChild({
@@ -24,7 +24,7 @@ class Legend(Tool):
             'type':'int',
             'value':1})
         pOrientation.sigValueChanged.connect(lambda param, value: 
-                    self.display.widget.view.legend.setColumnCount(value)) 
+                    l.setColumnCount(value)) 
 
         self.setChecked(True)
         

@@ -55,6 +55,16 @@ class GridROI(pg.ROI):
         self.addRotateHandle([0.5, 1], [0.5,0.5])
 
 
+    def getCellParameters(self, array, fn=np.mean):
+        out = np.arange(len(self.cells), 
+                        dtype=float).reshape(self.opts['grid'])
+        s = array.shape
+        for (i,j),n in np.ndenumerate(out):
+            m = self.cells[int(n)].getMask(s)
+            out[i,j] = fn(array[m])
+        return out
+
+
     def saveState(self):
         s = pg.ROI.saveState(self)
         o = self.opts
@@ -413,7 +423,8 @@ class CircleROI(_CellBase, pg.EllipseROI):
     def __init__(self, *args,**kwargs):
 
         pg.ROI.__init__(self, *args, **kwargs)
-        _CellBase.__init__(self, *args, **kwargs)        
+        _CellBase.__init__(self, *args, **kwargs) 
+        self._ratioEllispeRectangle = 1 #only changed in CellPseudoSquareROI     
 
 
     def setScaleCell(self):

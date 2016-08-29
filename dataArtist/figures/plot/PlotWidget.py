@@ -55,6 +55,16 @@ class PlotWidget(DisplayWidget, pgPlotWidget, PyqtgraphgDisplayBase):
                 lambda index, txt, self=self: self.curves[index].label.setText(txt))
 
 
+    @staticmethod
+    def getNLayers(data):
+        s = data.shape
+        l = data.ndim
+        if l == 1:
+            return s[0]
+        if l == 2:
+            return s[0]
+        return 0
+
 
     def saveState(self):
         state = DisplayWidget.saveState(self)

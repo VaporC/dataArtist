@@ -451,12 +451,19 @@ Click on 'Done Add' to stop drawing
             'type':'int',
             'value':5,
             'limits':[1,1000]})
-         
-        pShape = param.addChild({
+        
+        pShape = pCells.addChild({
             'name':'Shape',
             'type':'list',
             'value':'rect',
             'limits':['Rect','Circle', 'Pseudosquare']}) 
+
+        pAvgCellInt = param.addChild({
+            'name':'Return average cell intensity',
+            'type':'action'}) 
+        pAvgCellInt.sigActivated.connect(lambda param, p=path:
+                                         self._showCellAverage(p))
+
  
         pRatio = pShape.addChild({
             'name':'Ratio Circle/Square',
@@ -477,6 +484,13 @@ Click on 'Done Add' to stop drawing
                         [c.setRatioEllispeRect(v) for c in grid.cells])
         return path
 
+
+    def _showCellAverage(self, path):
+        for n, img in enumerate(self.display.widget.image):
+            avg = path.getCellParameters(img).T
+            self.display.workspace.addTableDock(
+                            name='layer %s' %n, array=avg)
+        
 
 
 class _Rect(pg.ROI):
